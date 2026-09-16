@@ -197,15 +197,15 @@ export function HomeView() {
             position: 'absolute',
             pointerEvents: 'none',
             backgroundImage: `
-              linear-gradient(180deg, rgba(9,47,33,0.18) 0%, rgba(9,47,33,0.58) 56%, ${theme.palette.secondary.main} 100%),
-              linear-gradient(90deg, rgba(5,37,24,0.94) 0%, rgba(18,61,43,0.58) 48%, rgba(5,37,24,0.84) 100%),
+              linear-gradient(180deg, rgba(9, 46, 82, 0.18) 0%,rgba(9, 46, 82, 0.58)  56%, ${theme.palette.secondary.main} 100%),
+              linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.58) 48%, rgba(7, 5, 37, 0.84) 100%),
               linear-gradient(0deg, rgba(217,181,109,0.08), rgba(217,181,109,0.08))
             `,
           }}
         />
 
         <Box sx={{ mx: 'auto', maxWidth: 1280, position: 'relative', zIndex: 2 }}>
-          <Box sx={{ maxWidth: 800 }}>
+          <Box sx={{ maxWidth: 700 ,alignItems: 'center', display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
             <Image
               alt="Single logo"
               sx={{ width: 400 }}
@@ -226,7 +226,11 @@ export function HomeView() {
             <Typography variant="h2" mt={2}>มีบุญคูณ แกลเลอรี่</Typography>
 
             <Typography variant="h5" mt={2}>
-              บ้านเหล่า พยัคฆภูมิพิสัย จังหวัดมหาสารคาม 
+              บ้านเหล่า  ตำบลเม็กดำ พยัคฆภูมิพิสัย จังหวัดมหาสารคาม 
+            </Typography>
+
+             <Typography variant="h5" mt={2}>
+              โทร 098-630-4174 (คุณปาม)
             </Typography>
           </Box>
 
@@ -389,7 +393,7 @@ export function HomeView() {
           py: { xs: 7, md: 10 },
           minHeight: 800,
           backgroundImage: `
-            linear-gradient(0deg, ${theme.palette.primary.main} 10%, rgba(9,47,33,0.64) 48%, ${theme.palette.secondary.main} 100%),
+            linear-gradient(0deg, ${theme.palette.primary.main} 10%, rgba(9, 46, 82, 0.64) 48%, ${theme.palette.secondary.main} 100%),
             linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
             url(${SCENES_1_IMAGE})
           `,
@@ -507,9 +511,9 @@ export function HomeView() {
           py: { xs: 8, md: 12 },
           minHeight: 670,
           backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9,47,33,0.64) 32%, ${theme.palette.primary.main} 100%),
-            linear-gradient(90deg, rgba(5,37,24,0.94) 0%, rgba(18,61,43,0.48) 52%, rgba(5,37,24,0.9) 100%),
-            linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
+            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9, 46, 82, 0.64) 32%, ${theme.palette.primary.main} 100%),
+            linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.48) 52%, rgba(7, 5, 37, 0.9) 100%),
+            linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
             url(${KRU_IMAGE})
           `,
           backgroundSize: 'cover',
@@ -634,9 +638,9 @@ export function HomeView() {
           py: { xs: 8, md: 12 },
           minHeight: 800,
           backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9,47,33,0.64) 32%, ${theme.palette.primary.main} 100%),
-            linear-gradient(90deg, rgba(5,37,24,0.94) 0%, rgba(18,61,43,0.48) 52%, rgba(5,37,24,0.9) 100%),
-            linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
+            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9, 46, 82, 0.64) 32%, ${theme.palette.primary.main} 100%),
+            linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.48) 52%, rgba(7, 5, 37, 0.9) 100%),
+            linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
             url(${SCENES_IMAGE})
           `,
           backgroundSize: 'cover',
