@@ -106,6 +106,16 @@ export const EditorRoot = styled('div')(({ theme }) => ({
         },
       },
       /**
+       * Mention
+       */
+      [`& .${editorClasses.content.mention}`]: {
+        padding: '0 4px',
+        borderRadius: 4,
+        fontWeight: theme.typography.fontWeightSemiBold,
+        color: theme.vars.palette.primary.main,
+        backgroundColor: varAlpha(theme.vars.palette.primary.mainChannel, 0.08),
+      },
+      /**
        * Lists
        */
       [`& .${editorClasses.content.bulletList}`]: {

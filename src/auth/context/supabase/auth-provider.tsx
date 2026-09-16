@@ -5,9 +5,6 @@ import type { AuthState } from '../../types';
 import { useSetState } from 'minimal-shared/hooks';
 import { useMemo, useEffect, useCallback } from 'react';
 
-import axios from 'src/lib/axios';
-import { supabase } from 'src/lib/supabase';
-
 import { AuthContext } from '../auth-context';
 
 // ----------------------------------------------------------------------
@@ -27,26 +24,10 @@ export function AuthProvider({ children }: Props) {
 
   const checkUserSession = useCallback(async () => {
     try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      const response = await fetch('/api/auth/session/', { credentials: 'include' });
+      const { user } = await response.json();
 
-      if (error) {
-        setState({ user: null, loading: false });
-        console.error(error);
-        throw error;
-      }
-
-      if (session) {
-        const accessToken = session?.access_token;
-
-        setState({ user: { ...session, ...session?.user }, loading: false });
-        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-      } else {
-        setState({ user: null, loading: false });
-        delete axios.defaults.headers.common.Authorization;
-      }
+      setState({ user, loading: false });
     } catch (error) {
       console.error(error);
       setState({ user: null, loading: false });
@@ -70,8 +51,7 @@ export function AuthProvider({ children }: Props) {
         ? {
             ...state.user,
             id: state.user?.id,
-            accessToken: state.user?.access_token,
-            displayName: state.user?.user_metadata.display_name,
+            displayName: state.user?.user_metadata?.display_name || state.user?.email,
             role: state.user?.role ?? 'admin',
           }
         : null,

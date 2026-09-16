@@ -56,6 +56,22 @@ export function fCurrency(inputValue: InputNumberValue, options?: Options) {
 
 // ----------------------------------------------------------------------
 
+/** Formats as Thai Baht regardless of the active UI locale — for business documents (quotations). */
+export function fBaht(inputValue: InputNumberValue, options?: Options) {
+  const number = processInput(inputValue);
+  if (number === null) return '';
+
+  return new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    ...options,
+  }).format(number);
+}
+
+// ----------------------------------------------------------------------
+
 export function fPercent(inputValue: InputNumberValue, options?: Options) {
   const locale = formatNumberLocale() || DEFAULT_LOCALE;
 

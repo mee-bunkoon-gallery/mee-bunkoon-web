@@ -1,7 +1,10 @@
+import 'dayjs/locale/th';
+
 import type { Dayjs, OpUnitType } from 'dayjs';
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 // ----------------------------------------------------------------------
@@ -27,6 +30,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(buddhistEra);
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +38,7 @@ export type DateInput = Dayjs | Date | string | number | null | undefined;
 
 export const FORMAT_PATTERNS = {
   dateTime: 'DD MMM YYYY h:mm a', // 17 Apr 2022 12:00 am
-  date: 'DD MMM YYYY', // 17 Apr 2022
+  date: 'DD MMM BBBB', // 17 เม.ย. 2565
   time: 'h:mm a', // 12:00 am
   split: {
     dateTime: 'DD/MM/YYYY h:mm a', // 17/04/2022 12:00 am
@@ -77,7 +81,7 @@ export function fDateTime(input: DateInput, template = FORMAT_PATTERNS.dateTime)
  * Formats a date string.
  * @returns Formatted date string or 'Invalid'.
  * @example
- * fDate('17-04-2022') // '17 Apr 2022'
+ * fDate('17-04-2022') // '17 เม.ย. 2565'
  */
 export function fDate(input: DateInput, template = FORMAT_PATTERNS.date): string {
   if (!input) return '';
@@ -85,7 +89,7 @@ export function fDate(input: DateInput, template = FORMAT_PATTERNS.date): string
   const date = dayjs(input);
   if (!date.isValid()) return INVALID_DATE;
 
-  return date.format(template);
+  return date.locale('th').format(template);
 }
 
 // ----------------------------------------------------------------------

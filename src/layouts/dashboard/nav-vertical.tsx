@@ -3,8 +3,8 @@ import type { NavSectionProps } from 'src/components/nav-section';
 
 import { varAlpha, mergeClasses } from 'minimal-shared/utils';
 
-import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
+import { Box, Stack, Typography } from '@mui/material';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -42,9 +42,23 @@ export function NavVertical({
   const renderNavVertical = () => (
     <>
       {slots?.topArea ?? (
-        <Box sx={{ pl: 3.5, pt: 2.5, pb: 1 }}>
-          <Logo />
-        </Box>
+        <Stack
+          spacing={2}
+          sx={{
+            pl: 3.5,
+            py: 2,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignContent: 'center',
+          }}
+        >
+          <Logo sx={{ width: 60, height: 60 }} />
+          <Stack mt={1}>
+            <Typography variant="subtitle1">มีบุญคูณ แกลเลอรี่</Typography>
+            <Typography variant="body2">MEE BUNKOON GALLERY</Typography>
+          </Stack>
+        </Stack>
       )}
 
       <Scrollbar fillContent>

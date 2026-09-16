@@ -1,3 +1,4 @@
+import type { Extensions } from '@tiptap/core';
 import type { BoxProps } from '@mui/material/Box';
 import type { Theme, SxProps } from '@mui/material/styles';
 import type { Editor, UseEditorOptions } from '@tiptap/react';
@@ -15,6 +16,8 @@ export type EditorProps = UseEditorOptions & {
   placeholder?: string;
   helperText?: React.ReactNode;
   onChange?: (value: string) => void;
+  /** Extra extensions appended to the default set, e.g. a domain-specific mention extension. */
+  extraExtensions?: Extensions;
   slotProps?: {
     wrapper?: BoxProps;
   };

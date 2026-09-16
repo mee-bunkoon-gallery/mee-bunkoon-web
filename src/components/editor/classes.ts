@@ -34,6 +34,7 @@ export const editorClasses = {
     root: createClasses('editor__content__root'),
     link: createClasses('editor__content__link'),
     image: createClasses('editor__content__image'),
+    mention: createClasses('editor__content__mention'),
     codeInline: createClasses('editor__content__code'),
     heading: createClasses('editor__content__heading'),
     listItem: createClasses('editor__content__listItem'),

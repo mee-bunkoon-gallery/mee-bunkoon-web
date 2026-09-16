@@ -137,6 +137,48 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}/edit`,
       },
     },
+    customer: {
+      root: `${ROOTS.DASHBOARD}/customers`,
+    },
+    service: {
+      root: `${ROOTS.DASHBOARD}/services`,
+    },
+    colorTheme: {
+      root: `${ROOTS.DASHBOARD}/color-themes`,
+    },
+    quotation: {
+      root: `${ROOTS.DASHBOARD}/quotations`,
+      new: `${ROOTS.DASHBOARD}/quotations/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/quotations/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/quotations/${id}/edit`,
+    },
+    contract: {
+      root: `${ROOTS.DASHBOARD}/contracts`,
+      new: `${ROOTS.DASHBOARD}/contracts/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/contracts/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/contracts/${id}/edit`,
+    },
+    payment: {
+      root: `${ROOTS.DASHBOARD}/payments`,
+      new: `${ROOTS.DASHBOARD}/payments/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/payments/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/payments/${id}/edit`,
+    },
+    delivery: {
+      root: `${ROOTS.DASHBOARD}/deliveries`,
+      new: `${ROOTS.DASHBOARD}/deliveries/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/deliveries/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/deliveries/${id}/edit`,
+    },
+    jobQueue: {
+      root: `${ROOTS.DASHBOARD}/job-queue`,
+      new: `${ROOTS.DASHBOARD}/job-queue/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/job-queue/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/job-queue/${id}/edit`,
+    },
+    settings: {
+      company: `${ROOTS.DASHBOARD}/settings/company`,
+    },
     post: {
       root: `${ROOTS.DASHBOARD}/post`,
       new: `${ROOTS.DASHBOARD}/post/new`,

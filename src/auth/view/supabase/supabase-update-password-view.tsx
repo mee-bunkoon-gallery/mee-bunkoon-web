@@ -67,7 +67,15 @@ export function SupabaseUpdatePasswordView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await updatePassword({ password: data.password });
+      // Supabase's recovery email link redirects here with the session tokens
+      // in the URL fragment (`#access_token=...&refresh_token=...`), which is
+      // never sent to a server automatically — forward them to the API so it
+      // can establish the session before updating the password.
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = hashParams.get('access_token') ?? undefined;
+      const refreshToken = hashParams.get('refresh_token') ?? undefined;
+
+      await updatePassword({ password: data.password, accessToken, refreshToken });
 
       router.push(paths.dashboard.root);
     } catch (error) {

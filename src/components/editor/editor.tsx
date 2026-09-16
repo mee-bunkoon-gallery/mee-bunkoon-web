@@ -39,6 +39,7 @@ export function Editor({
   editable = true,
   fullItem = false,
   immediatelyRender = false,
+  extraExtensions = [],
   ref: contentRef,
   value: initialContent = '',
   placeholder = 'Write something awesome...',
@@ -93,6 +94,7 @@ export function Editor({
       // Custom extensions
       TextTransformExtension,
       ClearFormatExtension,
+      ...extraExtensions,
     ],
     ...other,
   });

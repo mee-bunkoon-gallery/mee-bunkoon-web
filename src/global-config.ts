@@ -26,13 +26,12 @@ export type ConfigValue = {
   };
   amplify: { userPoolId: string; userPoolWebClientId: string; region: string };
   auth0: { clientId: string; domain: string; callbackUrl: string };
-  supabase: { url: string; key: string };
 };
 
 // ----------------------------------------------------------------------
 
 export const CONFIG: ConfigValue = {
-  appName: 'Minimal UI',
+  appName: 'MEE BUNKOON GALLERY',
   appVersion: packageJson.version,
   serverUrl: process.env.NEXT_PUBLIC_SERVER_URL ?? '',
   assetsDir: process.env.NEXT_PUBLIC_ASSETS_DIR ?? '',
@@ -42,7 +41,7 @@ export const CONFIG: ConfigValue = {
    * @method jwt | amplify | firebase | supabase | auth0
    */
   auth: {
-    method: 'jwt',
+    method: 'supabase',
     skip: false,
     redirectPath: paths.dashboard.root,
   },
@@ -73,12 +72,5 @@ export const CONFIG: ConfigValue = {
     clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID ?? '',
     domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN ?? '',
     callbackUrl: process.env.NEXT_PUBLIC_AUTH0_CALLBACK_URL ?? '',
-  },
-  /**
-   * Supabase
-   */
-  supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
-    key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
   },
 };
