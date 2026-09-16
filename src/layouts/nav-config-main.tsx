@@ -6,15 +6,15 @@ import { Iconify } from 'src/components/iconify';
 
 export const navData: NavMainProps['data'] = [
   {
-    title: 'อรรคฮาตสี',
+    title: 'มีบุญคูณ แกลเลอรี่',
     path: '/',
     icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
   },
-  // {
-  //   title: 'Components',
-  //   path: paths.components,
-  //   icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
-  // },
+  {
+    title: 'คิวงาน',
+    path: '/',
+    icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
+  },
   // {
   //   title: 'Pages',
   //   path: '/pages',

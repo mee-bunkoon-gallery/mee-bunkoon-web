@@ -181,7 +181,7 @@ export function HomeView() {
           {HERO_IMAGE.map((src, index) => (
             <Image
               key={src}
-              alt={`Akhahas'sri hero ${index + 1}`}
+              alt={`MEE BUNKOON GALLERY hero ${index + 1}`}
               src={src}
               visibleByDefault
               disablePlaceholder
@@ -205,27 +205,29 @@ export function HomeView() {
         />
 
         <Box sx={{ mx: 'auto', maxWidth: 1280, position: 'relative', zIndex: 2 }}>
-          <Box sx={{ maxWidth: 610 }}>
+          <Box sx={{ maxWidth: 800 }}>
             <Image
               alt="Single logo"
-              sx={{ width: 200 }}
+              sx={{ width: 400 }}
               src={`${CONFIG.assetsDir}/logo/logo-single.svg`}
             />
             <Typography
               sx={{
                 mt: 2,
                 color: theme.palette.secondary.main,
-                fontSize: { xs: 47, sm: 68, md: 82 },
+                fontSize: { xs: 48, },
                 fontWeight: 800,
                 lineHeight: 0.92,
                 textTransform: 'uppercase',
               }}
             >
-              AKHAHAS&apos;SRI
+              MEE BUNKOON GALLERY
             </Typography>
-            <Typography variant="h1">อรรคฮาตสี</Typography>
+            <Typography variant="h2" mt={2}>มีบุญคูณ แกลเลอรี่</Typography>
 
-            <Typography variant="h5">บ้านขามเรียง มหาสารคาม</Typography>
+            <Typography variant="h5" mt={2}>
+              บ้านเหล่า พยัคฆภูมิพิสัย จังหวัดมหาสารคาม 
+            </Typography>
           </Box>
 
           <Stack

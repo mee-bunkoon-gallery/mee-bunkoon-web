@@ -175,9 +175,9 @@ export function HomeFooter({ sx, ...other }: FooterProps) {
       {...other}
     >
       <Container>
-        <Logo />
+        <Logo sx={{ width: 100 , height: 100 }} />
         <Box sx={{ mt: 1, typography: 'caption', color: theme.palette.secondary.main }}>
-          © AKHAHAS SRI
+          © MEE BUNKOON GALLERY
         </Box>
       </Container>
     </FooterRoot>
