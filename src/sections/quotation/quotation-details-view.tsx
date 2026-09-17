@@ -109,7 +109,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
 
   return (
     <DashboardContent maxWidth="xl">
-      <>
+      <Box sx={{ display: 'contents' }}>
         <Box
           sx={{
             mb: 5,
@@ -390,7 +390,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
           </Box>
 
           {quotation.note && (
-            <>
+            <Box sx={{ display: 'contents' }}>
               <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 หมายเหตุ
@@ -398,11 +398,11 @@ export function QuotationDetailsView({ quotationId }: Props) {
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {quotation.note}
               </Typography>
-            </>
+            </Box>
           )}
 
           {quotation.paymentTerms && (
-            <>
+            <Box sx={{ display: 'contents' }}>
               <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 เงื่อนไขการชำระเงิน
@@ -418,7 +418,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
                     </Typography>
                   ))}
               </Box>
-            </>
+            </Box>
           )}
         </Card>
 
@@ -597,7 +597,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
             ))
           )}
         </Card>
-      </>
+      </Box>
 
       <Dialog
         fullWidth

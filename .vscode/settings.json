@@ -7,7 +7,7 @@
   // Specify working directories for ESLint
   "eslint.workingDirectories": [
     {
-      "directory": "../src",
+      "directory": ".",
       "changeProcessCWD": true
     }
   ],

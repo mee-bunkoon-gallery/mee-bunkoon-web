@@ -42,6 +42,13 @@ type DashboardData = {
 };
 
 const EMPTY_DATA: DashboardData = { jobs: [], payments: [], contracts: [], quotations: [] };
+const DASHBOARD_ENDPOINTS = ['quotations', 'contracts', 'jobs', 'payments'] as const;
+const OUTLINED_CARD_SX = {
+  height: 1,
+  border: '1px solid',
+  borderColor: 'divider',
+  boxShadow: 'none',
+} as const;
 const MONTHS = [
   'ม.ค.',
   'ก.พ.',
@@ -130,26 +137,34 @@ export function OverviewView() {
 
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all(
-      ['quotations', 'contracts', 'jobs', 'payments'].map((path) =>
+
+    Promise.allSettled(
+      DASHBOARD_ENDPOINTS.map((path) =>
         fetch(`/api/${path}/`, { signal: controller.signal }).then((response) => {
           if (!response.ok) throw new Error(`Unable to load ${path}`);
           return response.json();
         })
       )
-    )
-      .then(([quotations, contracts, jobs, payments]) =>
-        setData({
-          jobs: jobs.jobs ?? [],
-          payments: payments.payments ?? [],
-          contracts: contracts.contracts ?? [],
-          quotations: quotations.quotations ?? [],
-        })
-      )
-      .catch((error) => {
-        if (error.name !== 'AbortError') setData(EMPTY_DATA);
-      })
-      .finally(() => setLoading(false));
+    ).then((results) => {
+      if (controller.signal.aborted) return;
+
+      const [quotations, contracts, jobs, payments] = results.map((result, index) => {
+        if (result.status === 'rejected') {
+          console.error(`Failed to load ${DASHBOARD_ENDPOINTS[index]}`, result.reason);
+          return null;
+        }
+        return result.value;
+      });
+
+      setData({
+        jobs: jobs?.jobs ?? [],
+        payments: payments?.payments ?? [],
+        contracts: contracts?.contracts ?? [],
+        quotations: quotations?.quotations ?? [],
+      });
+      setLoading(false);
+    });
+
     return () => controller.abort();
   }, []);
 
@@ -265,15 +280,7 @@ export function OverviewView() {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card
-            sx={{
-              p: { xs: 2, sm: 3 },
-              height: 1,
-              border: '1px solid',
-              borderColor: 'divider',
-              boxShadow: 'none',
-            }}
-          >
+          <Card sx={{ ...OUTLINED_CARD_SX, p: { xs: 2, sm: 3 } }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Box>
                 <Typography variant="h6">ภาพรวมรายรับ</Typography>
@@ -301,9 +308,7 @@ export function OverviewView() {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card
-            sx={{ p: 3, height: 1, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}
-          >
+          <Card sx={{ ...OUTLINED_CARD_SX, p: 3 }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="h6">คิวงานเร็ว ๆ นี้</Typography>
               <IconButton component={RouterLink} href={paths.dashboard.jobQueue.root} size="small">
@@ -360,9 +365,7 @@ export function OverviewView() {
         </Grid>
 
         <Grid size={{ xs: 12, md: 5 }}>
-          <Card
-            sx={{ p: 3, height: 1, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}
-          >
+          <Card sx={{ ...OUTLINED_CARD_SX, p: 3 }}>
             <Typography variant="h6">สถานะงานเอกสาร</Typography>
             <Stack spacing={2.5} sx={{ mt: 3 }}>
               {[
@@ -407,7 +410,7 @@ export function OverviewView() {
         </Grid>
 
         <Grid size={{ xs: 12, md: 7 }}>
-          <Card sx={{ height: 1, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+          <Card sx={OUTLINED_CARD_SX}>
             <Stack
               direction="row"
               alignItems="center"

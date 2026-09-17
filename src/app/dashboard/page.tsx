@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import type { Metadata } from 'next';
 
 import { CONFIG } from 'src/global-config';
