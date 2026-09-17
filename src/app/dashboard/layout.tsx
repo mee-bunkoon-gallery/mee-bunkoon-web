@@ -75,6 +75,11 @@ const navData: NavSectionProps['data'] = [
         path: paths.dashboard.colorTheme.root,
         icon: <Iconify icon="solar:pallete-2-bold-duotone" />,
       },
+      {
+        title: 'ประเภทงาน',
+        path: paths.dashboard.eventType.root,
+        icon: <Iconify icon="solar:tag-horizontal-bold-duotone" />,
+      },
     ],
   },
   {

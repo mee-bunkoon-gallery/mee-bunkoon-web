@@ -1,4 +1,8 @@
+'use client';
+
 import type { Breakpoint } from '@mui/material/styles';
+
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -14,35 +18,65 @@ import { RouterLink } from 'src/routes/components';
 
 import { _socials } from 'src/_mock';
 
-import { Logo } from 'src/components/logo';
 import { Iconify } from 'src/components/iconify';
+import { CompanyLogo } from 'src/components/logo';
 
 // ----------------------------------------------------------------------
 
-const LINKS = [
+const DEFAULT_COMPANY = {
+  name: 'มีบุญคุณ แกลเลอรี่',
+  nameEn: 'MEE BUNKOON GALLERY',
+};
+
+function useCompany() {
+  const [company, setCompany] = useState(DEFAULT_COMPANY);
+
+  useEffect(() => {
+    fetch('/api/public/company/', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((payload) => {
+        if (payload?.company) {
+          setCompany({
+            name: payload.company.name || DEFAULT_COMPANY.name,
+            nameEn: payload.company.nameEn || DEFAULT_COMPANY.nameEn,
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  return company;
+}
+
+const getLinks = (companyName: string) => [
   {
-    headline: 'Minimal',
+    headline: 'เมนู',
     children: [
-      { name: 'About us', href: paths.about },
-      { name: 'Contact us', href: paths.contact },
-      { name: 'FAQs', href: paths.faqs },
+      { name: 'หน้าแรก', href: '/' },
+      { name: 'คิวงาน', href: paths.jobQueue },
     ],
   },
   {
-    headline: 'Legal',
+    headline: 'ข้อมูล',
     children: [
-      { name: 'Terms and condition', href: '#' },
-      { name: 'Privacy policy', href: '#' },
+      { name: 'เกี่ยวกับเรา', href: paths.about },
+      { name: 'ติดต่อเรา', href: paths.contact },
     ],
   },
-  { headline: 'Contact', children: [{ name: 'support@minimals.cc', href: '#' }] },
+  {
+    headline: 'ติดต่อ',
+    children: [{ name: companyName, href: paths.contact }],
+  },
 ];
 
 // ----------------------------------------------------------------------
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   position: 'relative',
-  backgroundColor: theme.vars.palette.primary.main,
+  backgroundColor: theme.palette.common.white,
 }));
 
 export type FooterProps = React.ComponentProps<typeof FooterRoot>;
@@ -52,6 +86,9 @@ export function Footer({
   layoutQuery = 'md',
   ...other
 }: FooterProps & { layoutQuery?: Breakpoint }) {
+  const company = useCompany();
+  const links = getLinks(company.name);
+
   return (
     <FooterRoot sx={sx} {...other}>
       <Divider />
@@ -64,7 +101,7 @@ export function Footer({
           [theme.breakpoints.up(layoutQuery)]: { textAlign: 'unset' },
         })}
       >
-        <Logo />
+        <CompanyLogo />
 
         <Grid
           container
@@ -85,8 +122,7 @@ export function Footer({
                 [theme.breakpoints.up(layoutQuery)]: { mx: 'unset' },
               })}
             >
-              The starting point for your next project with Minimal UI Kit, built on the newest
-              version of Material-UI ©, ready to be customized to your style.
+              {company.name} รับจัดงานด้วยความใส่ใจ เพื่อทุกช่วงเวลาสำคัญของคุณ
             </Typography>
 
             <Box
@@ -118,7 +154,7 @@ export function Footer({
                 [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row' },
               })}
             >
-              {LINKS.map((list) => (
+              {links.map((list) => (
                 <Box
                   key={list.headline}
                   sx={(theme) => ({
@@ -152,7 +188,7 @@ export function Footer({
         </Grid>
 
         <Typography variant="body2" sx={{ mt: 10 }}>
-          © All rights reserved.
+          © {new Date().getFullYear()} {company.name} สงวนลิขสิทธิ์
         </Typography>
       </Container>
     </FooterRoot>
@@ -163,6 +199,7 @@ export function Footer({
 
 export function HomeFooter({ sx, ...other }: FooterProps) {
   const theme = useTheme();
+  const company = useCompany();
   return (
     <FooterRoot
       sx={[
@@ -175,9 +212,9 @@ export function HomeFooter({ sx, ...other }: FooterProps) {
       {...other}
     >
       <Container>
-        <Logo sx={{ width: 100 , height: 100 }} />
+        <CompanyLogo sx={{ width: 100, height: 100 }} />
         <Box sx={{ mt: 1, typography: 'caption', color: theme.palette.secondary.main }}>
-          © MEE BUNKOON GALLERY
+          © {company.nameEn}
         </Box>
       </Container>
     </FooterRoot>

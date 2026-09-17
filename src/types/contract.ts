@@ -25,6 +25,7 @@ export type IContract = {
   customer?: ICustomer | null;
   contractDate: string;
   eventType: string | null;
+  eventTypeId: string | null;
   eventDate: string | null;
   eventTime: string | null;
   eventLocation: string | null;

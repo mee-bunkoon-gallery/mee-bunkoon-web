@@ -40,7 +40,7 @@ export function Logo({
   const singleLogo = (
     <img
       alt="Single logo"
-      src={`${CONFIG.assetsDir}/logo/logo-single.svg`}
+      src={`${CONFIG.assetsDir}/logo/logo-single-gold.svg`}
       width="100%"
       height="100%"
     />

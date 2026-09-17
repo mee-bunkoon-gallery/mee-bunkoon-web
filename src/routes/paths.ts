@@ -22,6 +22,7 @@ export const paths = {
   payment: '/payment',
   about: '/about-us',
   contact: '/contact-us',
+  jobQueue: '/job-queue',
   faqs: '/faqs',
   page403: '/error/403',
   page404: '/error/404',
@@ -146,6 +147,9 @@ export const paths = {
     colorTheme: {
       root: `${ROOTS.DASHBOARD}/color-themes`,
     },
+    eventType: {
+      root: `${ROOTS.DASHBOARD}/event-types`,
+    },
     quotation: {
       root: `${ROOTS.DASHBOARD}/quotations`,
       new: `${ROOTS.DASHBOARD}/quotations/new`,
@@ -172,6 +176,7 @@ export const paths = {
     },
     jobQueue: {
       root: `${ROOTS.DASHBOARD}/job-queue`,
+      display: `${ROOTS.DASHBOARD}/job-queue/display`,
       new: `${ROOTS.DASHBOARD}/job-queue/new`,
       details: (id: string) => `${ROOTS.DASHBOARD}/job-queue/${id}`,
       edit: (id: string) => `${ROOTS.DASHBOARD}/job-queue/${id}/edit`,

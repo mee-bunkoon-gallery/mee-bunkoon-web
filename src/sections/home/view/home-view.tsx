@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Fade from 'embla-carousel-fade';
-import ReactPlayer from 'react-player';
+import { useState, useEffect } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 
 import Box from '@mui/material/Box';
@@ -13,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import DialogContent from '@mui/material/DialogContent';
 
-import { CONFIG } from 'src/global-config';
+import { fDate } from 'src/utils/format-time';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
@@ -22,132 +21,136 @@ import { Carousel, useCarousel } from 'src/components/carousel';
 // ----------------------------------------------------------------------
 
 const HERO_IMAGE = [
-  '/assets/background/akhahas-sri-1.jpg',
-  '/assets/background/akhahas-sri-2.jpg',
-  '/assets/background/akhahas-sri-3.jpg',
-  '/assets/background/akhahas-sri-4.jpg',
-  '/assets/background/akhahas-sri-5.jpg',
-  '/assets/background/akhahas-sri-6.jpg',
-  '/assets/background/akhahas-sri-7.jpg',
+  '/assets/background/hero-1.jpg',
+  '/assets/background/hero-2.jpg',
+  '/assets/background/hero-3.jpg',
+  // '/assets/background/hero-4.jpg',
+  // '/assets/background/hero-5.jpg',
+  // '/assets/background/hero-6.jpg',
+  // '/assets/background/hero-7.jpg',
 ].slice(0, 7);
-const SCENES_IMAGE = '/assets/akhahas-sri/hero-2.jpg';
-const MEMORIAL_IMAGE = '/assets/akhahas-sri/rip-1.jpeg';
-const KRU_IMAGE = '/assets/akhahas-sri/bg-1.jpg';
+const SCENES_IMAGE = '/assets/mee-bunkoon/hero-3.jpg';
+const MEMORIAL_IMAGE = '/assets/mee-bunkoon/hero-1.jpg';
+const KRU_IMAGE = '/assets/mee-bunkoon/bg-1.jpg';
 
-const SCENES_1_IMAGE = '/assets/akhahas-sri/hero-5.jpeg';
+const SCENES_1_IMAGE = '/assets/mee-bunkoon/hero-2.jpg';
+
+const DEFAULT_COMPANY = {
+  name: 'มีบุญคุณ แกลเลอรี่',
+  nameEn: 'MEE BUNKOON GALLERY',
+  address: 'บ้านเหล่า ตำบลเม็กดำ พยัคฆภูมิพิสัย จังหวัดมหาสารคาม',
+  phone: '098-630-4174',
+  logoUrl: null as string | null,
+};
+
+type PublicCompany = typeof DEFAULT_COMPANY;
+
+type GalleryImage = {
+  title: string;
+  src: string;
+};
+
+type PublicDelivery = {
+  id: string;
+  deliveryNo: string;
+  deliveryDate: string;
+  itemsDelivered: string | null;
+  imageUrls: string[];
+};
 
 const highlights = [
   {
-    icon: '99',
-    title: 'ผลงานการแสดง',
-    body: 'การแสดงดนตรีพื้นบ้านอีสานและกิจกรรมทางวัฒนธรรมในหลากหลายเวที',
+    icon: '01',
+    title: 'รับจัดงานครบวงจร',
+    body: 'ดูแลงานแต่ง งานบุญ งานเลี้ยง และกิจกรรมพิเศษ ตั้งแต่เริ่มต้นจนจบงาน',
   },
   {
-    icon: '99',
-    title: 'สมาชิกวง',
-    body: 'นักดนตรี นักแสดง และทีมสร้างสรรค์ที่ร่วมสืบสานศิลปวัฒนธรรมอีสาน',
+    icon: '02',
+    title: 'ออกแบบให้ตรงใจ',
+    body: 'ออกแบบธีม สีสัน ฉาก และองค์ประกอบของงานให้สะท้อนความเป็นคุณ',
   },
   {
-    icon: '99',
-    title: 'รางวัลและเวทีประกวด',
-    body: 'ประสบการณ์จากการแสดงและการแข่งขันดนตรีพื้นบ้านระดับภูมิภาคและระดับประเทศ',
+    icon: '03',
+    title: 'ทีมงานดูแลหน้างาน',
+    body: 'ประสานงานและดูแลรายละเอียดหน้างาน เพื่อให้ทุกช่วงเวลาราบรื่น',
   },
 ];
 
 const ROYAL_IMAGE_ITEMS = [
   {
-    title: 'สมเด็จพระกนิษฐาธิราชเจ้า ฯ เชิญขวัญแม่โคสกเจ้า เข้าคืนนา',
-    src: '/assets/akhahas-sri/ac-1.png',
+    title: 'ตัวอย่างผลงานจัดงาน',
+    src: '/assets/mee-bunkoon/hero-1.jpg',
   },
   {
-    title: 'สมเด็จพระกนิษฐาธิราชเจ้า ฯ เชิญขวัญแม่โคสกเจ้า เข้าคืนนา',
-    src: '/assets/akhahas-sri/ac-2.png',
+    title: 'ตัวอย่างผลงานจัดงาน',
+    src: '/assets/mee-bunkoon/hero-2.jpg',
   },
   {
-    title: 'สมเด็จพระกนิษฐาธิราชเจ้า ฯ เชิญขวัญแม่โคสกเจ้า เข้าคืนนา',
-    src: '/assets/akhahas-sri/ac-3.png',
+    title: 'ตัวอย่างผลงานจัดงาน',
+    src: '/assets/mee-bunkoon/hero-3.jpg',
   },
   {
-    title: 'สมเด็จพระกนิษฐาธิราชเจ้า ฯ เชิญขวัญแม่โคสกเจ้า เข้าคืนนา',
-    src: '/assets/akhahas-sri/ac-4.png',
+    title: 'ตัวอย่างผลงานจัดงาน',
+    src: '/assets/mee-bunkoon/hero-4.jpg',
   },
 ];
-
-const VIDEO_ITEMS = [
-  {
-    title: 'เทิดพระเกียรติ | วงโปงลางอรรคฮาตสี การประกวดวงโปงลางกรมพลศึกษา 65',
-    src: 'https://www.youtube.com/watch?v=hZB0LIYLSgM&list=RDhZB0LIYLSgM&start_radio=1',
-    cover: 'https://img.youtube.com/vi/hZB0LIYLSgM/maxresdefault.jpg',
-  },
-  {
-    title: 'วงโปงลางอรรคฮาตสี | การประกวดวงโปงลางกรมพลศึกษา 66',
-    src: 'https://www.youtube.com/watch?v=S1twzNXRbCY&list=RDS1twzNXRbCY&start_radio=1&t=1076s',
-    cover: 'https://img.youtube.com/vi/S1twzNXRbCY/maxresdefault.jpg',
-  },
-  {
-    title: 'เทิดพระเกียรติ - วงโปงลางอรรคฮาตสี | การประกวดวงโปงลางกรมพลศึกษา 67',
-    src: 'https://www.youtube.com/watch?v=gxiq1n3JOT8&list=RDgxiq1n3JOT8&start_radio=1',
-    cover: 'https://img.youtube.com/vi/gxiq1n3JOT8/maxresdefault.jpg',
-  },
-  {
-    title: 'อรรคฮาตสีลาแฟน | วงโปงลางอรรคฮาตสี [Official MV]',
-    src: 'https://www.youtube.com/watch?v=Zr1H0ultIQ8',
-    cover: 'https://img.youtube.com/vi/Zr1H0ultIQ8/maxresdefault.jpg',
-  },
-];
-
-function PlayButton({ small = false }: { small?: boolean }) {
-  const theme = useTheme();
-  return (
-    <Box
-      component="span"
-      sx={{
-        width: small ? 34 : 48,
-        height: small ? 34 : 48,
-        display: 'grid',
-        borderRadius: '50%',
-        color: theme.palette.secondary.main,
-        placeItems: 'center',
-        border: '2px solid rgba(234,215,161,0.88)',
-        backgroundColor: 'rgba(9, 47, 33, 0.42)',
-        boxShadow: '0 18px 40px rgba(0,0,0,0.34), 0 0 20px rgba(217,181,109,0.14)',
-        '&::before': {
-          content: '""',
-          width: 0,
-          height: 0,
-          ml: '3px',
-          borderTop: `${small ? 6 : 8}px solid transparent`,
-          borderBottom: `${small ? 6 : 8}px solid transparent`,
-          borderLeft: `${small ? 9 : 13}px solid currentColor`,
-        },
-      }}
-    />
-  );
-}
 
 export function HomeView() {
   const theme = useTheme();
-  const [videoPreviewKey, setVideoPreviewKey] = useState(0);
-  const [selectedVideo, setSelectedVideo] = useState<(typeof VIDEO_ITEMS)[number] | null>(null);
-  const [selectedImage, setSelectedImage] = useState<(typeof ROYAL_IMAGE_ITEMS)[number] | null>(
-    null
-  );
+  const [company, setCompany] = useState<PublicCompany>(DEFAULT_COMPANY);
+  const [deliveries, setDeliveries] = useState<PublicDelivery[]>([]);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const heroCarousel = useCarousel({ loop: true, duration: 80 }, [
     Fade(),
     Autoplay({ playOnInit: true, delay: 5000 }),
   ]);
 
-  const handleCloseVideo = () => {
-    setSelectedVideo(null);
-    setVideoPreviewKey((prev) => prev + 1);
-  };
+  useEffect(() => {
+    fetch('/api/public/company/', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((payload) => {
+        if (payload?.company) {
+          setCompany({
+            name: payload.company.name || DEFAULT_COMPANY.name,
+            nameEn: payload.company.nameEn || DEFAULT_COMPANY.nameEn,
+            address: payload.company.address || DEFAULT_COMPANY.address,
+            phone: payload.company.phone || DEFAULT_COMPANY.phone,
+            logoUrl: payload.company.logoUrl ?? null,
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/public/deliveries/', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((payload) => setDeliveries(payload?.deliveries ?? []))
+      .catch(() => setDeliveries([]));
+  }, []);
+
+  const deliveryImages = deliveries
+    .flatMap((delivery) =>
+      delivery.imageUrls.map((src, index) => ({
+        src,
+        title: delivery.itemsDelivered || 'ผลงานของเรา',
+        subtitle: `${fDate(delivery.deliveryDate)} · ภาพบรรยากาศงาน`,
+      }))
+    )
+    .slice(0, 4);
 
   return (
     <Box
       component="main"
       sx={{
         minHeight: '100vh',
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
         overflow: 'hidden',
         bgcolor: theme.palette.primary.main,
         fontFamily: "'LINE Seed Sans TH', sans-serif",
@@ -181,7 +184,7 @@ export function HomeView() {
           {HERO_IMAGE.map((src, index) => (
             <Image
               key={src}
-              alt={`MEE BUNKOON GALLERY hero ${index + 1}`}
+              alt={`ผลงาน ${company.name} ${index + 1}`}
               src={src}
               visibleByDefault
               disablePlaceholder
@@ -197,40 +200,47 @@ export function HomeView() {
             position: 'absolute',
             pointerEvents: 'none',
             backgroundImage: `
-              linear-gradient(180deg, rgba(9, 46, 82, 0.18) 0%,rgba(9, 46, 82, 0.58)  56%, ${theme.palette.secondary.main} 100%),
-              linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.58) 48%, rgba(7, 5, 37, 0.84) 100%),
-              linear-gradient(0deg, rgba(217,181,109,0.08), rgba(217,181,109,0.08))
+              linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%,rgba(255, 255, 255, 0.23)  56%, ${theme.palette.secondary.light} 100%),
+              linear-gradient(90deg, ${theme.palette.secondary.lighter} 0%, rgba(255, 255, 255, 0.11) 18%, rgba(255, 255, 255, 0.19) 100%),
+              linear-gradient(0deg, ${theme.palette.secondary.main}, rgba(0, 44, 106, 0.08))
             `,
           }}
         />
 
         <Box sx={{ mx: 'auto', maxWidth: 1280, position: 'relative', zIndex: 2 }}>
-          <Box sx={{ maxWidth: 700 ,alignItems: 'center', display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
-            <Image
-              alt="Single logo"
-              sx={{ width: 400 }}
-              src={`${CONFIG.assetsDir}/logo/logo-single.svg`}
-            />
+          <Box
+            sx={{
+              maxWidth: 700,
+              alignItems: 'flex-start',
+              display: 'flex',
+              flexDirection: 'column',
+              textAlign: 'center',
+            }}
+          >
+            <Image alt={`โลโก้ ${company.name}`} sx={{ width: 400 }} src="/logo/logo-single.svg" />
+
             <Typography
               sx={{
                 mt: 2,
-                color: theme.palette.secondary.main,
-                fontSize: { xs: 48, },
+                color: theme.palette.common.white,
+                fontSize: { xs: 48 },
                 fontWeight: 800,
                 lineHeight: 0.92,
                 textTransform: 'uppercase',
               }}
             >
-              MEE BUNKOON GALLERY
+              {company.nameEn}
             </Typography>
-            <Typography variant="h2" mt={2}>มีบุญคูณ แกลเลอรี่</Typography>
-
-            <Typography variant="h5" mt={2}>
-              บ้านเหล่า  ตำบลเม็กดำ พยัคฆภูมิพิสัย จังหวัดมหาสารคาม 
+            <Typography variant="h2" mt={1} color={theme.palette.common.white}>
+              {company.name}
             </Typography>
 
-             <Typography variant="h5" mt={2}>
-              โทร 098-630-4174 (คุณปาม)
+            <Typography variant="h5" mt={2} color={theme.palette.common.white}>
+              {company.address}
+            </Typography>
+
+            <Typography variant="h5" mt={2} color={theme.palette.common.white}>
+              โทร {company.phone}
             </Typography>
           </Box>
 
@@ -254,8 +264,8 @@ export function HomeView() {
                 sx={{
                   color:
                     index === heroCarousel.dots.selectedIndex
-                      ? theme.palette.secondary.main
-                      : 'rgba(246,237,219,0.48)',
+                      ? theme.palette.common.white
+                      : theme.palette.common.white,
                   cursor: 'pointer',
                 }}
                 onClick={() => heroCarousel.dots.onClickDot(index)}
@@ -269,8 +279,8 @@ export function HomeView() {
                     width: index === heroCarousel.dots.selectedIndex ? 78 : 18,
                     bgcolor:
                       index === heroCarousel.dots.selectedIndex
-                        ? theme.palette.secondary.main
-                        : 'rgba(234,215,161,0.28)',
+                        ? theme.palette.secondary.dark
+                        : theme.palette.secondary.light,
                   }}
                 />
               </Stack>
@@ -291,7 +301,6 @@ export function HomeView() {
               <Stack key={item.title} direction="row" spacing={2.2} sx={{ flex: 1 }}>
                 <Typography
                   sx={{
-                    color: theme.palette.secondary.main,
                     fontSize: 24,
                     fontWeight: 800,
                     opacity: 0.78,
@@ -303,7 +312,7 @@ export function HomeView() {
                 </Typography>
                 <Box>
                   <Typography variant="h6">{item.title}</Typography>
-                  <Typography variant="body1" sx={{ mt: 0.8, color: 'rgba(246,237,219,0.58)' }}>
+                  <Typography variant="body1" sx={{ mt: 0.8 }}>
                     {item.body}
                   </Typography>
                   {/* <Typography
@@ -329,8 +338,8 @@ export function HomeView() {
           py: { xs: 7, md: 11 },
           // color: theme.palette.secondary.main,
           backgroundImage: `
-            radial-gradient(circle at 50% 8%,  ${theme.palette.secondary.main} 0,  ${theme.palette.secondary.main} 10%),
-            linear-gradient(180deg, ${theme.palette.secondary.main} 0, #034420 92px, #012d1a 100%)
+            radial-gradient(circle at 50% 8%,  ${theme.palette.secondary.light} 0,  ${theme.palette.secondary.light} 10%),
+            linear-gradient(180deg, ${theme.palette.secondary.main} 0, #fefefe 92px, #ffffff 100%)
           `,
         }}
       >
@@ -338,9 +347,9 @@ export function HomeView() {
           <Box
             component="img"
             src={MEMORIAL_IMAGE}
-            alt="Lotus memorial collage"
+            alt="ตัวอย่างผลงานของเรา"
             sx={{
-              width: '400px',
+              width: '600px',
               height: '100%',
               display: 'block',
               mx: 'auto',
@@ -357,8 +366,7 @@ export function HomeView() {
                   fontStyle: 'italic',
                 }}
               >
-                ปางเธอท่านผทม เสด็จชมเสวยสวรรค์ อาภาผ่องเพ็ญจันทร์ พระเธอนั้นนิทราลัย
-                เสด็จมาเป็นแก้วตา ให้ประชาได้ชื่นใจ เสด็จสู่สุราลัย ดังดวงใจจะรานรอน
+                เปลี่ยนทุกไอเดียให้เป็นงานที่น่าจดจำ ด้วยการออกแบบที่ใส่ใจในทุกรายละเอียด
               </Typography>
 
               <Typography
@@ -369,7 +377,7 @@ export function HomeView() {
                   mt: 3,
                 }}
               >
-                &quot;รจนาอาลัย : รัฐพล อินโพนทัน&quot;
+                &quot;เพราะทุกช่วงเวลาสำคัญ ควรได้รับการดูแลเป็นพิเศษ&quot;
               </Typography>
             </Box>
           </Stack>
@@ -393,7 +401,7 @@ export function HomeView() {
           py: { xs: 7, md: 10 },
           minHeight: 800,
           backgroundImage: `
-            linear-gradient(0deg, ${theme.palette.primary.main} 10%, rgba(9, 46, 82, 0.64) 48%, ${theme.palette.secondary.main} 100%),
+            linear-gradient(0deg, ${theme.palette.common.white} 10%, rgba(252, 252, 252, 0.64) 48%, ${theme.palette.secondary.light} 100%),
             linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
             url(${SCENES_1_IMAGE})
           `,
@@ -403,14 +411,11 @@ export function HomeView() {
       >
         <Box sx={{ mx: 'auto', maxWidth: 1000, textAlign: 'center' }}>
           <Typography variant="h3" color="primary">
-            สมเด็จพระกนิษฐาธิราชเจ้า ฯ เชิญขวัญแม่โคสกเจ้า เข้าคืนนา
+            ผลงานที่เราใส่ใจในทุกรายละเอียด
           </Typography>
           <Typography variant="subtitle1" color="primary" sx={{ mt: 1.4, textAlign: 'center' }}>
-            พระเทพนารี สองมือนี้ข้าถวาย มืออันเคยกรำหนักปักกล้าทำนามิวาย ขอฟ้อนถวายพระเทพนารี
-            อิตถีรัตนา ข้าหมายยิ่งว่า เทิดพระทรงศรี ขอได้สดับขับกล่อมพาที ลำนำชาวนา
-            เถิดพระทูลพระหม่อม เอย พระยอดกัลยา ข้า บ่มีสิ่งสูงค่าถวาย หากบ่ควรค่าใด
-            ขอทรงอภัยพระยอดกัลยา ธ แสนประเสริฐ ขอสำราญเถิด พระพุทธเจ้าข้า เหล่ากสิกรจักฟ้อนถวยพร
-            ไหว้ว่า ขอพระกนิษฐา จงยศยิ่งยงทรงชัย อนตายสังอันใด อย่าได้กายใกล้ พระทูลกระหม่อม เอย
+            เราร่วมวางแผน ออกแบบ และจัดเตรียมทุกองค์ประกอบให้เหมาะกับรูปแบบงาน งบประมาณ
+            และความต้องการของคุณ
           </Typography>
 
           <Box
@@ -450,7 +455,7 @@ export function HomeView() {
                     position: 'absolute',
                     transition: 'opacity 180ms ease',
                     background:
-                      'linear-gradient(180deg, rgba(5,37,24,0.02) 0%, rgba(5,37,24,0.46) 100%)',
+                      'linear-gradient(180deg, rgba(253, 253, 253, 0.02) 0%, rgba(255, 255, 255, 0.46) 100%)',
                   },
                   '&:hover::after, &:focus-visible::after': {
                     opacity: 1,
@@ -493,7 +498,7 @@ export function HomeView() {
                     color: theme.palette.secondary.main,
                     transform: 'translate(-50%, -50%) scale(0.92)',
                     transition: 'opacity 180ms ease, transform 180ms ease',
-                    bgcolor: 'rgba(9, 47, 33, 0.64)',
+                    bgcolor: 'rgba(255, 255, 255, 0.64)',
                     border: '1px solid rgba(234,215,161,0.58)',
                     boxShadow: '0 18px 40px rgba(0,0,0,0.34)',
                   }}
@@ -511,8 +516,8 @@ export function HomeView() {
           py: { xs: 8, md: 12 },
           minHeight: 670,
           backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9, 46, 82, 0.64) 32%, ${theme.palette.primary.main} 100%),
-            linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.48) 52%, rgba(7, 5, 37, 0.9) 100%),
+            linear-gradient(180deg, ${theme.palette.common.white} 0%, rgba(250, 251, 252, 0.64) 32%, ${theme.palette.common.white} 100%),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 249, 250, 0.48) 52%, rgba(254, 254, 254, 0.9) 100%),
             linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
             url(${KRU_IMAGE})
           `,
@@ -520,9 +525,6 @@ export function HomeView() {
           backgroundPosition: '100% 100%',
         }}
       >
-        {/* <Stack sx={{ display: 'flex', textAlign: 'center', mb: 2 }}>
-          <Typography variant="h3">ธีรวัฒน์ เจียงคำ</Typography>
-        </Stack> */}
         <Box
           sx={{
             mx: 'auto',
@@ -535,9 +537,7 @@ export function HomeView() {
         >
           <Box
             sx={{
-              gap: 2,
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+              width: 1,
             }}
           >
             <Box
@@ -549,33 +549,12 @@ export function HomeView() {
                 boxShadow: '0 24px 60px rgba(0,0,0,0.22)',
               }}
             >
-              <Box
-                sx={{
-                  width: 1,
-                  aspectRatio: '16 / 9',
-                  height: { xs: 200, md: 350 },
-                  overflow: 'hidden',
-                  borderRadius: 1,
-                  bgcolor: '#052518',
-                  '& .react-player__preview': {
-                    borderRadius: 1,
-                  },
-                  '& .react-player__shadow': {
-                    bgcolor: 'rgba(9, 47, 33, 0.54)',
-                    boxShadow: '0 18px 40px rgba(0,0,0,0.34)',
-                  },
-                }}
-              >
-                <ReactPlayer
-                  src="https://www.youtube.com/watch?v=76jSHW8-Sug&t=5s"
-                  light="https://img.youtube.com/vi/76jSHW8-Sug/maxresdefault.jpg"
-                  width="100%"
-                  height="100%"
-                  playIcon={<PlayButton small />}
-                  // previewAriaLabel={`ดูวิดีโอ ${video.title}`}
-                  // onClickPreview={() => setSelectedVideo(video)}
-                />
-              </Box>
+              <Image
+                alt="ทีมงานพร้อมดูแลงานของคุณ"
+                src={SCENES_IMAGE}
+                ratio="4/3"
+                sx={{ borderRadius: 1 }}
+              />
             </Box>
           </Box>
 
@@ -583,31 +562,26 @@ export function HomeView() {
             <Typography
               component="h2"
               sx={{
-                color: theme.palette.secondary.main,
                 maxWidth: 520,
-                fontSize: { xs: 42, sm: 58, md: 68 },
+                fontSize: { xs: 42, sm: 58, md: 60 },
                 fontWeight: 800,
                 lineHeight: 1.2,
                 textTransform: 'uppercase',
               }}
             >
-              ธีรวัฒน์ เจียงคำ
+              วางใจให้เราดูแลงานสำคัญของคุณ
             </Typography>
 
             <Typography
               sx={{
                 mt: 4,
                 maxWidth: 430,
-                color: theme.palette.secondary.main,
                 lineHeight: 1.75,
               }}
             >
-              การออกแบบไม่ควรยึดติดกับรูปแบบเดิมจนเกินไป
-              จนไม่สัมพันธ์กับความต้องการใช้งานของคนรุ่นใหม่
-              แนวคิดที่ดีคือการปล่อยให้วัสดุมีความเป็นตัวของมันเองมากที่สุด
-              เพื่อให้สามารถปรับเปลี่ยนไปเป็นอะไรก็ได้ที่ตอบสนองการใช้งานและสภาพปัจจุบันของผู้ใช้
-              ถ้าเรายึดติดกับการทำให้สิ่งของมีลักษณะโบราณมากเกินไป มันก็จะอยู่ได้แค่ในพิพิธภัณฑ์
-              ไม่ได้ถูกนำไปใช้งานจริง เมื่อสิ่งของไม่ถูกนำไปใช้งาน มันก็ไม่สามารถอยู่ร่วมกับสังคมได้
+              เริ่มจากการพูดคุยความต้องการ กำหนดรูปแบบและงบประมาณ แล้วให้ทีมงานจัดเตรียมทุกส่วน
+              ทั้งสถานที่ ฉาก ดอกไม้ แสง สี เสียง และลำดับงาน
+              เพื่อให้วันสำคัญของคุณดำเนินไปอย่างมั่นใจ
             </Typography>
 
             <Typography
@@ -617,7 +591,7 @@ export function HomeView() {
                 mt: 3,
               }}
             >
-              &quot;ธีรวัฒน์ เจียงคำ&quot;
+              &quot;ครบทุกเรื่องของงาน ในทีมเดียว&quot;
             </Typography>
             <Typography
               variant="caption"
@@ -626,7 +600,7 @@ export function HomeView() {
                 mt: 3,
               }}
             >
-              ที่มา https://soundisan.com/news/ttaste-khamriang/ และ The Isaan Record Podcast
+              ตั้งแต่การวางแผน จนถึงการดูแลหน้างาน
             </Typography>
           </Box>
         </Box>
@@ -638,8 +612,8 @@ export function HomeView() {
           py: { xs: 8, md: 12 },
           minHeight: 800,
           backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9, 46, 82, 0.64) 32%, ${theme.palette.primary.main} 100%),
-            linear-gradient(90deg, rgba(9, 46, 82, 0.94) 0%, rgba(9, 46, 82, 0.48) 52%, rgba(7, 5, 37, 0.9) 100%),
+            linear-gradient(180deg, ${theme.palette.common.white} 0%, rgba(250, 251, 251, 0.64) 32%, ${theme.palette.common.white} 100%),
+            linear-gradient(90deg, rgba(248, 249, 250, 0.94) 0%, rgba(244, 246, 248, 0.48) 52%, rgba(247, 247, 248, 0.9) 100%),
             linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
             url(${SCENES_IMAGE})
           `,
@@ -661,21 +635,20 @@ export function HomeView() {
             <Typography
               component="h2"
               sx={{
-                color: theme.palette.secondary.main,
                 maxWidth: 520,
-                fontSize: { xs: 42, sm: 58, md: 68 },
+                fontSize: { xs: 42, sm: 58, md: 60 },
                 fontWeight: 800,
                 lineHeight: 1.2,
                 textTransform: 'uppercase',
               }}
             >
-              ศิลปะ ส่องทาง ให้แก่กัน เสมอ
+              ผลงานล่าสุดของเรา
             </Typography>
 
-            <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 4.5 }}>
-              <PlayButton small />
+            <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mt: 4.5 }}>
+              <Iconify icon="solar:gallery-wide-bold" width={30} />
               <Typography variant="h5" sx={{ fontWeight: 800, textTransform: 'uppercase' }}>
-                รับชมวิดีโอ
+                ภาพบรรยากาศจากงานที่เราได้ดูแล
               </Typography>
             </Stack>
 
@@ -683,15 +656,11 @@ export function HomeView() {
               sx={{
                 mt: 4,
                 maxWidth: 430,
-                color: theme.palette.secondary.main,
                 fontSize: 13,
                 lineHeight: 1.75,
               }}
             >
-              อันว่า การใดแท้ ธรรมดาดีชอบ ฝูงข้าตกแต่งถ้วน อันล้วนที่ควร คุส่วนสมเสมอหน้า
-              เป็นไปในโลก ผลาผลแผ่ก้วง กวมพื้นแผ่นไตร ค้อมว่าสาธุการไหว้ แล้วนบนิ้วยอลง
-              กราบหว่างบูฮมฮอย บ่อนมรคาเพียงฮาบ การอันสมกระบวนเบื้อง ทั้งผองปองประโยชน์
-              ตางให้โลกเล่าเฮื้องภายซ้อยซาเซ็ง
+              ชมตัวอย่างผลงาน การจัดตกแต่ง และรายละเอียดจากงานจริงของเรา
             </Typography>
           </Box>
 
@@ -702,44 +671,30 @@ export function HomeView() {
               gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
             }}
           >
-            {VIDEO_ITEMS.map((video, index) => (
+            {deliveryImages.map((image, index) => (
               <Box
-                key={`${video.title}-${index}`}
+                key={`${image.src}-${index}`}
+                component="button"
+                type="button"
+                aria-label={`ดูภาพ ${image.title}`}
+                onClick={() => setSelectedImage(image)}
                 sx={{
                   p: 1,
+                  m: 0,
+                  border: 0,
+                  display: 'block',
+                  textAlign: 'left',
+                  cursor: 'pointer',
                   borderRadius: 1.5,
                   bgcolor: 'rgba(234,215,161,0.1)',
-                  border: '1px solid rgba(234,215,161,0.22)',
                   boxShadow: '0 24px 60px rgba(0,0,0,0.22)',
+                  '&:focus-visible': {
+                    outline: `2px solid ${theme.palette.secondary.main}`,
+                    outlineOffset: 4,
+                  },
                 }}
               >
-                <Box
-                  sx={{
-                    width: 1,
-                    aspectRatio: '16 / 9',
-                    overflow: 'hidden',
-                    borderRadius: 1,
-                    bgcolor: '#052518',
-                    '& .react-player__preview': {
-                      borderRadius: 1,
-                    },
-                    '& .react-player__shadow': {
-                      bgcolor: 'rgba(9, 47, 33, 0.54)',
-                      boxShadow: '0 18px 40px rgba(0,0,0,0.34)',
-                    },
-                  }}
-                >
-                  <ReactPlayer
-                    key={`${video.title}-${videoPreviewKey}`}
-                    src={video.src}
-                    light={video.cover}
-                    width="100%"
-                    height="100%"
-                    playIcon={<PlayButton small />}
-                    previewAriaLabel={`ดูวิดีโอ ${video.title}`}
-                    onClickPreview={() => setSelectedVideo(video)}
-                  />
-                </Box>
+                <Image alt={image.title} src={image.src} ratio="16/9" />
 
                 <Typography
                   sx={{
@@ -750,10 +705,28 @@ export function HomeView() {
                     fontWeight: 800,
                   }}
                 >
-                  {video.title}
+                  {image.title}
+                </Typography>
+                <Typography sx={{ px: 0.5, color: 'text.secondary', fontSize: 12 }}>
+                  {image.subtitle}
                 </Typography>
               </Box>
             ))}
+
+            {!deliveryImages.length && (
+              <Box
+                sx={{
+                  p: 4,
+                  gridColumn: '1 / -1',
+                  textAlign: 'center',
+                  borderRadius: 1.5,
+                  color: 'text.secondary',
+                  border: '1px dashed rgba(9,47,33,0.28)',
+                }}
+              >
+                กำลังอัปเดตผลงานใหม่เร็ว ๆ นี้
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
@@ -844,49 +817,6 @@ export function HomeView() {
               }}
             />
           )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        fullWidth
-        maxWidth="lg"
-        open={!!selectedVideo}
-        onClose={handleCloseVideo}
-        slotProps={{
-          paper: {
-            sx: {
-              overflow: 'hidden',
-              bgcolor: '#052518',
-              borderRadius: 1.5,
-              border: '1px solid rgba(234,215,161,0.24)',
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{
-            px: 2,
-            py: 1.25,
-            gap: 1.5,
-            display: 'flex',
-            alignItems: 'center',
-            color: theme.palette.secondary.main,
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography sx={{ fontSize: 16, fontWeight: 800 }}>{selectedVideo?.title}</Typography>
-
-          <IconButton onClick={handleCloseVideo} sx={{ color: 'inherit' }}>
-            <Iconify icon="mingcute:close-line" />
-          </IconButton>
-        </Box>
-
-        <DialogContent sx={{ p: 0, bgcolor: 'black' }}>
-          <Box sx={{ width: 1, aspectRatio: '16 / 9' }}>
-            {selectedVideo && (
-              <ReactPlayer controls playing src={selectedVideo.src} width="100%" height="100%" />
-            )}
-          </Box>
         </DialogContent>
       </Dialog>
 

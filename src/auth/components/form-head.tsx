@@ -3,6 +3,8 @@ import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
+import { CONFIG } from 'src/global-config';
+
 // ----------------------------------------------------------------------
 
 type FormHeadProps = BoxProps & {
@@ -34,6 +36,7 @@ export function FormHead({ sx, icon, title, description, ...other }: FormHeadPro
         ]}
         {...other}
       >
+        <Typography variant="h5">{CONFIG.appName}</Typography>
         <Typography variant="h5">{title}</Typography>
 
         {description && (

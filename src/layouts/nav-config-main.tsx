@@ -1,18 +1,20 @@
 import type { NavMainProps } from './main/nav/types';
 
+import { paths } from 'src/routes/paths';
+
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
 export const navData: NavMainProps['data'] = [
   {
-    title: 'มีบุญคูณ แกลเลอรี่',
+    title: 'มีบุญคุณ แกลเลอรี่',
     path: '/',
     icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
   },
   {
     title: 'คิวงาน',
-    path: '/',
+    path: paths.jobQueue,
     icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
   },
   // {

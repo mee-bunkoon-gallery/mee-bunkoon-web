@@ -11,6 +11,7 @@ export type ContractInput = {
   customerId: string;
   contractDate: string;
   eventType?: string;
+  eventTypeId?: string | null;
   eventDate?: string | null;
   eventTime?: string;
   eventLocation?: string;

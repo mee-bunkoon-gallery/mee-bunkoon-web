@@ -1,6 +1,7 @@
 'use client';
 
 import type { IContract } from 'src/types/contract';
+import type { IEventType } from 'src/types/event-type';
 import type { ICompanyProfile } from 'src/types/settings';
 import type { ICustomer, IQuotation } from 'src/types/quotation';
 
@@ -37,6 +38,7 @@ import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { getCustomers } from 'src/sections/customer/customer-api';
 import { getQuotations } from 'src/sections/quotation/quotation-api';
+import { getEventTypes } from 'src/sections/event-type/event-type-api';
 import { getCompanyProfile } from 'src/sections/settings/settings-api';
 
 import { ContractPdfDocument } from './contract-pdf-document';
@@ -77,6 +79,7 @@ export const ContractFormSchema = z.object({
   }),
   contractDate: z.string().min(1, { error: 'กรุณาเลือกวันที่ทำสัญญา' }),
   eventType: z.string().optional(),
+  eventTypeId: z.string().nullable(),
   eventDate: z.string().nullable(),
   eventTime: z.string().optional(),
   eventLocation: z.string().optional(),
@@ -106,6 +109,7 @@ function toDefaultValues(
         : null,
       contractDate: dayjs(contract.contractDate).format(),
       eventType: contract.eventType ?? '',
+      eventTypeId: contract.eventTypeId ?? null,
       eventDate: contract.eventDate ? dayjs(contract.eventDate).format() : null,
       eventTime: contract.eventTime ?? '',
       eventLocation: contract.eventLocation ?? '',
@@ -127,6 +131,7 @@ function toDefaultValues(
       customer: null,
       contractDate: dayjs().format(),
       eventType: duplicateContract.eventType ?? '',
+      eventTypeId: duplicateContract.eventTypeId ?? null,
       eventDate: duplicateContract.eventDate ? dayjs(duplicateContract.eventDate).format() : null,
       eventTime: duplicateContract.eventTime ?? '',
       eventLocation: duplicateContract.eventLocation ?? '',
@@ -156,6 +161,7 @@ function toDefaultValues(
         : null,
       contractDate: dayjs().format(),
       eventType: '',
+      eventTypeId: null,
       eventDate: null,
       eventTime: '',
       eventLocation: '',
@@ -176,6 +182,7 @@ function toDefaultValues(
     customer: null,
     contractDate: dayjs().format(),
     eventType: '',
+    eventTypeId: null,
     eventDate: null,
     eventTime: '',
     eventLocation: '',
@@ -206,6 +213,7 @@ export function ContractNewEditForm({
 
   const [customers, setCustomers] = useState<ICustomer[]>([]);
   const [quotations, setQuotations] = useState<IQuotation[]>([]);
+  const [eventTypes, setEventTypes] = useState<IEventType[]>([]);
   const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
 
   useEffect(() => {
@@ -215,6 +223,9 @@ export function ContractNewEditForm({
     getQuotations()
       .then(setQuotations)
       .catch(() => toast.error('โหลดรายการใบเสนอราคาไม่สำเร็จ'));
+    getEventTypes()
+      .then(setEventTypes)
+      .catch(() => toast.error('โหลดรายการประเภทงานไม่สำเร็จ'));
     getCompanyProfile()
       .then(setCompanyProfile)
       .catch(() => {});
@@ -266,6 +277,7 @@ export function ContractNewEditForm({
           ? dayjs(watchedValues.contractDate).format('YYYY-MM-DD')
           : dayjs().format('YYYY-MM-DD'),
         eventType: watchedValues.eventType ?? null,
+        eventTypeId: watchedValues.eventTypeId ?? null,
         eventDate: watchedValues.eventDate
           ? dayjs(watchedValues.eventDate).format('YYYY-MM-DD')
           : null,
@@ -300,6 +312,7 @@ export function ContractNewEditForm({
         customerId: data.customer!.id,
         contractDate: dayjs(data.contractDate).format('YYYY-MM-DD'),
         eventType: data.eventType,
+        eventTypeId: data.eventTypeId,
         eventDate: data.eventDate ? dayjs(data.eventDate).format('YYYY-MM-DD') : null,
         eventTime: data.eventTime,
         eventLocation: data.eventLocation,
@@ -418,7 +431,23 @@ export function ContractNewEditForm({
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Field.Text name="eventType" label="ประเภทงาน (เช่น งานแต่งงาน)" />
+                <Controller
+                  name="eventType"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      options={eventTypes}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={eventTypes.find((item) => item.name === field.value) ?? null}
+                      onChange={(_event, newValue) => {
+                        field.onChange(newValue?.name ?? '');
+                        setValue('eventTypeId', newValue?.id ?? null);
+                      }}
+                      renderInput={(params) => <TextField {...params} label="ประเภทงาน" />}
+                    />
+                  )}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 4 }}>

@@ -1,6 +1,6 @@
 'use client';
 
-import type { IColorTheme } from 'src/types/color-theme';
+import type { IEventType } from 'src/types/event-type';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -26,28 +26,31 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
+import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import {
-  getColorThemes,
-  createColorTheme,
-  updateColorTheme,
-  deleteColorTheme,
-} from './color-theme-api';
+  getEventTypes,
+  createEventType,
+  updateEventType,
+  deleteEventType,
+} from './event-type-api';
 
-export function ColorThemeListView() {
-  const [items, setItems] = useState<IColorTheme[]>([]);
+export function EventTypeListView() {
+  const [items, setItems] = useState<IEventType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const [hexCode, setHexCode] = useState('#000000');
 
   const loadItems = useCallback(async () => {
     try {
-      setItems(await getColorThemes());
+      setItems(await getEventTypes());
     } catch (error) {
       console.error(error);
-      toast.error('โหลดรายการโทนสีไม่สำเร็จ');
+      toast.error('โหลดรายการประเภทงานไม่สำเร็จ');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -59,64 +62,63 @@ export function ColorThemeListView() {
     setOpen(false);
     setEditingId(null);
     setName('');
-    setHexCode('#000000');
   };
 
   const openCreateDialog = () => {
     setEditingId(null);
     setName('');
-    setHexCode('#000000');
     setOpen(true);
   };
 
-  const openEditDialog = (item: IColorTheme) => {
+  const openEditDialog = (item: IEventType) => {
     setEditingId(item.id);
     setName(item.name);
-    setHexCode(item.hexCode || '#000000');
     setOpen(true);
   };
 
   const handleSave = async () => {
     try {
       if (editingId) {
-        const updated = await updateColorTheme(editingId, { name, hexCode });
+        const updated = await updateEventType(editingId, { name });
         setItems((current) =>
           current
             .map((item) => (item.id === editingId ? updated : item))
             .sort((a, b) => a.name.localeCompare(b.name))
         );
-        toast.success('แก้ไขโทนสีแล้ว');
+        toast.success('แก้ไขประเภทงานแล้ว');
       } else {
-        const created = await createColorTheme({ name, hexCode });
+        const created = await createEventType({ name });
         setItems((current) => [...current, created].sort((a, b) => a.name.localeCompare(b.name)));
-        toast.success('เพิ่มโทนสีแล้ว');
+        toast.success('เพิ่มประเภทงานแล้ว');
       }
       closeDialog();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'บันทึกโทนสีไม่สำเร็จ');
+      toast.error(error instanceof Error ? error.message : 'บันทึกประเภทงานไม่สำเร็จ');
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteColorTheme(id);
+      await deleteEventType(id);
       setItems((current) => current.filter((item) => item.id !== id));
-      toast.success('ลบโทนสีแล้ว');
+      toast.success('ลบประเภทงานแล้ว');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'ลบโทนสีไม่สำเร็จ');
+      toast.error(error instanceof Error ? error.message : 'ลบประเภทงานไม่สำเร็จ');
     }
   };
+
+  const notFound = !loading && !items.length;
 
   return (
     <DashboardContent maxWidth="xl">
       <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h4">โทนสี</Typography>
+        <Typography variant="h4">ประเภทงาน</Typography>
         <Button
           variant="contained"
           startIcon={<Iconify icon="mingcute:add-line" />}
           onClick={openCreateDialog}
         >
-          เพิ่มโทนสี
+          เพิ่มประเภทงาน
         </Button>
       </Box>
       <Card>
@@ -125,8 +127,7 @@ export function ColorThemeListView() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>สี</TableCell>
-                  <TableCell>ชื่อโทนสี</TableCell>
+                  <TableCell>ชื่อประเภทงาน</TableCell>
                   <TableCell align="right">จัดการ</TableCell>
                 </TableRow>
               </TableHead>
@@ -134,25 +135,13 @@ export function ColorThemeListView() {
                 {items.map((item) => (
                   <TableRow key={item.id} hover>
                     <TableCell>
-                      <Box
-                        sx={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: '50%',
-                          bgcolor: item.hexCode || 'transparent',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
                       <Typography variant="subtitle2">{item.name}</Typography>
                     </TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => openEditDialog(item)}>
                         <Iconify icon="solar:pen-bold" />
                       </IconButton>
-                      <Tooltip title={item.inUse ? 'ไม่สามารถลบโทนสีที่มีการใช้งานอยู่' : ''}>
+                      <Tooltip title={item.inUse ? 'ไม่สามารถลบประเภทงานที่มีการใช้งานอยู่' : ''}>
                         <span>
                           <IconButton
                             color="error"
@@ -166,25 +155,24 @@ export function ColorThemeListView() {
                     </TableCell>
                   </TableRow>
                 ))}
+
+                <TableNoData notFound={notFound} />
               </TableBody>
             </Table>
           </Scrollbar>
         </TableContainer>
       </Card>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={closeDialog}>
-        <DialogTitle>{editingId ? 'แก้ไขโทนสี' : 'เพิ่มโทนสี'}</DialogTitle>
+        <DialogTitle>{editingId ? 'แก้ไขประเภทงาน' : 'เพิ่มประเภทงาน'}</DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 1, display: 'flex', gap: 2, flexDirection: 'column' }}>
+          <Box sx={{ pt: 1 }}>
             <TextField
               autoFocus
-              label="ชื่อโทนสี"
+              fullWidth
+              label="ชื่อประเภทงาน"
+              placeholder="เช่น งานแต่งงาน"
               value={name}
               onChange={(event) => setName(event.target.value)}
-            />
-            <TextField
-              label="รหัสสี"
-              value={hexCode}
-              onChange={(event) => setHexCode(event.target.value)}
             />
           </Box>
         </DialogContent>

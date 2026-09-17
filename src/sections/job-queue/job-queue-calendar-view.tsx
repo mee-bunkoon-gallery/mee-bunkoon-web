@@ -95,13 +95,18 @@ export function JobQueueCalendarView() {
       >
         <Typography variant="h4">ลงคิวงาน</Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={handleNewClick}
-        >
-          ลงคิวงานใหม่
-        </Button>
+        <Box sx={{ gap: 1, display: 'flex', width: { xs: 1, sm: 'auto' } }}>
+          <Button variant="outlined" onClick={() => router.push(paths.dashboard.jobQueue.display)}>
+            มุมมองคิวงาน
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={handleNewClick}
+          >
+            ลงคิวงานใหม่
+          </Button>
+        </Box>
       </Box>
 
       <Box sx={{ mb: 3, gap: 1, display: 'flex', flexWrap: 'wrap' }}>

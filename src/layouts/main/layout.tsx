@@ -12,7 +12,7 @@ import Alert from '@mui/material/Alert';
 
 import { usePathname } from 'src/routes/hooks';
 
-import { Logo } from 'src/components/logo';
+import { CompanyLogo } from 'src/components/logo';
 
 import { NavMobile } from './nav/mobile';
 import { NavDesktop } from './nav/desktop';
@@ -73,7 +73,7 @@ export function MainLayout({
           <NavMobile data={navData} open={open} onClose={onClose} />
 
           {/** @slot Logo */}
-          <Logo />
+          <CompanyLogo />
         </>
       ),
       rightArea: (
