@@ -255,6 +255,17 @@ export function JobQueueDetailsView({ jobId }: Props) {
                 <JobInfo label="สถานที่" value={job.location} />
               </Grid>
             </Grid>
+            {!!job.jobDescription && (
+              <>
+                <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  รายละเอียดงาน
+                </Typography>
+                <Typography sx={{ whiteSpace: 'pre-wrap', color: 'text.secondary' }}>
+                  {job.jobDescription}
+                </Typography>
+              </>
+            )}
             {!!job.note && (
               <>
                 <Divider sx={{ my: 4, borderStyle: 'dashed' }} />

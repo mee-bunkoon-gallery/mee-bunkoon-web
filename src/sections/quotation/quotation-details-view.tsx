@@ -183,22 +183,6 @@ export function QuotationDetailsView({ quotationId }: Props) {
             </Button>
 
             <Button
-              variant="outlined"
-              startIcon={<Iconify icon="solar:pen-bold" />}
-              onClick={() => setSignatureSigner('issuer')}
-            >
-              เซ็นผู้เสนอราคา
-            </Button>
-
-            <Button
-              variant="outlined"
-              startIcon={<Iconify icon="solar:pen-bold" />}
-              onClick={() => setSignatureSigner('customer')}
-            >
-              เซ็นผู้รับข้อเสนอ
-            </Button>
-
-            <Button
               variant="contained"
               startIcon={<Iconify icon="solar:eye-bold" />}
               onClick={previewDialog.onTrue}
@@ -316,12 +300,22 @@ export function QuotationDetailsView({ quotationId }: Props) {
                   ผู้ติดต่อ: {quotation.customer.contactPerson}
                 </Typography>
               )}
-              {quotation.customer?.phone && (
-                <Typography variant="body2">โทร: {quotation.customer.phone}</Typography>
-              )}
-              {quotation.customer?.email && (
-                <Typography variant="body2">อีเมล: {quotation.customer.email}</Typography>
-              )}
+              <Stack
+                sx={{
+                  gap: 0.5,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {quotation.customer?.phone && (
+                  <Typography variant="body2">โทร: {quotation.customer.phone}</Typography>
+                )}
+                {quotation.customer?.email && (
+                  <Typography variant="body2">อีเมล: {quotation.customer.email}</Typography>
+                )}
+              </Stack>
               {quotation.customer?.address && (
                 <Typography variant="body2">ที่อยู่: {quotation.customer.address}</Typography>
               )}
@@ -439,7 +433,13 @@ export function QuotationDetailsView({ quotationId }: Props) {
                 ผู้เสนอราคา
               </Typography>
               <Box
+                component="button"
+                type="button"
+                onClick={() => setSignatureSigner('issuer')}
+                aria-label="ลงลายมือชื่อผู้เสนอราคา"
                 sx={{
+                  p: 0,
+                  width: 1,
                   height: 130,
                   border: '1px dashed',
                   borderColor: 'divider',
@@ -448,6 +448,18 @@ export function QuotationDetailsView({ quotationId }: Props) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   bgcolor: 'background.neutral',
+                  cursor: 'pointer',
+                  transition: (theme) =>
+                    theme.transitions.create(['border-color', 'background-color']),
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: 'primary.lighter',
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2,
+                  },
                 }}
               >
                 {quotation.issuerSignatureUrl ? (
@@ -473,7 +485,13 @@ export function QuotationDetailsView({ quotationId }: Props) {
                 ผู้รับข้อเสนอ
               </Typography>
               <Box
+                component="button"
+                type="button"
+                onClick={() => setSignatureSigner('customer')}
+                aria-label="ลงลายมือชื่อผู้รับข้อเสนอ"
                 sx={{
+                  p: 0,
+                  width: 1,
                   height: 130,
                   border: '1px dashed',
                   borderColor: 'divider',
@@ -482,6 +500,18 @@ export function QuotationDetailsView({ quotationId }: Props) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   bgcolor: 'background.neutral',
+                  cursor: 'pointer',
+                  transition: (theme) =>
+                    theme.transitions.create(['border-color', 'background-color']),
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: 'primary.lighter',
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2,
+                  },
                 }}
               >
                 {quotation.customerSignatureUrl ? (
@@ -630,8 +660,16 @@ export function QuotationDetailsView({ quotationId }: Props) {
           setQuotation((current) => {
             if (!current) return current;
             return signatureSigner === 'issuer'
-              ? { ...current, issuerSignatureUrl: signatureUrl }
-              : { ...current, customerSignatureUrl: signatureUrl };
+              ? {
+                  ...current,
+                  issuerSignatureUrl: signatureUrl,
+                  issuerSignedAt: new Date().toISOString(),
+                }
+              : {
+                  ...current,
+                  customerSignatureUrl: signatureUrl,
+                  customerSignedAt: new Date().toISOString(),
+                };
           })
         }
       />

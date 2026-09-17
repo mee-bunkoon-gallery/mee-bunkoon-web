@@ -26,6 +26,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Autocomplete from '@mui/material/Autocomplete';
 import DialogContent from '@mui/material/DialogContent';
 
+import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/global-config';
@@ -102,7 +103,11 @@ function toDefaultValues(
       contractName: contract.contractName ?? '',
       placeOfExecution: contract.placeOfExecution ?? '',
       quotation: contract.quotation
-        ? { id: contract.quotation.id, quoteNo: contract.quotation.quoteNo, total: contract.quotation.total }
+        ? {
+            id: contract.quotation.id,
+            quoteNo: contract.quotation.quoteNo,
+            total: contract.quotation.total,
+          }
         : null,
       customer: contract.customer
         ? { id: contract.customer.id, name: contract.customer.name }
@@ -155,7 +160,11 @@ function toDefaultValues(
     return {
       contractName: '',
       placeOfExecution: '',
-      quotation: { id: sourceQuotation.id, quoteNo: sourceQuotation.quoteNo, total: sourceQuotation.total },
+      quotation: {
+        id: sourceQuotation.id,
+        quoteNo: sourceQuotation.quoteNo,
+        total: sourceQuotation.total,
+      },
       customer: sourceQuotation.customer
         ? { id: sourceQuotation.customer.id, name: sourceQuotation.customer.name }
         : null,
@@ -298,6 +307,7 @@ export function ContractNewEditForm({
         note: watchedValues.note ?? null,
         issuerSignatureUrl: currentContract?.issuerSignatureUrl ?? null,
         customerSignatureUrl: currentContract?.customerSignatureUrl ?? null,
+        idCardFrontUrl: currentContract?.idCardFrontUrl ?? null,
         createdAt: currentContract?.createdAt ?? new Date().toISOString(),
         updatedAt: currentContract?.updatedAt ?? new Date().toISOString(),
       }
@@ -330,7 +340,7 @@ export function ContractNewEditForm({
         : await createContract(payload);
 
       toast.success(currentContract ? 'แก้ไขสัญญาแล้ว' : 'สร้างสัญญาแล้ว');
-      // router.push(paths.dashboard.contract.details(contract.id));
+      router.push(paths.dashboard.contract.details(contract.id));
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาด');
@@ -387,7 +397,11 @@ export function ContractNewEditForm({
                   control={control}
                   render={({ field }) => (
                     <Autocomplete
-                      options={quotations.map((q) => ({ id: q.id, quoteNo: q.quoteNo, total: q.total }))}
+                      options={quotations.map((q) => ({
+                        id: q.id,
+                        quoteNo: q.quoteNo,
+                        total: q.total,
+                      }))}
                       getOptionLabel={(option) => option.quoteNo}
                       isOptionEqualToValue={(option, value) => option.id === value.id}
                       value={field.value}
@@ -401,7 +415,10 @@ export function ContractNewEditForm({
                         if (selectedQuotation?.customer) {
                           setValue(
                             'customer',
-                            { id: selectedQuotation.customer.id, name: selectedQuotation.customer.name },
+                            {
+                              id: selectedQuotation.customer.id,
+                              name: selectedQuotation.customer.name,
+                            },
                             { shouldValidate: true }
                           );
                         }
@@ -423,7 +440,11 @@ export function ContractNewEditForm({
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Field.Text name="placeOfExecution" label="ทำขึ้นที่" placeholder="เช่น สำนักงานใหญ่ บริษัท..." />
+                <Field.Text
+                  name="placeOfExecution"
+                  label="ทำขึ้นที่"
+                  placeholder="เช่น สำนักงานใหญ่ บริษัท..."
+                />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>

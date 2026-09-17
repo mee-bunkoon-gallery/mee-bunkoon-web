@@ -5,7 +5,6 @@ import { Font, Page, View, Text, Image, Document, StyleSheet } from '@react-pdf/
 
 import { fBaht } from 'src/utils/format-number';
 
-import { CONTRACT_STATUS_META } from './contract-status';
 import { renderClauseBodyPdf } from './contract-pdf-rich-text';
 import {
   toClauseBodyHtml,
@@ -54,6 +53,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#212B36',
     marginBottom: 6,
   },
+  idCardImage: { width: '72%', maxHeight: 300, objectFit: 'contain', alignSelf: 'center' },
 });
 
 type Props = {
@@ -67,7 +67,6 @@ export function ContractPdfDocument({
   companyProfile,
   companyName = 'MEE BUNKOON GALLERY',
 }: Props) {
-  const statusMeta = CONTRACT_STATUS_META[contract.status];
   const issuerName = companyProfile?.storeNameTh || companyProfile?.name || companyName;
   const issuerNameEn = companyProfile?.storeNameEn;
 
@@ -209,6 +208,12 @@ export function ContractPdfDocument({
           </View>
         </View>
       </Page>
+      {!!contract.idCardFrontUrl && (
+        <Page size="A4" style={styles.page}>
+          <Text style={[styles.h3, styles.mb24]}>สำเนาบัตรประชาชน (ด้านหน้า)</Text>
+          <Image src={contract.idCardFrontUrl} style={styles.idCardImage} />
+        </Page>
+      )}
     </Document>
   );
 }

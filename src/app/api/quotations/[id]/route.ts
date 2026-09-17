@@ -36,6 +36,8 @@ function mapQuotation(row: any) {
     paymentTerms: row.payment_terms,
     issuerSignatureUrl: row.issuer_signature_url,
     customerSignatureUrl: row.customer_signature_url,
+    issuerSignedAt: row.issuer_signed_at,
+    customerSignedAt: row.customer_signed_at,
     items: (row.items ?? [])
       .sort((a: any, b: any) => a.position - b.position)
       .map((item: any) => ({

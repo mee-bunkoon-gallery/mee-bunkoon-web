@@ -12,9 +12,13 @@ function mapJob(row: any) {
     contractId: row.contract_id,
     customerId: row.customer_id,
     colorThemeId: row.color_theme_id,
+    colorThemeIds: row.color_theme_ids ?? (row.color_theme_id ? [row.color_theme_id] : []),
     colorTheme: row.color_theme
       ? { id: row.color_theme.id, name: row.color_theme.name, hexCode: row.color_theme.hex_code }
       : null,
+    colorThemes: row.color_theme
+      ? [{ id: row.color_theme.id, name: row.color_theme.name, hexCode: row.color_theme.hex_code }]
+      : [],
     customer: row.customer
       ? {
           id: row.customer.id,
@@ -30,6 +34,7 @@ function mapJob(row: any) {
         }
       : null,
     title: row.title,
+    jobDescription: row.job_description,
     jobDate: row.job_date,
     startTime: row.start_time,
     endTime: row.end_time,
@@ -148,7 +153,9 @@ export async function POST(request: Request) {
       contract_id: body.contractId || null,
       customer_id: body.customerId,
       color_theme_id: body.colorThemeId || null,
+      color_theme_ids: body.colorThemeIds || [],
       title: body.title || '',
+      job_description: body.jobDescription || null,
       job_date: body.jobDate,
       start_time: body.startTime || null,
       end_time: body.endTime || null,

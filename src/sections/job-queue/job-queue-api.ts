@@ -9,7 +9,9 @@ export type JobQueueInput = {
   contractId?: string | null;
   customerId: string;
   colorThemeId?: string | null;
+  colorThemeIds?: string[];
   title: string;
+  jobDescription?: string;
   jobDate: string;
   startTime?: string | null;
   endTime?: string | null;

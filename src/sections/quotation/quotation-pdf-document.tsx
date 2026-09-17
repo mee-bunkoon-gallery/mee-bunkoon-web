@@ -99,7 +99,12 @@ export function QuotationPdfDocument({
     .filter(Boolean)
     .join(' | ');
 
-  console.log('companyProfile', companyProfile);
+  const issuerContactCustomer = [
+    quotation?.customer?.phone ? `โทร: ${quotation.customer.phone}` : null,
+    quotation?.customer?.email ? `อีเมล: ${quotation?.customer?.email}` : null,
+  ]
+    .filter(Boolean)
+    .join(' | ');
 
   return (
     <Document>
@@ -153,11 +158,9 @@ export function QuotationPdfDocument({
             {quotation.customer?.contactPerson && (
               <Text style={styles.subtitle}>ผู้ติดต่อ: {quotation.customer.contactPerson}</Text>
             )}
-            {quotation.customer?.phone && (
-              <Text style={styles.subtitle}>โทร: {quotation.customer.phone}</Text>
-            )}
-            {quotation.customer?.email && (
-              <Text style={styles.subtitle}>อีเมล: {quotation.customer.email}</Text>
+
+            {!!issuerContactCustomer && (
+              <Text style={styles.subtitle}>{issuerContactCustomer}</Text>
             )}
             {quotation.customer?.address && (
               <Text style={styles.subtitle}>ที่อยู่: {quotation.customer.address}</Text>
@@ -246,7 +249,10 @@ export function QuotationPdfDocument({
             <View style={styles.signatureLine} />
             <Text style={styles.signatureText}>ลงชื่อผู้เสนอราคา</Text>
             <Text style={styles.subtitle}>{issuerName}</Text>
-            <Text style={[styles.subtitle, { marginTop: 4 }]}>วันที่ ____ / ____ / ______</Text>
+            <Text style={[styles.subtitle, { marginTop: 4 }]}>
+              วันที่{' '}
+              {quotation.issuerSignedAt ? fDate(quotation.issuerSignedAt) : '____ / ____ / ______'}
+            </Text>
           </View>
 
           <View style={styles.signatureBox}>
@@ -258,7 +264,12 @@ export function QuotationPdfDocument({
             <View style={styles.signatureLine} />
             <Text style={styles.signatureText}>ลงชื่อผู้รับข้อเสนอ</Text>
             <Text style={styles.subtitle}>{quotation.customer?.name || 'ลูกค้า'}</Text>
-            <Text style={[styles.subtitle, { marginTop: 4 }]}>วันที่ ____ / ____ / ______</Text>
+            <Text style={[styles.subtitle, { marginTop: 4 }]}>
+              วันที่{' '}
+              {quotation.customerSignedAt
+                ? fDate(quotation.customerSignedAt)
+                : '____ / ____ / ______'}
+            </Text>
           </View>
         </View>
       </Page>

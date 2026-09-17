@@ -44,6 +44,8 @@ export const CompanyProfileSchema = z.object({
   email: z.union([z.literal(''), z.email({ error: 'อีเมลไม่ถูกต้อง' })]).optional(),
   address: z.string().optional(),
   logo: z.union([z.file(), z.string(), z.null()]).optional(),
+  idCardFront: z.union([z.file(), z.string(), z.null()]).optional(),
+  idCardWatermark: z.string().optional(),
 });
 
 function toDefaultValues(profile: ICompanyProfile): CompanyProfileSchemaType {
@@ -58,6 +60,8 @@ function toDefaultValues(profile: ICompanyProfile): CompanyProfileSchemaType {
     email: profile.email ?? '',
     address: profile.address ?? '',
     logo: profile.logoUrl,
+    idCardFront: null,
+    idCardWatermark: 'ใช้สำหรับรับจ้างจัดงานเท่านั้น',
   };
 }
 
@@ -217,6 +221,27 @@ export function CompanyProfileView() {
                     slotProps={{ inputLabel: { shrink: true } }}
                     label="สาขา (เช่น สำนักงานใหญ่)"
                   />
+                )}
+
+                {entityType === 'individual' && (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      หน้าบัตรประชาชน
+                    </Typography>
+                    <Field.Upload
+                      name="idCardFront"
+                      maxSize={5 * 1024 * 1024}
+                      accept={{ 'image/*': [] }}
+                      helperText="อัปโหลดหรือถ่ายภาพหน้าบัตรประชาชน ขนาดไม่เกิน 5 MB"
+                    />
+                    <Field.Text
+                      name="idCardWatermark"
+                      label="ข้อความลายน้ำบนบัตร"
+                      sx={{ mt: 2 }}
+                      helperText="ข้อความนี้จะแสดงทับบนภาพบัตรประชาชน"
+                      slotProps={{ inputLabel: { shrink: true } }}
+                    />
+                  </Box>
                 )}
 
                 <Field.Text

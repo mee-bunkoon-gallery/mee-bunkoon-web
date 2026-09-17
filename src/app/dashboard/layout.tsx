@@ -15,7 +15,7 @@ const navData: NavSectionProps['data'] = [
     subheader: 'Overview',
     items: [
       {
-        title: 'Dashboard',
+        title: 'ภาพรวม',
         path: paths.dashboard.root,
         icon: <Iconify icon="solar:home-angle-bold-duotone" />,
       },

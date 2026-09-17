@@ -36,6 +36,8 @@ function mapQuotation(row: any) {
     paymentTerms: row.payment_terms,
     issuerSignatureUrl: row.issuer_signature_url,
     customerSignatureUrl: row.customer_signature_url,
+    issuerSignedAt: row.issuer_signed_at,
+    customerSignedAt: row.customer_signed_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

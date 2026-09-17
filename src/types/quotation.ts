@@ -54,6 +54,8 @@ export type IQuotation = {
   paymentTerms: string | null;
   issuerSignatureUrl: string | null;
   customerSignatureUrl: string | null;
+  issuerSignedAt: string | null;
+  customerSignedAt: string | null;
   items: IQuotationItem[];
   createdAt: string;
   updatedAt: string;

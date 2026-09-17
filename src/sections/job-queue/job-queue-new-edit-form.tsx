@@ -37,8 +37,9 @@ import { createJob, deleteJob, updateJob } from './job-queue-api';
 
 type JobQueueFormValues = {
   title: string;
+  jobDescription?: string;
   customer: { id: string; name: string } | null;
-  colorTheme: { id: string; name: string } | null;
+  colorThemes: { id: string; name: string }[];
   quotation: { id: string; quoteNo: string } | null;
   contract: { id: string; contractNo: string } | null;
   jobDate: string;
@@ -51,10 +52,11 @@ type JobQueueFormValues = {
 
 const JobQueueFormSchema = z.object({
   title: z.string().min(1, { error: 'กรุณากรอกชื่องาน' }),
+  jobDescription: z.string().optional(),
   customer: schemaUtils.nullableInput(z.object({ id: z.string(), name: z.string() }), {
     error: 'กรุณาเลือกลูกค้า',
   }),
-  colorTheme: z.object({ id: z.string(), name: z.string() }).nullable(),
+  colorThemes: z.array(z.object({ id: z.string(), name: z.string() })),
   quotation: z.object({ id: z.string(), quoteNo: z.string() }).nullable(),
   contract: z.object({ id: z.string(), contractNo: z.string() }).nullable(),
   jobDate: z.string().min(1, { error: 'กรุณาเลือกวันที่' }),
@@ -69,8 +71,11 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
   if (job) {
     return {
       title: job.title,
+      jobDescription: job.jobDescription ?? '',
       customer: job.customer ? { id: job.customer.id, name: job.customer.name } : null,
-      colorTheme: job.colorTheme ? { id: job.colorTheme.id, name: job.colorTheme.name } : null,
+      colorThemes:
+        job.colorThemes?.map((theme) => ({ id: theme.id, name: theme.name })) ??
+        (job.colorTheme ? [{ id: job.colorTheme.id, name: job.colorTheme.name }] : []),
       quotation: null,
       contract: null,
       jobDate: dayjs(job.jobDate).format(),
@@ -84,8 +89,9 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
 
   return {
     title: '',
+    jobDescription: '',
     customer: null,
-    colorTheme: null,
+    colorThemes: [],
     quotation: null,
     contract: null,
     jobDate: defaultDate ? dayjs(defaultDate).format() : dayjs().format(),
@@ -160,14 +166,27 @@ export function JobQueueNewEditForm({
     }
   }, [currentJob, initialQuotationId, initialContractId, quotations, contracts, setValue]);
 
+  useEffect(() => {
+    if (currentJob?.colorThemeIds?.length && colorThemes.length) {
+      setValue(
+        'colorThemes',
+        colorThemes
+          .filter((theme) => currentJob.colorThemeIds.includes(theme.id))
+          .map((theme) => ({ id: theme.id, name: theme.name }))
+      );
+    }
+  }, [currentJob, colorThemes, setValue]);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       const payload = {
         quotationId: data.quotation?.id ?? null,
         contractId: data.contract?.id ?? null,
         customerId: data.customer!.id,
-        colorThemeId: data.colorTheme?.id ?? null,
+        colorThemeId: data.colorThemes[0]?.id ?? null,
+        colorThemeIds: data.colorThemes.map((theme) => theme.id),
         title: data.title,
+        jobDescription: data.jobDescription,
         jobDate: dayjs(data.jobDate).format('YYYY-MM-DD'),
         startTime: data.startTime ? dayjs(data.startTime).format('HH:mm') : null,
         endTime: data.endTime ? dayjs(data.endTime).format('HH:mm') : null,
@@ -205,6 +224,13 @@ export function JobQueueNewEditForm({
       <Card sx={{ p: { xs: 3, md: 4 } }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <Field.Text name="title" label="ชื่องาน" />
+          <Field.Text
+            name="jobDescription"
+            label="รายละเอียดงาน"
+            multiline
+            rows={4}
+            placeholder="เช่น รูปแบบงาน สิ่งที่ต้องจัดเตรียม หรือรายละเอียดสำหรับทีมงาน"
+          />
 
           <Controller
             name="customer"
@@ -229,16 +255,19 @@ export function JobQueueNewEditForm({
           />
 
           <Controller
-            name="colorTheme"
+            name="colorThemes"
             control={control}
             render={({ field }) => (
               <Autocomplete
+                multiple
                 options={colorThemes.map((item) => ({ id: item.id, name: item.name }))}
                 getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={field.value}
                 onChange={(_event, value) => field.onChange(value)}
-                renderInput={(params) => <TextField {...params} label="โทนสี" />}
+                renderInput={(params) => (
+                  <TextField {...params} label="โทนสี" placeholder="เลือกได้มากกว่า 1" />
+                )}
               />
             )}
           />

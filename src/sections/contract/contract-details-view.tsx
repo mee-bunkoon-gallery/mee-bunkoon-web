@@ -71,6 +71,47 @@ function renderLines(text: string | null) {
     .filter(Boolean);
 }
 
+async function addIdCardWatermark(file: File, contractName: string): Promise<File> {
+  const imageUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new window.Image();
+      element.onload = () => resolve(element);
+      element.onerror = reject;
+      element.src = imageUrl;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('ไม่สามารถเตรียมรูปภาพได้');
+
+    context.drawImage(image, 0, 0);
+    const fontSize = Math.max(18, Math.round(canvas.width / 24));
+    context.save();
+    context.translate(canvas.width / 2, canvas.height / 2);
+    context.rotate((-18 * Math.PI) / 180);
+    context.fillStyle = 'rgba(68, 68, 68, 0.38)';
+    context.font = `700 ${fontSize}px sans-serif`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('ใช้สำหรับประกอบสัญญา', 0, -fontSize * 0.8);
+    context.fillText(contractName || 'สัญญาจ้างงาน', 0, fontSize * 1.2);
+    context.fillText('เท่านั้น', 0, fontSize * 2.4);
+    context.restore();
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.92)
+    );
+    if (!blob) throw new Error('ไม่สามารถสร้างรูปภาพได้');
+    return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 type Props = {
   contractId: string;
 };
@@ -118,6 +159,28 @@ export function ContractDetailsView({ contractId }: Props) {
   const clauses = parseContractClauses(contract.termsConditions);
   const mentionContext = buildContractMentionContext(contract, companyProfile);
 
+  const uploadIdCard = async (file?: File) => {
+    if (!file) return;
+    try {
+      const watermarkedFile = await addIdCardWatermark(
+        file,
+        contract.contractName || contract.contractNo
+      );
+      const formData = new FormData();
+      formData.append('file', watermarkedFile);
+      const response = await fetch(`/api/contracts/${contract.id}/id-card/`, {
+        method: 'POST',
+        body: formData,
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message);
+      setContract({ ...contract, idCardFrontUrl: payload.idCardFrontUrl });
+      toast.success('บันทึกหน้าบัตรประชาชนแล้ว');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'อัปโหลดรูปไม่สำเร็จ');
+    }
+  };
+
   return (
     <DashboardContent maxWidth="xl">
       <Box
@@ -156,7 +219,22 @@ export function ContractDetailsView({ contractId }: Props) {
           </Label>
         </Box>
 
-        <Box sx={{ gap: 1.5, display: 'flex' }}>
+        <Box
+          sx={{
+            gap: 1,
+            width: { xs: 1, sm: 'auto' },
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+            '& .MuiButton-root': {
+              minHeight: 40,
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              width: { xs: 'calc(50% - 4px)', sm: 'auto' },
+              justifyContent: { xs: 'flex-start', sm: 'center' },
+            },
+          }}
+        >
           <Button
             component={RouterLink}
             href={paths.dashboard.contract.edit(contract.id)}
@@ -191,22 +269,6 @@ export function ContractDetailsView({ contractId }: Props) {
             startIcon={<Iconify icon="solar:calendar-date-bold" />}
           >
             ลงคิวงาน
-          </Button>
-
-          <Button
-            variant="outlined"
-            startIcon={<Iconify icon="solar:pen-bold" />}
-            onClick={() => setSignatureSigner('issuer')}
-          >
-            เซ็นผู้รับจ้าง
-          </Button>
-
-          <Button
-            variant="outlined"
-            startIcon={<Iconify icon="solar:pen-bold" />}
-            onClick={() => setSignatureSigner('customer')}
-          >
-            เซ็นผู้ว่าจ้าง
           </Button>
 
           <Button
@@ -306,82 +368,6 @@ export function ContractDetailsView({ contractId }: Props) {
       </Card>
 
       <Card sx={{ p: { xs: 3, md: 5 }, mt: 3 }}>
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          ลายมือชื่อ
-        </Typography>
-
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              ผู้รับจ้าง
-            </Typography>
-            <Box
-              sx={{
-                height: 130,
-                border: '1px dashed',
-                borderColor: 'divider',
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'background.neutral',
-              }}
-            >
-              {contract.issuerSignatureUrl ? (
-                <Box
-                  component="img"
-                  src={contract.issuerSignatureUrl}
-                  alt="ลายมือชื่อผู้รับจ้าง"
-                  sx={{ maxWidth: '85%', maxHeight: 90, objectFit: 'contain' }}
-                />
-              ) : (
-                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
-                  ยังไม่ได้ลงชื่อ
-                </Typography>
-              )}
-            </Box>
-            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
-              {companyProfile?.storeNameTh || companyProfile?.name || CONFIG.appName}
-            </Typography>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              ผู้ว่าจ้าง
-            </Typography>
-            <Box
-              sx={{
-                height: 130,
-                border: '1px dashed',
-                borderColor: 'divider',
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'background.neutral',
-              }}
-            >
-              {contract.customerSignatureUrl ? (
-                <Box
-                  component="img"
-                  src={contract.customerSignatureUrl}
-                  alt="ลายมือชื่อผู้ว่าจ้าง"
-                  sx={{ maxWidth: '85%', maxHeight: 90, objectFit: 'contain' }}
-                />
-              ) : (
-                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
-                  ยังไม่ได้ลงชื่อ
-                </Typography>
-              )}
-            </Box>
-            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
-              {contract.customer?.name || 'ลูกค้า'}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Card>
-
-      <Card sx={{ p: { xs: 3, md: 5 }, mt: 3 }}>
         {!!contract.scopeOfWork && (
           <>
             <Typography variant="subtitle1" mb={3}>
@@ -445,6 +431,171 @@ export function ContractDetailsView({ contractId }: Props) {
             </Typography>
           </>
         )}
+      </Card>
+
+      <Card sx={{ p: { xs: 2.5, md: 3 }, mt: 3 }}>
+        <Grid container spacing={{ xs: 2.5, md: 3 }} alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography variant="h6">หน้าบัตรประชาชน</Typography>
+            <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
+              สำเนาหน้าบัตรของผู้ว่าจ้างสำหรับแนบกับสัญญา
+            </Typography>
+            <Button
+              component="label"
+              size="small"
+              variant="outlined"
+              sx={{ mt: 2 }}
+              startIcon={<Iconify icon="solar:gallery-add-bold" />}
+            >
+              {contract.idCardFrontUrl ? 'เปลี่ยนรูป' : 'แนบรูปหน้าบัตร'}
+              <input
+                hidden
+                accept="image/*"
+                capture="environment"
+                type="file"
+                onChange={(event) => uploadIdCard(event.target.files?.[0])}
+              />
+            </Button>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            {contract.idCardFrontUrl ? (
+              <Box
+                component="img"
+                src={contract.idCardFrontUrl}
+                alt="หน้าบัตรประชาชนผู้ว่าจ้าง"
+                onClick={() =>
+                  window.open(contract.idCardFrontUrl!, '_blank', 'noopener,noreferrer')
+                }
+                sx={{
+                  width: 1,
+                  height: 'auto',
+                  display: 'block',
+                  cursor: 'zoom-in',
+                  objectFit: 'contain',
+                  maxHeight: { xs: 280, md: 340 },
+                  borderRadius: 1.5,
+                  bgcolor: 'background.neutral',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  minHeight: 190,
+                  display: 'grid',
+                  textAlign: 'center',
+                  border: '1px dashed',
+                  borderColor: 'divider',
+                  borderRadius: 1.5,
+                  color: 'text.secondary',
+                  placeItems: 'center',
+                }}
+              >
+                ยังไม่ได้แนบหน้าบัตรประชาชน
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      </Card>
+
+      <Card sx={{ p: { xs: 3, md: 5 }, mt: 3 }}>
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          ลายมือชื่อ
+        </Typography>
+
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              ผู้รับจ้าง
+            </Typography>
+            <Box
+              component="button"
+              type="button"
+              onClick={() => setSignatureSigner('issuer')}
+              sx={{
+                p: 0,
+                height: 130,
+                width: 1,
+                cursor: 'pointer',
+                border: '1px dashed',
+                borderColor: 'divider',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'background.neutral',
+                transition: 'border-color 150ms ease, background-color 150ms ease',
+                '&:hover, &:focus-visible': {
+                  borderColor: 'primary.main',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              {contract.issuerSignatureUrl ? (
+                <Box
+                  component="img"
+                  src={contract.issuerSignatureUrl}
+                  alt="ลายมือชื่อผู้รับจ้าง"
+                  sx={{ maxWidth: '85%', maxHeight: 90, objectFit: 'contain' }}
+                />
+              ) : (
+                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
+                  ยังไม่ได้ลงชื่อ
+                </Typography>
+              )}
+            </Box>
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+              {companyProfile?.storeNameTh || companyProfile?.name || CONFIG.appName}
+            </Typography>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              ผู้ว่าจ้าง
+            </Typography>
+            <Box
+              component="button"
+              type="button"
+              onClick={() => setSignatureSigner('customer')}
+              sx={{
+                p: 0,
+                height: 130,
+                width: 1,
+                cursor: 'pointer',
+                border: '1px dashed',
+                borderColor: 'divider',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'background.neutral',
+                transition: 'border-color 150ms ease, background-color 150ms ease',
+                '&:hover, &:focus-visible': {
+                  borderColor: 'primary.main',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              {contract.customerSignatureUrl ? (
+                <Box
+                  component="img"
+                  src={contract.customerSignatureUrl}
+                  alt="ลายมือชื่อผู้ว่าจ้าง"
+                  sx={{ maxWidth: '85%', maxHeight: 90, objectFit: 'contain' }}
+                />
+              ) : (
+                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
+                  ยังไม่ได้ลงชื่อ
+                </Typography>
+              )}
+            </Box>
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+              {contract.customer?.name || 'ลูกค้า'}
+            </Typography>
+          </Grid>
+        </Grid>
       </Card>
 
       <Card sx={{ p: { xs: 3, md: 5 }, mt: 3 }}>

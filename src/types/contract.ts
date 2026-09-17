@@ -38,6 +38,7 @@ export type IContract = {
   note: string | null;
   issuerSignatureUrl: string | null;
   customerSignatureUrl: string | null;
+  idCardFrontUrl: string | null;
   createdAt: string;
   updatedAt: string;
 };

@@ -19,7 +19,10 @@ export type IJobQueue = {
   customer?: ICustomer | null;
   colorThemeId: string | null;
   colorTheme?: IColorTheme | null;
+  colorThemeIds: string[];
+  colorThemes: IColorTheme[];
   title: string;
+  jobDescription: string | null;
   jobDate: string;
   startTime: string | null;
   endTime: string | null;
