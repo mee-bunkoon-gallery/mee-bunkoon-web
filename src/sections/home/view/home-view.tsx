@@ -5,6 +5,7 @@ import type { IPublicPromotionPackage } from 'src/types/promotion-package';
 import { useState } from 'react';
 import Fade from 'embla-carousel-fade';
 import Autoplay from 'embla-carousel-autoplay';
+import { varAlpha } from 'minimal-shared/utils';
 import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
@@ -150,27 +151,35 @@ export function HomeView() {
       sx={{
         width: 1,
         overflow: 'hidden',
-        bgcolor: '#fffdf9',
+        bgcolor: 'background.default',
       }}
     >
       <Box
         component="section"
-        sx={{ minHeight: { xs: 700, md: 760 }, position: 'relative', bgcolor: '#fffdf9' }}
+        sx={{
+          minHeight: { xs: 700, md: 740 },
+          position: 'relative',
+          bgcolor: 'background.default',
+        }}
       >
         <Carousel
           carousel={heroCarousel}
           sx={{
             m: 0,
-            top: { xs: 96, md: 112 },
-            right: { xs: 16, sm: 32, md: 64 },
-            bottom: { xs: 32, md: 48 },
-            left: { xs: 16, sm: 32, md: 64 },
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
             width: 'auto',
             height: 'auto',
             overflow: 'hidden',
-            borderRadius: { xs: 2.5, md: 4 },
+            bgcolor: 'primary.main',
+            borderRadius: 0,
             position: 'absolute',
-            boxShadow: '0 28px 70px rgba(56,45,24,0.16)',
+            border: '1px solid',
+            borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.16),
+            boxShadow: (theme) =>
+              `0 28px 70px ${varAlpha(theme.vars.palette.primary.mainChannel, 0.18)}`,
           }}
           slotProps={{ container: { height: 1 }, slide: { height: 1 } }}
         >
@@ -182,20 +191,28 @@ export function HomeView() {
               visibleByDefault
               disablePlaceholder
               sx={{ width: 1, height: 1 }}
+              slotProps={{
+                img: {
+                  sx: {
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                  },
+                },
+              }}
             />
           ))}
         </Carousel>
         <Box
           sx={{
-            top: { xs: 96, md: 112 },
-            right: { xs: 16, sm: 32, md: 64 },
-            bottom: { xs: 32, md: 48 },
-            left: { xs: 16, sm: 32, md: 64 },
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
             overflow: 'hidden',
-            borderRadius: { xs: 2.5, md: 4 },
+            borderRadius: 0,
             position: 'absolute',
-            background:
-              'linear-gradient(90deg, rgba(23,18,10,0.78) 0%, rgba(23,18,10,0.44) 48%, rgba(23,18,10,0.12) 100%), linear-gradient(0deg, rgba(23,18,10,0.42), transparent 55%)',
+            background: (theme) =>
+              `linear-gradient(90deg, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.92)} 0%, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.6)} 48%, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.12)} 100%), linear-gradient(0deg, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.42)}, transparent 55%)`,
           }}
         />
         <Box
@@ -203,7 +220,7 @@ export function HomeView() {
             mx: 'auto',
             px: { xs: 5, sm: 8, md: 13 },
             pt: { xs: 17, md: 19 },
-            pb: { xs: 7, md: 8 },
+            pb: { xs: 11, md: 13 },
             maxWidth: 1440,
             minHeight: 'inherit',
             display: 'flex',
@@ -211,12 +228,12 @@ export function HomeView() {
             alignItems: 'center',
           }}
         >
-          <Box sx={{ zIndex: 1, maxWidth: 720, color: 'common.white' }}>
+          <Box sx={{ zIndex: 1, maxWidth: 680, color: 'common.white' }}>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-              <Box sx={{ width: 46, height: 2, bgcolor: 'secondary.main' }} />
+              <Box sx={{ width: 46, height: 2, bgcolor: 'common.white', opacity: 0.72 }} />
               <Typography
                 variant="overline"
-                sx={{ color: 'secondary.light', fontWeight: 800, letterSpacing: 2.6 }}
+                sx={{ color: 'common.white', opacity: 0.8, fontWeight: 800, letterSpacing: 2.6 }}
               >
                 {company.nameEn}
               </Typography>
@@ -224,7 +241,7 @@ export function HomeView() {
             <Typography
               component="h1"
               sx={{
-                fontSize: { xs: 43, sm: 64, md: 78 },
+                fontSize: { xs: 43, sm: 60, md: 70 },
                 fontWeight: 700,
                 lineHeight: 1.08,
                 letterSpacing: -1.5,
@@ -235,11 +252,7 @@ export function HomeView() {
                 component="span"
                 sx={{
                   display: 'block',
-                  color: 'secondary.light',
-                  background: 'linear-gradient(110deg, #f4d98f, #fff1bd 52%, #d7b66d)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
+                  color: 'common.white',
                 }}
               >
                 งดงามในแบบของคุณ
@@ -263,9 +276,14 @@ export function HomeView() {
                 href={paths.promotionPackages.root}
                 size="large"
                 variant="contained"
-                color="secondary"
                 endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
-                sx={{ px: 3.5, color: '#33240b', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}
+                sx={{
+                  px: 3.5,
+                  color: 'primary.main',
+                  bgcolor: 'common.white',
+                  boxShadow: '0 12px 30px rgba(0,0,0,0.18)',
+                  '&:hover': { bgcolor: 'grey.200' },
+                }}
               >
                 ดูแพ็กเกจและโปรโมชั่น
               </Button>
@@ -284,7 +302,7 @@ export function HomeView() {
             spacing={1.2}
             sx={{
               right: 96,
-              bottom: 76,
+              bottom: 88,
               display: { xs: 'none', md: 'flex' },
               position: 'absolute',
             }}
@@ -302,8 +320,7 @@ export function HomeView() {
                   height: 3,
                   border: 0,
                   cursor: 'pointer',
-                  bgcolor:
-                    index === heroCarousel.dots.selectedIndex ? 'secondary.light' : 'grey.400',
+                  bgcolor: index === heroCarousel.dots.selectedIndex ? 'common.white' : 'grey.400',
                   transition: 'width 180ms ease',
                 }}
               />
@@ -314,20 +331,29 @@ export function HomeView() {
 
       <Box
         component="section"
-        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 6, md: 10 }, position: 'relative', zIndex: 2 }}
+        sx={{
+          mt: { xs: -3, md: -6 },
+          px: { xs: 2.5, md: 8 },
+          pt: { xs: 9, md: 12 },
+          pb: { xs: 7, md: 10 },
+          zIndex: 2,
+          position: 'relative',
+          bgcolor: 'background.default',
+          borderRadius: { xs: '28px 28px 0 0', md: '48px 48px 0 0' },
+        }}
       >
         <Box
           sx={{
             mx: 'auto',
             maxWidth: 1280,
             display: 'grid',
-            gap: { xs: 4, md: 7 },
-            alignItems: 'center',
-            gridTemplateColumns: { xs: '1fr', md: '0.9fr 1.1fr' },
+            gap: { xs: 4, lg: 5 },
+            alignItems: 'stretch',
+            gridTemplateColumns: { xs: '1fr', lg: '400px minmax(0, 1fr)' },
           }}
         >
           <Box>
-            <Typography variant="overline" sx={{ color: 'secondary.dark', letterSpacing: 2 }}>
+            <Typography variant="overline" sx={{ color: 'primary.main', letterSpacing: 2 }}>
               WHY CHOOSE US
             </Typography>
             <Typography variant="h2" sx={{ mt: 1.5 }}>
@@ -338,17 +364,30 @@ export function HomeView() {
               เพื่อเปลี่ยนภาพในใจให้กลายเป็นบรรยากาศจริงที่น่าจดจำ
             </Typography>
           </Box>
-          <Stack spacing={1.5}>
+          <Box
+            sx={{
+              gap: 2,
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' },
+            }}
+          >
             {HIGHLIGHTS.map((item) => (
               <Stack
                 key={item.title}
-                direction="row"
-                spacing={2}
+                spacing={2.5}
                 sx={{
-                  p: 2.5,
-                  borderRadius: 2,
-                  bgcolor: '#f8f3e8',
-                  border: '1px solid rgba(181,137,55,0.2)',
+                  p: { xs: 2.5, md: 3 },
+                  minHeight: { sm: 230 },
+                  borderRadius: 2.5,
+                  bgcolor: (theme) => theme.vars.palette.primary.main,
+                  border: '1px solid',
+                  borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.18),
+                  transition: 'transform 180ms ease, box-shadow 180ms ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: (theme) =>
+                      `0 18px 36px ${varAlpha(theme.vars.palette.primary.mainChannel, 0.1)}`,
+                  },
                 }}
               >
                 <Box
@@ -359,29 +398,35 @@ export function HomeView() {
                     display: 'grid',
                     borderRadius: 1.5,
                     placeItems: 'center',
-                    color: 'secondary.dark',
+                    color: 'primary.main',
                     bgcolor: 'common.white',
-                    border: '1px solid rgba(181,137,55,0.22)',
+                    border: '1px solid',
+                    borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.2),
                   }}
                 >
                   <Iconify icon={item.icon as any} width={26} />
                 </Box>
-                <Box>
-                  <Typography variant="h6">{item.title}</Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
+                <Box sx={{ mt: 'auto !important' }}>
+                  <Typography variant="h5" color="secondary.main">
+                    {item.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ mt: 1, color: 'common.white', lineHeight: 1.7 }}
+                  >
                     {item.body}
                   </Typography>
                 </Box>
               </Stack>
             ))}
-          </Stack>
+          </Box>
         </Box>
       </Box>
 
       {promotionPackages.length > 0 && (
         <Box
           component="section"
-          sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#fffdf9' }}
+          sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: 'background.default' }}
         >
           <Box
             sx={{
@@ -389,8 +434,9 @@ export function HomeView() {
               p: { xs: 2.5, sm: 4, md: 5 },
               maxWidth: 1280,
               borderRadius: { xs: 2.5, md: 4 },
-              bgcolor: '#f8f3e8',
-              border: '1px solid rgba(181,137,55,0.16)',
+              bgcolor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.04),
+              border: '1px solid',
+              borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.16),
             }}
           >
             <SectionHeading
@@ -428,10 +474,12 @@ export function HomeView() {
                     borderRadius: 2,
                     position: 'relative',
                     textDecoration: 'none',
-                    border: '1px solid rgba(181,137,55,0.22)',
-                    boxShadow: '0 18px 48px rgba(96,70,25,0.12)',
+                    border: '1px solid',
+                    borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.2),
+                    boxShadow: (theme) =>
+                      `0 18px 48px ${varAlpha(theme.vars.palette.primary.mainChannel, 0.12)}`,
                     '&:hover img': { transform: 'scale(1.05)' },
-                    '&:focus-visible': { outline: '3px solid', outlineColor: 'secondary.main' },
+                    '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main' },
                   }}
                 >
                   <Image
@@ -492,7 +540,11 @@ export function HomeView() {
       {galleryImages.length > 0 && (
         <Box
           component="section"
-          sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#f8f3e8' }}
+          sx={{
+            px: { xs: 2.5, md: 8 },
+            py: { xs: 9, md: 14 },
+            bgcolor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.04),
+          }}
         >
           <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
             <SectionHeading
@@ -521,12 +573,13 @@ export function HomeView() {
                     cursor: 'pointer',
                     overflow: 'hidden',
                     borderRadius: 1.5,
-                    border: '1px solid rgba(181,137,55,0.18)',
+                    border: '1px solid',
+                    borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.18),
                     position: 'relative',
                     gridColumn: { md: index === 0 ? 'span 2' : 'span 1' },
                     gridRow: { md: index === 0 ? 'span 2' : 'span 1' },
                     '&:hover img': { transform: 'scale(1.05)' },
-                    '&:focus-visible': { outline: '3px solid', outlineColor: 'secondary.main' },
+                    '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main' },
                   }}
                 >
                   <Image
@@ -551,7 +604,7 @@ export function HomeView() {
                     <Typography variant="subtitle1">{image.title}</Typography>
                     {image.subtitle && <Typography variant="caption">{image.subtitle}</Typography>}
                     {!!image.album?.length && (
-                      <Typography variant="caption" sx={{ mt: 0.5, color: 'secondary.light' }}>
+                      <Typography variant="caption" sx={{ mt: 0.5, color: 'primary.light' }}>
                         ดูอัลบั้ม {image.album.length} ภาพ
                       </Typography>
                     )}
@@ -565,7 +618,7 @@ export function HomeView() {
 
       <Box
         component="section"
-        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#fffdf9' }}
+        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: 'background.default' }}
       >
         <Box
           sx={{
@@ -582,7 +635,11 @@ export function HomeView() {
               src="/assets/mee-bunkoon/bg-1.jpg"
               alt="ทีมงานมีบุญคุณ แกลเลอรี่"
               ratio="4/3"
-              sx={{ borderRadius: 2, border: '1px solid rgba(181,137,55,0.22)' }}
+              sx={{
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.2),
+              }}
             />
             <Box
               sx={{
@@ -591,15 +648,20 @@ export function HomeView() {
                 p: 2.5,
                 maxWidth: 220,
                 borderRadius: 1.5,
-                color: '#33240b',
+                color: 'primary.contrastText',
                 position: 'absolute',
-                bgcolor: 'secondary.light',
-                border: '1px solid rgba(155,107,32,0.25)',
-                boxShadow: '0 16px 36px rgba(96,70,25,0.18)',
+                bgcolor: 'primary.main',
+                border: '1px solid',
+                borderColor: 'primary.light',
+                boxShadow: (theme) =>
+                  `0 16px 36px ${varAlpha(theme.vars.palette.primary.mainChannel, 0.2)}`,
               }}
             >
               <Typography variant="h4">ใส่ใจทุกขั้นตอน</Typography>
-              <Typography variant="body2" sx={{ mt: 0.75, color: 'rgba(51,36,11,0.7)' }}>
+              <Typography
+                variant="body2"
+                sx={{ mt: 0.75, color: 'primary.contrastText', opacity: 0.72 }}
+              >
                 ตั้งแต่แนวคิดแรกจนถึงวันส่งมอบงาน
               </Typography>
             </Box>
@@ -607,11 +669,11 @@ export function HomeView() {
           <Box>
             <Typography
               variant="overline"
-              sx={{ color: 'secondary.dark', fontWeight: 800, letterSpacing: 2 }}
+              sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}
             >
               ABOUT US
             </Typography>
-            <Typography variant="h2" sx={{ mt: 1.5 }}>
+            <Typography variant="h2" color="primary" sx={{ mt: 1.5 }}>
               งานที่ดี เริ่มจากการฟังและเข้าใจ
             </Typography>
             <Typography sx={{ mt: 3, color: 'text.secondary', lineHeight: 1.9 }}>
@@ -637,7 +699,7 @@ export function HomeView() {
 
       <Box
         component="section"
-        sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 10, md: 20 }, bgcolor: '#fffdf9' }}
+        sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 10, md: 20 }, bgcolor: 'background.default' }}
       >
         <Box
           sx={{
@@ -649,14 +711,16 @@ export function HomeView() {
             color: 'text.primary',
             borderRadius: 2.5,
             position: 'relative',
-            border: '1px solid rgba(181,137,55,0.28)',
-            background:
-              'radial-gradient(circle at 90% 20%, rgba(215,182,109,0.28), transparent 30%), linear-gradient(135deg, #fffdf9, #f6ecd6)',
-            boxShadow: '0 24px 60px rgba(96,70,25,0.1)',
+            border: '1px solid',
+            borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.2),
+            background: (theme) =>
+              `radial-gradient(circle at 90% 20%, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.16)}, transparent 30%), linear-gradient(135deg, ${theme.vars.palette.background.paper}, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.08)})`,
+            boxShadow: (theme) =>
+              `0 24px 60px ${varAlpha(theme.vars.palette.primary.mainChannel, 0.1)}`,
           }}
         >
           <Box sx={{ zIndex: 1, maxWidth: 760, position: 'relative' }}>
-            <Typography variant="overline" sx={{ color: 'secondary.light', letterSpacing: 2 }}>
+            <Typography variant="overline" sx={{ color: 'primary.main', letterSpacing: 2 }}>
               LET&apos;S CREATE TOGETHER
             </Typography>
             <Typography variant="h2" sx={{ mt: 1.5 }}>
@@ -670,7 +734,7 @@ export function HomeView() {
                 component="a"
                 href={`tel:${company.phone.replace(/[^0-9+]/g, '')}`}
                 size="large"
-                color="secondary"
+                color="primary"
                 variant="contained"
                 startIcon={<Iconify icon="solar:phone-bold" />}
               >
@@ -681,7 +745,7 @@ export function HomeView() {
                 href={paths.jobQueue}
                 size="large"
                 variant="outlined"
-                sx={{ color: 'text.primary', borderColor: 'rgba(155,107,32,0.42)' }}
+                sx={{ color: 'primary.main', borderColor: 'primary.main' }}
               >
                 ดูคิวงาน
               </Button>
@@ -762,7 +826,7 @@ export function HomeView() {
                       cursor: 'pointer',
                       overflow: 'hidden',
                       borderRadius: 1,
-                      borderColor: isSelected ? 'secondary.main' : 'transparent',
+                      borderColor: isSelected ? 'primary.main' : 'transparent',
                       opacity: isSelected ? 1 : 0.58,
                       transition: 'opacity 180ms ease, border-color 180ms ease',
                       '&:hover': { opacity: 1 },
@@ -806,11 +870,11 @@ function SectionHeading({
       <Box sx={{ maxWidth: 780 }}>
         <Typography
           variant="overline"
-          sx={{ color: 'secondary.dark', fontWeight: 800, letterSpacing: 2 }}
+          sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}
         >
           {eyebrow}
         </Typography>
-        <Typography variant="h2" sx={{ mt: 1 }}>
+        <Typography variant="h2" color="primary" sx={{ mt: 1 }}>
           {title}
         </Typography>
         <Typography sx={{ mt: 1.5, color: 'text.secondary', lineHeight: 1.8 }}>

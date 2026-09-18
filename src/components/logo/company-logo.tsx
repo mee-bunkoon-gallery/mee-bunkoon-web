@@ -57,14 +57,21 @@ export function CompanyLogo({ sx, isRow }: CompanyLogoProps) {
         href="/"
         sx={{ color: 'inherit', textDecoration: 'none', lineHeight: 1.1 }}
       >
-        <Typography sx={{ fontSize: { xs: 13, sm: 15 }, fontWeight: 800, lineHeight: 1.2 }}>
+        <Typography
+          sx={{
+            fontSize: { xs: 13, sm: 15 },
+            fontWeight: 800,
+            lineHeight: 1.2,
+            color: (theme) => theme.palette.secondary.dark,
+          }}
+        >
           {companyName}
         </Typography>
         <Typography
           sx={{
-            mt: 0.25,
+            mt: 0.5,
             display: { xs: 'none', sm: 'block' },
-            color: 'inherit',
+            color: (theme) => theme.palette.secondary.dark,
             opacity: 0.64,
             fontSize: 10,
             fontWeight: 600,
