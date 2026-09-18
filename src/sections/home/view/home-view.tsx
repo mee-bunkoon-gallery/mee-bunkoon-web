@@ -272,10 +272,22 @@ export function HomeView() {
         >
           <Box sx={{ zIndex: 1, maxWidth: 680, color: 'common.white' }}>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-              <Box sx={{ width: 46, height: 2, bgcolor: 'common.white', opacity: 0.72 }} />
+              <Box
+                sx={{
+                  width: 46,
+                  height: 2,
+                  bgcolor: (theme) => theme.palette.secondary.main,
+                  opacity: 0.72,
+                }}
+              />
               <Typography
                 variant="overline"
-                sx={{ color: 'common.white', opacity: 0.8, fontWeight: 800, letterSpacing: 2.6 }}
+                sx={{
+                  color: (theme) => theme.palette.secondary.main,
+                  opacity: 0.8,
+                  fontWeight: 800,
+                  letterSpacing: 2.6,
+                }}
               >
                 {activeHero.eyebrow || company.nameEn}
               </Typography>
