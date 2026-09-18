@@ -112,17 +112,17 @@ export const _socials = [
   {
     value: 'facebook',
     label: 'Facebook',
-    path: 'https://www.facebook.com/profile.php?id=100083596260914',
+    path: 'https://www.facebook.com/profile.php?id=100075973069214',
   },
   {
     value: 'instagram',
     label: 'Instagram',
-    path: 'https://www.instagram.com/caitlyn.kerluke',
+    path: 'https://www.instagram.com/meebunkoon.gallery',
   },
   {
-    value: 'twitter',
-    label: 'Twitter',
-    path: 'https://www.twitter.com/caitlyn.kerluke',
+    value: 'tiktok',
+    label: 'Tiktok',
+    path: 'https://www.tiktok.com/@meebunkoon',
   },
 ];
 

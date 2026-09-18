@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { fDate } from 'src/utils/format-time';
@@ -67,12 +66,13 @@ export function PublicJobQueueView() {
     <Box
       sx={{
         minHeight: '100vh',
-        py: { xs: 4, md: 12 },
-        background:
-          'linear-gradient(180deg, rgba(240, 244, 248, 0.82) 0%, rgba(255, 255, 255, 1) 42%)',
+        px: { xs: 2.5, md: 8 },
+        pt: { xs: 14, md: 12 },
+        pb: { xs: 8, md: 12 },
+        bgcolor: 'background.neutral',
       }}
     >
-      <Container maxWidth="lg">
+      <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
         <Box
           sx={{
             px: { xs: 2.5, sm: 5 },
@@ -82,9 +82,9 @@ export function PublicJobQueueView() {
             overflow: 'hidden',
             position: 'relative',
             borderRadius: { xs: 2.5, sm: 3 },
-            boxShadow: '0 24px 48px rgba(13, 32, 61, 0.2)',
+            boxShadow: '0 24px 54px rgba(5, 37, 24, 0.2)',
             backgroundImage:
-              'linear-gradient(105deg, rgba(13, 32, 61, 0.98), rgba(13, 32, 61, 0.78)), url(/assets/background/background-3.webp)',
+              'linear-gradient(105deg, rgba(5, 37, 24, 0.98), rgba(9, 65, 44, 0.82)), url(/assets/background/hero-2.jpg)',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
             '&::after': {
@@ -134,8 +134,8 @@ export function PublicJobQueueView() {
                 </Box>
               )}
               <Box>
-                <Typography variant="overline" sx={{ opacity: 0.76 }}>
-                  {companyName}
+                <Typography variant="overline" sx={{ color: 'secondary.light', letterSpacing: 2 }}>
+                  UPCOMING EVENTS
                 </Typography>
                 <Typography variant="h3" sx={{ mt: 0.25, fontSize: { xs: 32, sm: 42 } }}>
                   คิวงานที่กำลังจะมาถึง
@@ -197,7 +197,7 @@ export function PublicJobQueueView() {
                   transition: 'transform 180ms ease, box-shadow 180ms ease',
                   '&:hover': {
                     transform: { sm: 'translateY(-2px)' },
-                    boxShadow: '0 16px 34px rgba(13, 32, 61, 0.12)',
+                    boxShadow: '0 16px 34px rgba(5, 37, 24, 0.12)',
                   },
                 }}
               >
@@ -307,7 +307,7 @@ export function PublicJobQueueView() {
             </Card>
           )}
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 }

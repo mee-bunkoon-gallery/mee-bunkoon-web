@@ -116,6 +116,7 @@ export function MainLayout({
       <HeaderSection
         layoutQuery={layoutQuery}
         {...slotProps?.header}
+        defaultColor={isHomePage ? '#FFFFFF' : slotProps?.header?.defaultColor}
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={slotProps?.header?.slotProps}
         sx={slotProps?.header?.sx}

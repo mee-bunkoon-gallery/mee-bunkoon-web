@@ -12,13 +12,17 @@ function mapPackage(row: any) {
     startDate: row.start_date,
     endDate: row.end_date,
     active: row.active,
+    eventTypeId: row.event_type_id,
+    eventType: row.event_type
+      ? { id: row.event_type.id, name: row.event_type.name, inUse: true }
+      : null,
     items: (row.items ?? [])
       .sort((a: any, b: any) => a.position - b.position)
       .map((item: any) => ({
         id: item.id,
         serviceItemId: item.service_item_id,
         quantity: Number(item.quantity),
-        unitPrice: Number(item.unit_price),
+        unitPrice: Number(item.service_item.unit_price),
         serviceItem: {
           id: item.service_item.id,
           name: item.service_item.name,
@@ -37,7 +41,8 @@ function mapPackage(row: any) {
   };
 }
 
-const selectPackage = '*, items:promotion_package_items(*, service_item:service_items(*))';
+const selectPackage =
+  '*, event_type:event_types(*), items:promotion_package_items(*, service_item:service_items(*))';
 
 export async function GET(request: Request) {
   const supabase = await createSupabaseServerClient();
@@ -86,6 +91,7 @@ export async function POST(request: Request) {
       start_date: body.startDate || null,
       end_date: body.endDate || null,
       active: body.active ?? true,
+      event_type_id: body.eventTypeId,
       created_by: user.id,
     })
     .select('id')

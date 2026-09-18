@@ -132,6 +132,14 @@ export async function PUT(request: Request, { params }: Params) {
     if (themesError) return NextResponse.json({ message: themesError.message }, { status: 400 });
   }
 
+  const { error: packageItemsError } = await supabase
+    .from('promotion_package_items')
+    .update({ unit_price: data.unit_price })
+    .eq('service_item_id', id);
+  if (packageItemsError) {
+    return NextResponse.json({ message: packageItemsError.message }, { status: 400 });
+  }
+
   const [linkedItemsResult, previousNameItemsResult, currentNameItemsResult] = await Promise.all([
     supabase.from('quotation_items').select('id, quotation_id, quantity').eq('service_item_id', id),
     supabase

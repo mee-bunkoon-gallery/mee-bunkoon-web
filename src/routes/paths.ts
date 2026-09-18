@@ -23,6 +23,10 @@ export const paths = {
   about: '/about-us',
   contact: '/contact-us',
   jobQueue: '/job-queue',
+  promotionPackages: {
+    root: '/packages',
+    details: (id: string) => `/packages/${id}`,
+  },
   faqs: '/faqs',
   page403: '/error/403',
   page404: '/error/404',

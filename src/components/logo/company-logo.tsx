@@ -4,6 +4,12 @@ import type { Theme, SxProps } from '@mui/material/styles';
 
 import { useState, useEffect } from 'react';
 
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+
+import { RouterLink } from 'src/routes/components';
+
 import { Logo } from './logo';
 
 // ----------------------------------------------------------------------
@@ -13,7 +19,8 @@ type CompanyLogoProps = {
 };
 
 export function CompanyLogo({ sx }: CompanyLogoProps) {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState('มีบุญคุณ แกลเลอรี่');
+  const [companyNameEn, setCompanyNameEn] = useState('MEE BUNKOON GALLERY');
 
   useEffect(() => {
     let mounted = true;
@@ -24,7 +31,10 @@ export function CompanyLogo({ sx }: CompanyLogoProps) {
         return response.json();
       })
       .then((payload) => {
-        if (mounted) setLogoUrl(payload?.company?.logoUrl ?? null);
+        if (mounted && payload?.company) {
+          setCompanyName(payload.company.name || 'มีบุญคุณ แกลเลอรี่');
+          setCompanyNameEn(payload.company.nameEn || 'MEE BUNKOON GALLERY');
+        }
       })
       .catch(() => undefined);
 
@@ -33,17 +43,32 @@ export function CompanyLogo({ sx }: CompanyLogoProps) {
     };
   }, []);
 
-  if (logoUrl) return <Logo sx={sx} />;
-
-  // return (
-  //   <Box
-  //     component="img"
-  //     src={logoUrl}
-  //     alt="โลโก้บริษัท"
-  //     sx={[
-  //       { width: 40, height: 40, objectFit: 'contain', flexShrink: 0 },
-  //       ...(Array.isArray(sx) ? sx : [sx]),
-  //     ]}
-  //   />
-  // );
+  return (
+    <Stack direction="row" spacing={1.5} alignItems="center">
+      <Logo sx={sx} />
+      <Box
+        component={RouterLink}
+        href="/"
+        sx={{ color: 'inherit', textDecoration: 'none', lineHeight: 1.1 }}
+      >
+        <Typography sx={{ fontSize: { xs: 13, sm: 15 }, fontWeight: 800, lineHeight: 1.2 }}>
+          {companyName}
+        </Typography>
+        <Typography
+          sx={{
+            mt: 0.25,
+            display: { xs: 'none', sm: 'block' },
+            color: 'inherit',
+            opacity: 0.64,
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: 0.7,
+            lineHeight: 1.2,
+          }}
+        >
+          {companyNameEn}
+        </Typography>
+      </Box>
+    </Stack>
+  );
 }

@@ -60,6 +60,7 @@ export function useUpdateServiceItemMutation() {
       updateServiceItem(id, input),
     onSuccess: (serviceItem: IServiceItem) => {
       queryClient.invalidateQueries({ queryKey: serviceItemKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ['promotion-packages'] });
       queryClient.setQueryData(serviceItemKeys.detail(serviceItem.id), serviceItem);
     },
   });

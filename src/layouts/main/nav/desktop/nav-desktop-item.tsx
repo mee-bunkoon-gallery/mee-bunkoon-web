@@ -1,7 +1,7 @@
 import type { CSSObject } from '@mui/material/styles';
 import type { NavItemProps } from '../types';
 
-import { varAlpha, mergeClasses } from 'minimal-shared/utils';
+import { mergeClasses } from 'minimal-shared/utils';
 
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
@@ -76,16 +76,17 @@ const ItemRoot = styled(ButtonBase, { shouldForwardProp })<StyledState>(({
     content: '""',
     borderRadius: '50%',
     position: 'absolute',
-    backgroundColor: varAlpha(theme.vars.palette.text.disabledChannel, 0.64),
+    backgroundColor: 'currentColor',
+    opacity: 0.56,
     transition: theme.transitions.create(['opacity', 'scale'], {
       duration: theme.transitions.duration.shorter,
     }),
-    ...(active && { ...dotTransitions.out, backgroundColor: theme.vars.palette.primary.main }),
+    ...(active && { ...dotTransitions.out, opacity: 1 }),
   };
 
   const rootItemStyles: CSSObject = {
     ...(open && { '&::before': { ...dotTransitions.out } }),
-    ...(active && { color: theme.vars.palette.primary.main }),
+    ...(active && { color: 'inherit' }),
   };
 
   const subItemStyles: CSSObject = {
@@ -114,7 +115,7 @@ const ItemTitle = styled('span', { shouldForwardProp })<StyledState>(({ theme })
   ...navItemStyles.title(theme),
   ...theme.typography.body2,
   fontWeight: theme.typography.fontWeightMedium,
-  color: theme.palette.common.white,
+  color: 'inherit',
   variants: [
     { props: { variant: 'subItem' }, style: { fontSize: theme.typography.pxToRem(13) } },
     { props: { active: true }, style: { fontWeight: theme.typography.fontWeightSemiBold } },

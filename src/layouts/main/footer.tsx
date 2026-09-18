@@ -72,6 +72,12 @@ const getLinks = (companyName: string) => [
   },
 ];
 
+const SOCIAL_ICONS = {
+  facebook: 'socials:facebook',
+  instagram: 'socials:instagram',
+  tiktok: 'logos:tiktok-icon',
+} as const;
+
 // ----------------------------------------------------------------------
 
 const FooterRoot = styled('footer')(({ theme }) => ({
@@ -95,6 +101,9 @@ export function Footer({
 
       <Container
         sx={(theme) => ({
+          width: { xs: 'calc(100% - 40px)', md: 'calc(100% - 128px)' },
+          maxWidth: '1280px !important',
+          px: '0 !important',
           pb: 5,
           pt: 10,
           textAlign: 'center',
@@ -135,11 +144,15 @@ export function Footer({
               })}
             >
               {_socials.map((social) => (
-                <IconButton key={social.label}>
-                  {social.value === 'twitter' && <Iconify icon="socials:twitter" />}
-                  {social.value === 'facebook' && <Iconify icon="socials:facebook" />}
-                  {social.value === 'instagram' && <Iconify icon="socials:instagram" />}
-                  {social.value === 'linkedin' && <Iconify icon="socials:linkedin" />}
+                <IconButton
+                  key={social.label}
+                  component="a"
+                  href={social.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                >
+                  <Iconify icon={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] as any} />
                 </IconButton>
               ))}
             </Box>
@@ -211,8 +224,28 @@ export function HomeFooter({ sx, ...other }: FooterProps) {
       ]}
       {...other}
     >
-      <Container>
+      <Container
+        sx={{
+          width: { xs: 'calc(100% - 40px)', md: 'calc(100% - 128px)' },
+          maxWidth: '1280px !important',
+          px: '0 !important',
+        }}
+      >
         <CompanyLogo sx={{ width: 100, height: 100 }} />
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+          {_socials.map((social) => (
+            <IconButton
+              key={social.label}
+              component="a"
+              href={social.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.label}
+            >
+              <Iconify icon={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] as any} />
+            </IconButton>
+          ))}
+        </Box>
         <Box sx={{ mt: 1, typography: 'caption', color: theme.palette.secondary.main }}>
           © {company.nameEn}
         </Box>

@@ -4,8 +4,8 @@ import type { AppBarProps } from '@mui/material/AppBar';
 import type { ContainerProps } from '@mui/material/Container';
 import type { Theme, SxProps, CSSObject, Breakpoint } from '@mui/material/styles';
 
-import { mergeClasses } from 'minimal-shared/utils';
 import { useScrollOffsetTop } from 'minimal-shared/hooks';
+import { varAlpha, mergeClasses } from 'minimal-shared/utils';
 
 import AppBar from '@mui/material/AppBar';
 import { styled } from '@mui/material/styles';
@@ -17,6 +17,7 @@ import { layoutClasses } from './classes';
 
 export type HeaderSectionProps = AppBarProps & {
   layoutQuery?: Breakpoint;
+  defaultColor?: string;
   disableOffset?: boolean;
   disableElevation?: boolean;
   slots?: {
@@ -39,7 +40,8 @@ export function HeaderSection({
   className,
   disableOffset,
   disableElevation,
-  layoutQuery = 'xl',
+  defaultColor,
+  layoutQuery = 'lg',
   ...other
 }: HeaderSectionProps) {
   const { offsetTop: isOffset } = useScrollOffsetTop();
@@ -54,6 +56,7 @@ export function HeaderSection({
       className={mergeClasses([layoutClasses.header, className])}
       sx={[
         (theme) => ({
+          '--color': defaultColor ?? theme.vars.palette.text.primary,
           ...(isOffset && {
             '--color': `var(--offset-color, ${theme.vars.palette.text.primary})`,
           }),
@@ -101,9 +104,9 @@ const HeaderRoot = styled(AppBar, {
   };
 
   const bgStyles: CSSObject = {
-    // ...theme.mixins.bgBlur({
-    //   color: varAlpha(theme.vars.palette.background.defaultChannel, 0.8),
-    // }),
+    ...theme.mixins.bgBlur({
+      color: varAlpha(theme.vars.palette.background.defaultChannel, 0.88),
+    }),
     ...pauseStyles,
     top: 0,
     left: 0,
@@ -129,6 +132,9 @@ const HeaderRoot = styled(AppBar, {
 
   return {
     zIndex: 'var(--layout-header-zIndex)',
+    transition: theme.transitions.create(['color'], {
+      duration: theme.transitions.duration.shorter,
+    }),
     ...(!disableOffset && { '&::before': bgStyles }),
     ...(!disableElevation && { '&::after': shadowStyles }),
   };
@@ -136,12 +142,19 @@ const HeaderRoot = styled(AppBar, {
 
 const HeaderContainer = styled(Container, {
   shouldForwardProp: (prop: string) => !['layoutQuery', 'sx'].includes(prop),
-})<Pick<HeaderSectionProps, 'layoutQuery'>>(({ layoutQuery = 'md', theme }) => ({
+})<Pick<HeaderSectionProps, 'layoutQuery'>>(({ layoutQuery = 'lg', theme }) => ({
+  width: 'calc(100% - 40px)',
+  maxWidth: '1280px !important',
+  paddingLeft: '0 !important',
+  paddingRight: '0 !important',
   display: 'flex',
   alignItems: 'center',
   color: 'var(--color)',
   height: 'var(--layout-header-mobile-height)',
-  [theme.breakpoints.up(layoutQuery)]: { height: 'var(--layout-header-desktop-height)' },
+  [theme.breakpoints.up(layoutQuery)]: {
+    width: 'calc(100% - 128px)',
+    height: 'var(--layout-header-desktop-height)',
+  },
 }));
 
 const HeaderCenterArea = styled('div')(() => ({

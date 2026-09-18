@@ -1,5 +1,7 @@
 'use client';
 
+import type { IPublicPromotionPackage } from 'src/types/promotion-package';
+
 import { useState } from 'react';
 import Fade from 'embla-carousel-fade';
 import Autoplay from 'embla-carousel-autoplay';
@@ -7,34 +9,34 @@ import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import { useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import DialogContent from '@mui/material/DialogContent';
 
+import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
+
 import { fDate } from 'src/utils/format-time';
+import { fBaht } from 'src/utils/format-number';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { Carousel, useCarousel } from 'src/components/carousel';
 
-// ----------------------------------------------------------------------
-
-const HERO_IMAGE = [
+const HERO_IMAGES = [
   '/assets/background/hero-1.jpg',
   '/assets/background/hero-2.jpg',
   '/assets/background/hero-3.jpg',
-  // '/assets/background/hero-4.jpg',
-  // '/assets/background/hero-5.jpg',
-  // '/assets/background/hero-6.jpg',
-  // '/assets/background/hero-7.jpg',
-].slice(0, 7);
-const SCENES_IMAGE = '/assets/mee-bunkoon/hero-3.jpg';
-const MEMORIAL_IMAGE = '/assets/mee-bunkoon/hero-1.jpg';
-const KRU_IMAGE = '/assets/mee-bunkoon/bg-1.jpg';
+];
 
-const SCENES_1_IMAGE = '/assets/mee-bunkoon/hero-2.jpg';
+const FALLBACK_GALLERY = [
+  '/assets/mee-bunkoon/hero-1.jpg',
+  '/assets/mee-bunkoon/hero-2.jpg',
+  '/assets/mee-bunkoon/hero-3.jpg',
+  '/assets/mee-bunkoon/hero-4.jpg',
+];
 
 const DEFAULT_COMPANY = {
   name: 'มีบุญคุณ แกลเลอรี่',
@@ -45,12 +47,7 @@ const DEFAULT_COMPANY = {
 };
 
 type PublicCompany = typeof DEFAULT_COMPANY;
-
-type GalleryImage = {
-  title: string;
-  src: string;
-};
-
+type GalleryImage = { title: string; subtitle?: string; src: string };
 type PublicDelivery = {
   id: string;
   deliveryNo: string;
@@ -59,50 +56,29 @@ type PublicDelivery = {
   imageUrls: string[];
 };
 
-const highlights = [
+const HIGHLIGHTS = [
   {
-    icon: '01',
-    title: 'รับจัดงานครบวงจร',
-    body: 'ดูแลงานแต่ง งานบุญ งานเลี้ยง และกิจกรรมพิเศษ ตั้งแต่เริ่มต้นจนจบงาน',
+    icon: 'solar:palette-bold-duotone',
+    title: 'ออกแบบเฉพาะคุณ',
+    body: 'ออกแบบธีม สี และองค์ประกอบให้เข้ากับเรื่องราวและงบประมาณของคุณ',
   },
   {
-    icon: '02',
-    title: 'ออกแบบให้ตรงใจ',
-    body: 'ออกแบบธีม สีสัน ฉาก และองค์ประกอบของงานให้สะท้อนความเป็นคุณ',
+    icon: 'solar:stars-bold-duotone',
+    title: 'ครบทุกองค์ประกอบ',
+    body: 'ดูแลฉาก ดอกไม้ แสง สี เสียง และรายละเอียดสำคัญไว้ในทีมเดียว',
   },
   {
-    icon: '03',
-    title: 'ทีมงานดูแลหน้างาน',
-    body: 'ประสานงานและดูแลรายละเอียดหน้างาน เพื่อให้ทุกช่วงเวลาราบรื่น',
-  },
-];
-
-const ROYAL_IMAGE_ITEMS = [
-  {
-    title: 'ตัวอย่างผลงานจัดงาน',
-    src: '/assets/mee-bunkoon/hero-1.jpg',
-  },
-  {
-    title: 'ตัวอย่างผลงานจัดงาน',
-    src: '/assets/mee-bunkoon/hero-2.jpg',
-  },
-  {
-    title: 'ตัวอย่างผลงานจัดงาน',
-    src: '/assets/mee-bunkoon/hero-3.jpg',
-  },
-  {
-    title: 'ตัวอย่างผลงานจัดงาน',
-    src: '/assets/mee-bunkoon/hero-4.jpg',
+    icon: 'solar:shield-check-bold-duotone',
+    title: 'ทีมงานมืออาชีพ',
+    body: 'วางแผน ประสานงาน และดูแลหน้างาน เพื่อให้วันสำคัญเป็นไปอย่างราบรื่น',
   },
 ];
 
 async function fetchPublicCompany(): Promise<PublicCompany> {
   const response = await fetch('/api/public/company/', { cache: 'no-store' });
   if (!response.ok) return DEFAULT_COMPANY;
-
   const payload = await response.json();
   if (!payload?.company) return DEFAULT_COMPANY;
-
   return {
     name: payload.company.name || DEFAULT_COMPANY.name,
     nameEn: payload.company.nameEn || DEFAULT_COMPANY.nameEn,
@@ -115,568 +91,354 @@ async function fetchPublicCompany(): Promise<PublicCompany> {
 async function fetchPublicDeliveries(): Promise<PublicDelivery[]> {
   const response = await fetch('/api/public/deliveries/', { cache: 'no-store' });
   if (!response.ok) return [];
+  return (await response.json())?.deliveries ?? [];
+}
 
-  const payload = await response.json();
-  return payload?.deliveries ?? [];
+async function fetchPublicPromotionPackages(): Promise<IPublicPromotionPackage[]> {
+  const response = await fetch('/api/public/promotion-packages/?limit=6', { cache: 'no-store' });
+  if (!response.ok) return [];
+  return (await response.json())?.packages ?? [];
 }
 
 export function HomeView() {
-  const theme = useTheme();
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const heroCarousel = useCarousel({ loop: true, duration: 80 }, [
     Fade(),
-    Autoplay({ playOnInit: true, delay: 5000 }),
+    Autoplay({ playOnInit: true, delay: 5500 }),
   ]);
-
   const { data: company = DEFAULT_COMPANY } = useQuery({
     queryKey: ['public-company'],
     queryFn: fetchPublicCompany,
     retry: false,
   });
-
   const { data: deliveries = [] } = useQuery({
     queryKey: ['public-deliveries'],
     queryFn: fetchPublicDeliveries,
     retry: false,
   });
+  const { data: promotionPackages = [] } = useQuery({
+    queryKey: ['public-promotion-packages', 'featured'],
+    queryFn: fetchPublicPromotionPackages,
+    retry: false,
+  });
 
-  const deliveryImages = deliveries
+  const deliveryImages: GalleryImage[] = deliveries
     .flatMap((delivery) =>
-      delivery.imageUrls.map((src, index) => ({
+      delivery.imageUrls.map((src) => ({
         src,
         title: delivery.itemsDelivered || 'ผลงานของเรา',
         subtitle: `${fDate(delivery.deliveryDate)} · ภาพบรรยากาศงาน`,
       }))
     )
-    .slice(0, 4);
+    .slice(0, 6);
+  const galleryImages: GalleryImage[] = deliveryImages.length
+    ? deliveryImages
+    : FALLBACK_GALLERY.map((src) => ({ src, title: 'ตัวอย่างผลงานของเรา' }));
 
   return (
-    <Box
-      component="main"
-      sx={{
-        minHeight: '100vh',
-        color: theme.palette.primary.main,
-        overflow: 'hidden',
-        bgcolor: theme.palette.primary.main,
-        fontFamily: "'LINE Seed Sans TH', sans-serif",
-      }}
-    >
+    <Box component="main" sx={{ overflow: 'hidden', bgcolor: 'common.white' }}>
       <Box
-        sx={{
-          minHeight: { xs: 760, md: 1020 },
-          position: 'relative',
-          px: { xs: 2.5, md: 8, lg: 13 },
-          pt: { xs: 14, md: 19 },
-          pb: { xs: 7, md: 6 },
-          bgcolor: '#052518',
-        }}
+        component="section"
+        sx={{ minHeight: { xs: 760, md: 820 }, position: 'relative', bgcolor: '#071d15' }}
       >
         <Carousel
           carousel={heroCarousel}
-          sx={{
-            m: 0,
-            inset: 0,
-            width: 1,
-            height: 1,
-            zIndex: 0,
-            position: 'absolute',
-          }}
-          slotProps={{
-            container: { height: 1 },
-            slide: { height: 1 },
-          }}
+          sx={{ m: 0, inset: 0, width: 1, height: 1, position: 'absolute' }}
+          slotProps={{ container: { height: 1 }, slide: { height: 1 } }}
         >
-          {HERO_IMAGE.map((src, index) => (
+          {HERO_IMAGES.map((src, index) => (
             <Image
               key={src}
-              alt={`ผลงาน ${company.name} ${index + 1}`}
               src={src}
+              alt={`บรรยากาศผลงาน ${index + 1}`}
               visibleByDefault
               disablePlaceholder
               sx={{ width: 1, height: 1 }}
             />
           ))}
         </Carousel>
-
         <Box
           sx={{
             inset: 0,
-            zIndex: 1,
             position: 'absolute',
-            pointerEvents: 'none',
-            backgroundImage: `
-              linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%,rgba(255, 255, 255, 0.23)  56%, ${theme.palette.secondary.light} 100%),
-              linear-gradient(90deg, ${theme.palette.secondary.lighter} 0%, rgba(255, 255, 255, 0.11) 18%, rgba(255, 255, 255, 0.19) 100%),
-              linear-gradient(0deg, ${theme.palette.secondary.main}, rgba(0, 44, 106, 0.08))
-            `,
+            background:
+              'linear-gradient(90deg, rgba(4,28,19,0.94) 0%, rgba(4,28,19,0.72) 48%, rgba(4,28,19,0.18) 100%), linear-gradient(0deg, rgba(4,28,19,0.55), transparent 55%)',
           }}
         />
-
-        <Box sx={{ mx: 'auto', maxWidth: 1280, position: 'relative', zIndex: 2 }}>
-          <Box
-            sx={{
-              maxWidth: 700,
-              alignItems: 'flex-start',
-              display: 'flex',
-              flexDirection: 'column',
-              textAlign: 'center',
-            }}
-          >
-            <Image alt={`โลโก้ ${company.name}`} sx={{ width: 400 }} src="/logo/logo-single.svg" />
-
-            <Typography
-              sx={{
-                mt: 2,
-                color: theme.palette.common.white,
-                fontSize: { xs: 48 },
-                fontWeight: 800,
-                lineHeight: 0.92,
-                textTransform: 'uppercase',
-              }}
-            >
-              {company.nameEn}
-            </Typography>
-            <Typography variant="h2" mt={1} color={theme.palette.common.white}>
-              {company.name}
-            </Typography>
-
-            <Typography variant="h5" mt={2} color={theme.palette.common.white}>
-              {company.address}
-            </Typography>
-
-            <Typography variant="h5" mt={2} color={theme.palette.common.white}>
-              โทร {company.phone}
-            </Typography>
-          </Box>
-
-          <Stack
-            spacing={1.35}
-            sx={{
-              top: { xs: 152, md: 170 },
-              right: 0,
-              width: 120,
-              display: { xs: 'none', md: 'flex' },
-              position: 'absolute',
-              alignItems: 'flex-end',
-            }}
-          >
-            {HERO_IMAGE.map((_, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                spacing={1.3}
-                alignItems="center"
-                sx={{
-                  color:
-                    index === heroCarousel.dots.selectedIndex
-                      ? theme.palette.common.white
-                      : theme.palette.common.white,
-                  cursor: 'pointer',
-                }}
-                onClick={() => heroCarousel.dots.onClickDot(index)}
-              >
-                <Typography sx={{ fontSize: 12, fontWeight: 800 }}>
-                  {String(index + 1).padStart(2, '0')}
-                </Typography>
-                <Box
-                  sx={{
-                    height: 2,
-                    width: index === heroCarousel.dots.selectedIndex ? 78 : 18,
-                    bgcolor:
-                      index === heroCarousel.dots.selectedIndex
-                        ? theme.palette.secondary.dark
-                        : theme.palette.secondary.light,
-                  }}
-                />
-              </Stack>
-            ))}
-          </Stack>
-
-          <Stack
-            direction={{ xs: 'column', md: 'row' }}
-            spacing={{ xs: 3, md: 5 }}
-            sx={{
-              mt: { xs: 19, md: 23 },
-              pt: 3,
-              borderBottom: '1px solid rgba(234,215,161,0.26)',
-              pb: 4,
-            }}
-          >
-            {highlights.map((item) => (
-              <Stack key={item.title} direction="row" spacing={2.2} sx={{ flex: 1 }}>
-                <Typography
-                  sx={{
-                    fontSize: 24,
-                    fontWeight: 800,
-                    opacity: 0.78,
-                    minWidth: 34,
-                    lineHeight: 1,
-                  }}
-                >
-                  {item.icon}
-                </Typography>
-                <Box>
-                  <Typography variant="h6">{item.title}</Typography>
-                  <Typography variant="body1" sx={{ mt: 0.8 }}>
-                    {item.body}
-                  </Typography>
-                  {/* <Typography
-                    variant="subtitle1"
-                    sx={{
-                      mt: 1.5,
-                      color: theme.palette.secondary.main,
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    รากหดกหด
-                  </Typography> */}
-                </Box>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          px: { xs: 2.5, md: 8, lg: 13 },
-          py: { xs: 7, md: 11 },
-          // color: theme.palette.secondary.main,
-          backgroundImage: `
-            radial-gradient(circle at 50% 8%,  ${theme.palette.secondary.light} 0,  ${theme.palette.secondary.light} 10%),
-            linear-gradient(180deg, ${theme.palette.secondary.main} 0, #fefefe 92px, #ffffff 100%)
-          `,
-        }}
-      >
-        <Box sx={{ textAlign: 'center' }}>
-          <Box
-            component="img"
-            src={MEMORIAL_IMAGE}
-            alt="ตัวอย่างผลงานของเรา"
-            sx={{
-              width: '600px',
-              height: '100%',
-              display: 'block',
-              mx: 'auto',
-              filter: 'drop-shadow(0 28px 55px rgba(9,47,33,0.12))',
-            }}
-          />
-
-          <Stack sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4 }}>
-            <Box sx={{ width: '50%' }}>
-              <Typography
-                variant="h3"
-                color="primary"
-                sx={{
-                  fontStyle: 'italic',
-                }}
-              >
-                เปลี่ยนทุกไอเดียให้เป็นงานที่น่าจดจำ ด้วยการออกแบบที่ใส่ใจในทุกรายละเอียด
-              </Typography>
-
-              <Typography
-                variant="h4"
-                color="primary"
-                sx={{
-                  fontStyle: 'italic',
-                  mt: 3,
-                }}
-              >
-                &quot;เพราะทุกช่วงเวลาสำคัญ ควรได้รับการดูแลเป็นพิเศษ&quot;
-              </Typography>
-            </Box>
-          </Stack>
-
-          <Box
-            sx={{
-              mt: 3,
-              mx: 'auto',
-              width: 180,
-              height: 4,
-              bgcolor: theme.palette.secondary.main,
-              opacity: 0.72,
-            }}
-          />
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          px: { xs: 2.5, md: 8, lg: 13 },
-          py: { xs: 7, md: 10 },
-          minHeight: 800,
-          backgroundImage: `
-            linear-gradient(0deg, ${theme.palette.common.white} 10%, rgba(252, 252, 252, 0.64) 48%, ${theme.palette.secondary.light} 100%),
-            linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
-            url(${SCENES_1_IMAGE})
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: '100% 20%',
-        }}
-      >
-        <Box sx={{ mx: 'auto', maxWidth: 1000, textAlign: 'center' }}>
-          <Typography variant="h3" color="primary">
-            ผลงานที่เราใส่ใจในทุกรายละเอียด
-          </Typography>
-          <Typography variant="subtitle1" color="primary" sx={{ mt: 1.4, textAlign: 'center' }}>
-            เราร่วมวางแผน ออกแบบ และจัดเตรียมทุกองค์ประกอบให้เหมาะกับรูปแบบงาน งบประมาณ
-            และความต้องการของคุณ
-          </Typography>
-
-          <Box
-            sx={{
-              mt: 7,
-              display: 'grid',
-              gap: { xs: 2.2, sm: 2.5 },
-              gridTemplateColumns: {
-                xs: 'repeat(2, minmax(0, 1fr))',
-                md: 'repeat(4, minmax(0, 1fr))',
-              },
-            }}
-          >
-            {ROYAL_IMAGE_ITEMS.map((image) => (
-              <Box
-                key={image.src}
-                className="royal-image-button"
-                component="button"
-                type="button"
-                aria-label={`ดูภาพ ${image.title}`}
-                onClick={() => setSelectedImage(image)}
-                sx={{
-                  p: 0,
-                  m: 0,
-                  border: 0,
-                  width: 1,
-                  display: 'block',
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  borderRadius: 1,
-                  bgcolor: 'transparent',
-                  position: 'relative',
-                  '&::after': {
-                    inset: 0,
-                    opacity: 0,
-                    content: '""',
-                    position: 'absolute',
-                    transition: 'opacity 180ms ease',
-                    background:
-                      'linear-gradient(180deg, rgba(253, 253, 253, 0.02) 0%, rgba(255, 255, 255, 0.46) 100%)',
-                  },
-                  '&:hover::after, &:focus-visible::after': {
-                    opacity: 1,
-                  },
-                  '&:focus-visible': {
-                    outline: `2px solid ${theme.palette.secondary.main}`,
-                    outlineOffset: 4,
-                  },
-                  '&:hover .royal-image-preview-icon, &:focus-visible .royal-image-preview-icon': {
-                    opacity: 1,
-                    transform: 'translate(-50%, -50%) scale(1)',
-                  },
-                }}
-              >
-                <Image
-                  alt={image.title}
-                  src={image.src}
-                  ratio="3/4"
-                  sx={{
-                    width: 1,
-                    transition: 'transform 220ms ease',
-                    '.royal-image-button:hover > &, .royal-image-button:focus-visible > &': {
-                      transform: 'scale(1.04)',
-                    },
-                  }}
-                />
-                <Box
-                  className="royal-image-preview-icon"
-                  sx={{
-                    top: '50%',
-                    left: '50%',
-                    zIndex: 1,
-                    width: 52,
-                    height: 52,
-                    opacity: 0,
-                    display: 'grid',
-                    borderRadius: '50%',
-                    placeItems: 'center',
-                    position: 'absolute',
-                    color: theme.palette.secondary.main,
-                    transform: 'translate(-50%, -50%) scale(0.92)',
-                    transition: 'opacity 180ms ease, transform 180ms ease',
-                    bgcolor: 'rgba(255, 255, 255, 0.64)',
-                    border: '1px solid rgba(234,215,161,0.58)',
-                    boxShadow: '0 18px 40px rgba(0,0,0,0.34)',
-                  }}
-                >
-                  <Iconify icon="solar:eye-bold" width={24} />
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          px: { xs: 2.5, md: 8, lg: 13 },
-          py: { xs: 8, md: 12 },
-          minHeight: 670,
-          backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.common.white} 0%, rgba(250, 251, 252, 0.64) 32%, ${theme.palette.common.white} 100%),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 249, 250, 0.48) 52%, rgba(254, 254, 254, 0.9) 100%),
-            linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
-            url(${KRU_IMAGE})
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: '100% 100%',
-        }}
-      >
         <Box
           sx={{
             mx: 'auto',
-            gap: { xs: 6, md: 5 },
+            px: { xs: 2.5, sm: 4, md: 8 },
+            pt: { xs: 18, md: 21 },
+            pb: 9,
             maxWidth: 1280,
-            display: 'grid',
+            minHeight: 'inherit',
+            display: 'flex',
+            position: 'relative',
             alignItems: 'center',
-            gridTemplateColumns: { xs: '1fr', md: '0.88fr 1.12fr' },
           }}
         >
-          <Box
-            sx={{
-              width: 1,
-            }}
-          >
-            <Box
-              sx={{
-                p: 1,
-                borderRadius: 1.5,
-                bgcolor: 'rgba(234,215,161,0.1)',
-                border: '1px solid rgba(234,215,161,0.22)',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.22)',
-              }}
-            >
-              <Image
-                alt="ทีมงานพร้อมดูแลงานของคุณ"
-                src={SCENES_IMAGE}
-                ratio="4/3"
-                sx={{ borderRadius: 1 }}
-              />
-            </Box>
-          </Box>
-
-          <Box>
-            <Typography
-              component="h2"
-              sx={{
-                maxWidth: 520,
-                fontSize: { xs: 42, sm: 58, md: 60 },
-                fontWeight: 800,
-                lineHeight: 1.2,
-                textTransform: 'uppercase',
-              }}
-            >
-              วางใจให้เราดูแลงานสำคัญของคุณ
-            </Typography>
-
-            <Typography
-              sx={{
-                mt: 4,
-                maxWidth: 430,
-                lineHeight: 1.75,
-              }}
-            >
-              เริ่มจากการพูดคุยความต้องการ กำหนดรูปแบบและงบประมาณ แล้วให้ทีมงานจัดเตรียมทุกส่วน
-              ทั้งสถานที่ ฉาก ดอกไม้ แสง สี เสียง และลำดับงาน
-              เพื่อให้วันสำคัญของคุณดำเนินไปอย่างมั่นใจ
-            </Typography>
-
-            <Typography
-              variant="h4"
-              sx={{
-                fontStyle: 'italic',
-                mt: 3,
-              }}
-            >
-              &quot;ครบทุกเรื่องของงาน ในทีมเดียว&quot;
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                fontStyle: 'italic',
-                mt: 3,
-              }}
-            >
-              ตั้งแต่การวางแผน จนถึงการดูแลหน้างาน
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          px: { xs: 2.5, md: 8, lg: 13 },
-          py: { xs: 8, md: 12 },
-          minHeight: 800,
-          backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.common.white} 0%, rgba(250, 251, 251, 0.64) 32%, ${theme.palette.common.white} 100%),
-            linear-gradient(90deg, rgba(248, 249, 250, 0.94) 0%, rgba(244, 246, 248, 0.48) 52%, rgba(247, 247, 248, 0.9) 100%),
-            linear-gradient(0deg, rgba(217, 181, 109, 0.1), rgba(217, 181, 109, 0.1)),
-            url(${SCENES_IMAGE})
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: '100% 100%',
-        }}
-      >
-        <Box
-          sx={{
-            mx: 'auto',
-            gap: { xs: 6, md: 5 },
-            maxWidth: 1280,
-            display: 'grid',
-            alignItems: 'center',
-            gridTemplateColumns: { xs: '1fr', md: '0.88fr 1.12fr' },
-          }}
-        >
-          <Box>
-            <Typography
-              component="h2"
-              sx={{
-                maxWidth: 520,
-                fontSize: { xs: 42, sm: 58, md: 60 },
-                fontWeight: 800,
-                lineHeight: 1.2,
-                textTransform: 'uppercase',
-              }}
-            >
-              ผลงานล่าสุดของเรา
-            </Typography>
-
-            <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mt: 4.5 }}>
-              <Iconify icon="solar:gallery-wide-bold" width={30} />
-              <Typography variant="h5" sx={{ fontWeight: 800, textTransform: 'uppercase' }}>
-                ภาพบรรยากาศจากงานที่เราได้ดูแล
+          <Box sx={{ maxWidth: 760, color: 'common.white' }}>
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+              <Box sx={{ width: 46, height: 2, bgcolor: 'secondary.main' }} />
+              <Typography
+                variant="overline"
+                sx={{ color: 'secondary.light', fontWeight: 800, letterSpacing: 2.2 }}
+              >
+                {company.nameEn}
               </Typography>
             </Stack>
-
             <Typography
+              component="h1"
               sx={{
-                mt: 4,
-                maxWidth: 430,
-                fontSize: 13,
-                lineHeight: 1.75,
+                fontSize: { xs: 50, sm: 68, md: 84 },
+                fontWeight: 800,
+                lineHeight: 1.08,
+                letterSpacing: -2,
               }}
             >
-              ชมตัวอย่างผลงาน การจัดตกแต่ง และรายละเอียดจากงานจริงของเรา
+              ให้ทุกช่วงเวลาสำคัญ
+              <Box component="span" sx={{ display: 'block', color: 'secondary.light' }}>
+                งดงามในแบบของคุณ
+              </Box>
             </Typography>
+            <Typography
+              sx={{
+                mt: 3,
+                maxWidth: 620,
+                color: 'rgba(255,255,255,0.78)',
+                fontSize: 18,
+                lineHeight: 1.8,
+              }}
+            >
+              เราดูแลงานแต่ง งานบุญ และทุกโอกาสพิเศษ ตั้งแต่การวางแนวคิด ออกแบบ
+              ไปจนถึงดูแลรายละเอียดในวันจริง
+            </Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 4 }}>
+              <Button
+                component={RouterLink}
+                href={paths.promotionPackages.root}
+                size="large"
+                variant="contained"
+                color="secondary"
+                endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+                sx={{ px: 3.5 }}
+              >
+                ดูแพ็กเกจและโปรโมชั่น
+              </Button>
+              <Button
+                component={RouterLink}
+                href={paths.jobQueue}
+                size="large"
+                variant="outlined"
+                sx={{ px: 3.5, color: 'common.white', borderColor: 'rgba(255,255,255,0.48)' }}
+              >
+                ตรวจสอบคิวงาน
+              </Button>
+            </Stack>
           </Box>
-
-          <Box
+          <Stack
+            spacing={1.2}
             sx={{
-              gap: 2,
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+              right: 64,
+              bottom: 64,
+              display: { xs: 'none', md: 'flex' },
+              position: 'absolute',
             }}
           >
-            {deliveryImages.map((image, index) => (
+            {HERO_IMAGES.map((_, index) => (
+              <Box
+                key={index}
+                component="button"
+                type="button"
+                aria-label={`ภาพสไลด์ ${index + 1}`}
+                onClick={() => heroCarousel.dots.onClickDot(index)}
+                sx={{
+                  p: 0,
+                  width: index === heroCarousel.dots.selectedIndex ? 54 : 20,
+                  height: 3,
+                  border: 0,
+                  cursor: 'pointer',
+                  bgcolor:
+                    index === heroCarousel.dots.selectedIndex ? 'secondary.main' : 'grey.500',
+                  transition: 'width 180ms ease',
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      </Box>
+
+      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, position: 'relative', zIndex: 2 }}>
+        <Box
+          sx={{
+            mx: 'auto',
+            mt: { xs: -4, md: -6 },
+            maxWidth: 1280,
+            display: 'grid',
+            overflow: 'hidden',
+            borderRadius: 2,
+            bgcolor: 'common.white',
+            boxShadow: '0 24px 70px rgba(5,37,24,0.14)',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+          }}
+        >
+          {HIGHLIGHTS.map((item, index) => (
+            <Stack
+              key={item.title}
+              direction="row"
+              spacing={2}
+              sx={{
+                p: { xs: 3, md: 4 },
+                borderBottom: { xs: index < 2 ? '1px solid' : 0, md: 0 },
+              }}
+            >
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  flexShrink: 0,
+                  display: 'grid',
+                  borderRadius: 1.5,
+                  placeItems: 'center',
+                  color: 'primary.main',
+                  bgcolor: 'secondary.lighter',
+                }}
+              >
+                <Iconify icon={item.icon as any} width={26} />
+              </Box>
+              <Box>
+                <Typography variant="h6">{item.title}</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 0.75, color: 'text.secondary', lineHeight: 1.7 }}
+                >
+                  {item.body}
+                </Typography>
+              </Box>
+            </Stack>
+          ))}
+        </Box>
+      </Box>
+
+      {promotionPackages.length > 0 && (
+        <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 } }}>
+          <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
+            <SectionHeading
+              eyebrow="SELECTED PACKAGES"
+              title="แพ็กเกจที่ออกแบบมาเพื่อวันสำคัญ"
+              description="เลือกแพ็กเกจที่เหมาะกับรูปแบบงาน และดูรายละเอียดบริการทั้งหมดได้ในคลิกเดียว"
+              action={
+                <Button
+                  component={RouterLink}
+                  href={paths.promotionPackages.root}
+                  color="inherit"
+                  endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+                >
+                  ดูทั้งหมด
+                </Button>
+              }
+            />
+            <Box
+              sx={{
+                mt: 5,
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+              }}
+            >
+              {promotionPackages.map((item, index) => (
+                <Box
+                  key={item.id}
+                  component={RouterLink}
+                  href={paths.promotionPackages.details(item.id)}
+                  sx={{
+                    minHeight: 440,
+                    overflow: 'hidden',
+                    color: 'common.white',
+                    borderRadius: 2,
+                    position: 'relative',
+                    textDecoration: 'none',
+                    boxShadow: '0 16px 45px rgba(5,37,24,0.12)',
+                    '&:hover img': { transform: 'scale(1.05)' },
+                    '&:focus-visible': { outline: '3px solid', outlineColor: 'secondary.main' },
+                  }}
+                >
+                  <Image
+                    alt={item.name}
+                    src={item.imageUrl || HERO_IMAGES[index % HERO_IMAGES.length]}
+                    sx={{
+                      inset: 0,
+                      width: 1,
+                      height: 1,
+                      position: 'absolute',
+                      '& img': { transition: 'transform 350ms ease' },
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      inset: 0,
+                      position: 'absolute',
+                      background:
+                        'linear-gradient(180deg, transparent 25%, rgba(4,28,19,0.92) 100%)',
+                    }}
+                  />
+                  <Stack sx={{ inset: 0, p: 3, position: 'absolute', justifyContent: 'flex-end' }}>
+                    <Typography variant="h4">{item.name}</Typography>
+                    <Typography variant="body2" sx={{ mt: 1, color: 'rgba(255,255,255,0.72)' }}>
+                      {item.items.length} รายการบริการ
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      sx={{ mt: 2 }}
+                    >
+                      <Typography variant="h4" sx={{ color: 'secondary.light' }}>
+                        {fBaht(item.promotionPrice)}
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 42,
+                          height: 42,
+                          display: 'grid',
+                          borderRadius: '50%',
+                          placeItems: 'center',
+                          bgcolor: 'common.white',
+                          color: 'primary.main',
+                        }}
+                      >
+                        <Iconify icon="eva:arrow-ios-forward-fill" />
+                      </Box>
+                    </Stack>
+                  </Stack>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      <Box
+        component="section"
+        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#f4f1e9' }}
+      >
+        <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
+          <SectionHeading
+            eyebrow="OUR PORTFOLIO"
+            title="รายละเอียดที่เปลี่ยนงานหนึ่งงานให้เป็นความทรงจำ"
+            description="ชมบรรยากาศและรายละเอียดจากงานจริงที่เราได้รับความไว้วางใจให้ดูแล"
+          />
+          <Box
+            sx={{
+              mt: 5,
+              display: 'grid',
+              gap: 2,
+              gridAutoRows: { xs: 220, md: 260 },
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            }}
+          >
+            {galleryImages.map((image, index) => (
               <Box
                 key={`${image.src}-${index}`}
                 component="button"
@@ -684,163 +446,250 @@ export function HomeView() {
                 aria-label={`ดูภาพ ${image.title}`}
                 onClick={() => setSelectedImage(image)}
                 sx={{
-                  p: 1,
-                  m: 0,
+                  p: 0,
                   border: 0,
-                  display: 'block',
-                  textAlign: 'left',
                   cursor: 'pointer',
+                  overflow: 'hidden',
                   borderRadius: 1.5,
-                  bgcolor: 'rgba(234,215,161,0.1)',
-                  boxShadow: '0 24px 60px rgba(0,0,0,0.22)',
-                  '&:focus-visible': {
-                    outline: `2px solid ${theme.palette.secondary.main}`,
-                    outlineOffset: 4,
-                  },
+                  position: 'relative',
+                  gridColumn: { md: index === 0 ? 'span 2' : 'span 1' },
+                  gridRow: { md: index === 0 ? 'span 2' : 'span 1' },
+                  '&:hover img': { transform: 'scale(1.05)' },
+                  '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main' },
                 }}
               >
-                <Image alt={image.title} src={image.src} ratio="16/9" />
-
-                <Typography
+                <Image
+                  src={image.src}
+                  alt={image.title}
+                  sx={{ width: 1, height: 1, '& img': { transition: 'transform 300ms ease' } }}
+                />
+                <Box
                   sx={{
-                    mt: 1.25,
-                    px: 0.5,
-                    color: theme.palette.secondary.main,
-                    fontSize: 13,
-                    fontWeight: 800,
+                    inset: 0,
+                    p: 2.5,
+                    display: 'flex',
+                    color: 'common.white',
+                    textAlign: 'left',
+                    position: 'absolute',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    background: 'linear-gradient(180deg, transparent 45%, rgba(4,28,19,0.76) 100%)',
                   }}
                 >
-                  {image.title}
-                </Typography>
-                <Typography sx={{ px: 0.5, color: 'text.secondary', fontSize: 12 }}>
-                  {image.subtitle}
-                </Typography>
+                  <Typography variant="subtitle1">{image.title}</Typography>
+                  {image.subtitle && <Typography variant="caption">{image.subtitle}</Typography>}
+                </Box>
               </Box>
             ))}
-
-            {!deliveryImages.length && (
-              <Box
-                sx={{
-                  p: 4,
-                  gridColumn: '1 / -1',
-                  textAlign: 'center',
-                  borderRadius: 1.5,
-                  color: 'text.secondary',
-                  border: '1px dashed rgba(9,47,33,0.28)',
-                }}
-              >
-                กำลังอัปเดตผลงานใหม่เร็ว ๆ นี้
-              </Box>
-            )}
           </Box>
         </Box>
       </Box>
 
-      {/* <Box
-        sx={{
-          textAlign: 'center',
-          px: { xs: 2.5, md: 8, lg: 13 },
-          py: { xs: 8, md: 12 },
-          minHeight: 600,
-          backgroundImage: `
-            linear-gradient(180deg, ${theme.palette.primary.main} 0%, rgba(9,47,33,0.64) 32%, ${theme.palette.primary.main} 100%),
-            linear-gradient(90deg, rgba(5,37,24,0.94) 0%, rgba(18,61,43,0.48) 52%, rgba(5,37,24,0.9) 100%),
-            linear-gradient(0deg, rgba(217,181,109,0.1), rgba(217,181,109,0.1)),
-            url(${SCENES_IMAGE})
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: '100% 100%',
-        }}
-      >
-        <Typography
+      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 } }}>
+        <Box
           sx={{
-            mt: 2,
-            color: theme.palette.secondary.main,
-            fontSize: { xs: 24, sm: 32, md: 40 },
-            fontWeight: 800,
-            lineHeight: 0.92,
-            textTransform: 'uppercase',
+            mx: 'auto',
+            gap: { xs: 5, md: 9 },
+            maxWidth: 1280,
+            display: 'grid',
+            alignItems: 'center',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 0.9fr' },
           }}
         >
-          ผู้มีส่วนร่วม
-        </Typography>
-        <Stack
-          mt={6}
-          sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
-          spacing={4}
+          <Box sx={{ position: 'relative' }}>
+            <Image
+              src="/assets/mee-bunkoon/bg-1.jpg"
+              alt="ทีมงานมีบุญคุณ แกลเลอรี่"
+              ratio="4/3"
+              sx={{ borderRadius: 2 }}
+            />
+            <Box
+              sx={{
+                right: { xs: 16, md: -28 },
+                bottom: { xs: 16, md: -28 },
+                p: 2.5,
+                maxWidth: 220,
+                borderRadius: 1.5,
+                color: 'common.white',
+                position: 'absolute',
+                bgcolor: 'primary.main',
+                boxShadow: 12,
+              }}
+            >
+              <Typography variant="h4">ใส่ใจทุกขั้นตอน</Typography>
+              <Typography variant="body2" sx={{ mt: 0.75, color: 'rgba(255,255,255,0.7)' }}>
+                ตั้งแต่แนวคิดแรกจนถึงวันส่งมอบงาน
+              </Typography>
+            </Box>
+          </Box>
+          <Box>
+            <Typography
+              variant="overline"
+              sx={{ color: 'secondary.dark', fontWeight: 800, letterSpacing: 2 }}
+            >
+              ABOUT US
+            </Typography>
+            <Typography variant="h2" sx={{ mt: 1.5 }}>
+              งานที่ดี เริ่มจากการฟังและเข้าใจ
+            </Typography>
+            <Typography sx={{ mt: 3, color: 'text.secondary', lineHeight: 1.9 }}>
+              ทุกงานมีเรื่องราวและความต้องการที่แตกต่าง เราจึงเริ่มจากการพูดคุย วางแผน
+              และออกแบบรายละเอียดให้เหมาะกับเจ้าของงานจริง ๆ
+              เพื่อให้ภาพที่คุณคิดไว้กลายเป็นบรรยากาศที่สัมผัสได้ในวันสำคัญ
+            </Typography>
+            <Stack spacing={1.5} sx={{ mt: 3 }}>
+              {[
+                'ให้คำปรึกษาและวางแผนรูปแบบงาน',
+                'ออกแบบตามงบประมาณและพื้นที่',
+                'ทีมงานดูแลและประสานงานหน้างาน',
+              ].map((text) => (
+                <Stack key={text} direction="row" spacing={1.2} alignItems="center">
+                  <Iconify icon="solar:check-circle-bold" color="success.main" />
+                  <Typography>{text}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 8, md: 12 } }}>
+        <Box
+          sx={{
+            mx: 'auto',
+            px: { xs: 3, md: 7 },
+            py: { xs: 6, md: 8 },
+            maxWidth: 1280,
+            overflow: 'hidden',
+            color: 'common.white',
+            borderRadius: 2.5,
+            position: 'relative',
+            bgcolor: 'primary.main',
+          }}
         >
-          <Image alt="Single logo" sx={{ width: 200 }} src="/assets/akhahas-sri/logo-kaitod.png" />
-        </Stack>
-      </Box> */}
+          <Box sx={{ zIndex: 1, maxWidth: 760, position: 'relative' }}>
+            <Typography variant="overline" sx={{ color: 'secondary.light', letterSpacing: 2 }}>
+              LET&apos;S CREATE TOGETHER
+            </Typography>
+            <Typography variant="h2" sx={{ mt: 1.5 }}>
+              พร้อมเริ่มต้นวางแผนงานสำคัญของคุณหรือยัง?
+            </Typography>
+            <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.72)', lineHeight: 1.8 }}>
+              พูดคุยกับเราเพื่อเลือกแพ็กเกจ เช็กวันว่าง และออกแบบรูปแบบงานที่เหมาะกับคุณ
+            </Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 4 }}>
+              <Button
+                component="a"
+                href={`tel:${company.phone.replace(/[^0-9+]/g, '')}`}
+                size="large"
+                color="secondary"
+                variant="contained"
+                startIcon={<Iconify icon="solar:phone-bold" />}
+              >
+                โทร {company.phone}
+              </Button>
+              <Button
+                component={RouterLink}
+                href={paths.jobQueue}
+                size="large"
+                variant="outlined"
+                sx={{ color: 'common.white', borderColor: 'rgba(255,255,255,0.45)' }}
+              >
+                ดูคิวงาน
+              </Button>
+            </Stack>
+          </Box>
+          <Box
+            sx={{
+              width: 360,
+              height: 360,
+              right: -80,
+              bottom: -180,
+              opacity: 0.12,
+              borderRadius: '50%',
+              position: 'absolute',
+              border: '70px solid',
+              borderColor: 'secondary.light',
+            }}
+          />
+        </Box>
+      </Box>
 
       <Dialog
         fullWidth
+        maxWidth="md"
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
-        slotProps={{
-          paper: {
-            sx: {
-              overflow: 'hidden',
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 1.5,
-              border: '1px solid rgba(234,215,161,0.24)',
-            },
-          },
-        }}
+        slotProps={{ paper: { sx: { overflow: 'hidden', borderRadius: 2, bgcolor: '#071d15' } } }}
       >
-        <Box
-          sx={{
-            px: 2,
-            py: 1.25,
-            gap: 1.5,
-            display: 'flex',
-            alignItems: 'center',
-            color: theme.palette.secondary.main,
-            justifyContent: 'space-between',
-          }}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ px: 2.5, py: 1.5, color: 'common.white' }}
         >
-          <Typography sx={{ fontSize: 16, fontWeight: 800 }}>{selectedImage?.title}</Typography>
-
-          <IconButton onClick={() => setSelectedImage(null)} sx={{ color: 'inherit' }}>
+          <Box>
+            <Typography variant="subtitle1">{selectedImage?.title}</Typography>
+            {selectedImage?.subtitle && (
+              <Typography variant="caption">{selectedImage.subtitle}</Typography>
+            )}
+          </Box>
+          <IconButton
+            aria-label="ปิดรูปภาพ"
+            onClick={() => setSelectedImage(null)}
+            sx={{ color: 'inherit' }}
+          >
             <Iconify icon="mingcute:close-line" />
           </IconButton>
-        </Box>
-
-        <DialogContent sx={{ py: 3, bgcolor: theme.palette.primary.main, width: 'auto' }}>
+        </Stack>
+        <DialogContent sx={{ p: 0 }}>
           {selectedImage && (
             <Box
               component="img"
-              alt={selectedImage.title}
               src={selectedImage.src}
-              sx={{
-                width: 1,
-                height: 'auto',
-                display: 'block',
-                objectFit: 'contain',
-                maxHeight: { xs: '78vh', md: '82vh' },
-                bgcolor: theme.palette.primary.main,
-              }}
+              alt={selectedImage.title}
+              sx={{ width: 1, maxHeight: '78vh', display: 'block', objectFit: 'contain' }}
             />
           )}
         </DialogContent>
       </Dialog>
-
-      {/* <Stack
-        component="footer"
-        direction="row"
-        spacing={4}
-        justifyContent="center"
-        sx={{ pb: 7, color: theme.palette.secondary.main, bgcolor: theme.palette.primary.main }}
-      >
-        {_socials.map((social) => (
-          <IconButton key={social.label}>
-            {social.value === 'twitter' && <Iconify icon="socials:twitter" />}
-            {social.value === 'facebook' && <Iconify icon="socials:facebook" />}
-            {social.value === 'instagram' && <Iconify icon="socials:instagram" />}
-            {social.value === 'linkedin' && <Iconify icon="socials:linkedin" />}
-          </IconButton>
-        ))}
-      </Stack> */}
     </Box>
+  );
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <Stack
+      direction={{ xs: 'column', md: 'row' }}
+      spacing={3}
+      alignItems={{ md: 'flex-end' }}
+      justifyContent="space-between"
+    >
+      <Box sx={{ maxWidth: 780 }}>
+        <Typography
+          variant="overline"
+          sx={{ color: 'secondary.dark', fontWeight: 800, letterSpacing: 2 }}
+        >
+          {eyebrow}
+        </Typography>
+        <Typography variant="h2" sx={{ mt: 1 }}>
+          {title}
+        </Typography>
+        <Typography sx={{ mt: 1.5, color: 'text.secondary', lineHeight: 1.8 }}>
+          {description}
+        </Typography>
+      </Box>
+      {action}
+    </Stack>
   );
 }

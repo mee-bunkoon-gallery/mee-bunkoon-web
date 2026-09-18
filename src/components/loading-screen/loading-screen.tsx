@@ -3,8 +3,6 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 import type { LinearProgressProps } from '@mui/material/LinearProgress';
 
-import { Fragment } from 'react';
-
 import Portal from '@mui/material/Portal';
 import { styled } from '@mui/material/styles';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -23,26 +21,24 @@ export type LoadingScreenProps = React.ComponentProps<'div'> & {
 };
 
 export function LoadingScreen({ portal, slots, slotsProps, sx, ...other }: LoadingScreenProps) {
-  const PortalWrapper = portal ? Portal : Fragment;
-
-  return (
-    <PortalWrapper>
-      <LoadingContent sx={sx} {...other}>
-        {slots?.progress ?? (
-          <LinearProgress
-            color="inherit"
-            sx={[
-              { width: 1, maxWidth: 360 },
-              ...(Array.isArray(slotsProps?.progress?.sx)
-                ? slotsProps.progress.sx
-                : [slotsProps?.progress?.sx]),
-            ]}
-            {...slotsProps?.progress}
-          />
-        )}
-      </LoadingContent>
-    </PortalWrapper>
+  const content = (
+    <LoadingContent sx={sx} {...other}>
+      {slots?.progress ?? (
+        <LinearProgress
+          color="inherit"
+          sx={[
+            { width: 1, maxWidth: 360 },
+            ...(Array.isArray(slotsProps?.progress?.sx)
+              ? slotsProps.progress.sx
+              : [slotsProps?.progress?.sx]),
+          ]}
+          {...slotsProps?.progress}
+        />
+      )}
+    </LoadingContent>
   );
+
+  return portal ? <Portal>{content}</Portal> : content;
 }
 
 // ----------------------------------------------------------------------

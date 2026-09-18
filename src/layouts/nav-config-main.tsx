@@ -17,6 +17,11 @@ export const navData: NavMainProps['data'] = [
     path: paths.jobQueue,
     icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
   },
+  {
+    title: 'โปรโมชั่น',
+    path: paths.promotionPackages.root,
+    icon: <Iconify width={22} icon={'solar:gift-bold-duotone' as any} />,
+  },
   // {
   //   title: 'Pages',
   //   path: '/pages',
