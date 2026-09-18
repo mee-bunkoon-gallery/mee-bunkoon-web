@@ -1,6 +1,7 @@
 'use client';
 
-import type { ICustomer, IQuotation, IServiceItem } from 'src/types/quotation';
+import type { IQuotation, IServiceItem } from 'src/types/quotation';
+import type { IPromotionPackage } from 'src/types/promotion-package';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
@@ -10,7 +11,9 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
@@ -38,10 +41,11 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getCustomers } from 'src/sections/customer/customer-api';
-import { getServiceItems } from 'src/sections/service/service-api';
+import { useCustomersQuery } from 'src/sections/customer/customer-queries';
+import { useServiceItemsQuery } from 'src/sections/service/service-queries';
+import { usePromotionPackagesQuery } from 'src/sections/promotion-package/promotion-package-queries';
 
-import { createQuotation, updateQuotation } from './quotation-api';
+import { useCreateQuotationMutation, useUpdateQuotationMutation } from './quotation-queries';
 
 // ----------------------------------------------------------------------
 
@@ -54,6 +58,8 @@ const STATUS_OPTIONS: { value: IQuotation['status']; label: string }[] = [
 
 const QuotationItemSchema = z.object({
   serviceItemId: z.string().nullable().optional(),
+  promotionPackageId: z.string().nullable().optional(),
+  promotionPackageDiscount: z.coerce.number().min(0).optional(),
   description: z.string().min(1, { error: 'กรุณากรอกรายละเอียด' }),
   unit: z.string().optional(),
   quantity: z.coerce.number({ error: 'กรุณากรอกจำนวน' }).positive({ error: 'จำนวนต้องมากกว่า 0' }),
@@ -77,7 +83,15 @@ export const QuotationFormSchema = z.object({
   items: z.array(QuotationItemSchema).min(1, { error: 'กรุณาเพิ่มอย่างน้อย 1 รายการ' }),
 });
 
-const emptyItem = { serviceItemId: null, description: '', unit: 'รายการ', quantity: 1, unitPrice: 0 };
+const emptyItem = {
+  serviceItemId: null,
+  promotionPackageId: null,
+  promotionPackageDiscount: 0,
+  description: '',
+  unit: 'รายการ',
+  quantity: 1,
+  unitPrice: 0,
+};
 
 function toDefaultValues(quotation?: IQuotation | null): QuotationFormSchemaType {
   if (!quotation) {
@@ -96,7 +110,9 @@ function toDefaultValues(quotation?: IQuotation | null): QuotationFormSchemaType
   }
 
   return {
-    customer: quotation.customer ? { id: quotation.customer.id, name: quotation.customer.name } : null,
+    customer: quotation.customer
+      ? { id: quotation.customer.id, name: quotation.customer.name }
+      : null,
     issueDate: dayjs(quotation.issueDate).format(),
     validUntil: quotation.validUntil ? dayjs(quotation.validUntil).format() : null,
     status: quotation.status,
@@ -108,6 +124,8 @@ function toDefaultValues(quotation?: IQuotation | null): QuotationFormSchemaType
     items: quotation.items.length
       ? quotation.items.map((item) => ({
           serviceItemId: item.serviceItemId,
+          promotionPackageId: item.promotionPackageId ?? null,
+          promotionPackageDiscount: item.promotionPackageDiscount ?? 0,
           description: item.description,
           unit: item.unit ?? '',
           quantity: item.quantity,
@@ -123,14 +141,25 @@ type Props = {
 
 export function QuotationNewEditForm({ currentQuotation }: Props) {
   const router = useRouter();
+  const [selectedPackage, setSelectedPackage] = useState<IPromotionPackage | null>(null);
 
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [serviceItems, setServiceItems] = useState<IServiceItem[]>([]);
+  const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
+  const { data: serviceItems = [], isError: isServiceItemsError } = useServiceItemsQuery();
+  const { data: promotionPackages = [], isError: isPackagesError } = usePromotionPackagesQuery();
+  const createMutation = useCreateQuotationMutation();
+  const updateMutation = useUpdateQuotationMutation();
 
   useEffect(() => {
-    getCustomers().then(setCustomers).catch(() => toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ'));
-    getServiceItems().then(setServiceItems).catch(() => toast.error('โหลดรายการบริการไม่สำเร็จ'));
-  }, []);
+    if (isCustomersError) toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ');
+  }, [isCustomersError]);
+
+  useEffect(() => {
+    if (isServiceItemsError) toast.error('โหลดรายการบริการไม่สำเร็จ');
+  }, [isServiceItemsError]);
+
+  useEffect(() => {
+    if (isPackagesError) toast.error('โหลดแพ็กเกจ/โปรโมชั่นไม่สำเร็จ');
+  }, [isPackagesError]);
 
   const methods = useForm({
     resolver: zodResolver(QuotationFormSchema),
@@ -179,6 +208,8 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
         paymentTerms: data.paymentTerms,
         items: data.items.map((item) => ({
           serviceItemId: item.serviceItemId,
+          promotionPackageId: item.promotionPackageId,
+          promotionPackageDiscount: item.promotionPackageDiscount,
           description: item.description,
           unit: item.unit,
           quantity: item.quantity,
@@ -187,8 +218,8 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
       };
 
       const quotation = currentQuotation
-        ? await updateQuotation(currentQuotation.id, payload)
-        : await createQuotation(payload);
+        ? await updateMutation.mutateAsync({ id: currentQuotation.id, input: payload })
+        : await createMutation.mutateAsync(payload);
 
       toast.success(currentQuotation ? 'แก้ไขใบเสนอราคาแล้ว' : 'สร้างใบเสนอราคาแล้ว');
       router.push(paths.dashboard.quotation.details(quotation.id));
@@ -202,6 +233,59 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
     methods.setValue(`items.${index}.description`, serviceItem.name);
     methods.setValue(`items.${index}.unit`, serviceItem.unit);
     methods.setValue(`items.${index}.unitPrice`, serviceItem.unitPrice);
+  };
+
+  const availablePackages = promotionPackages.filter((item) => {
+    const today = dayjs();
+    return (
+      item.active &&
+      !values.items.some((quotationItem) => quotationItem.promotionPackageId === item.id) &&
+      (!item.startDate || !today.isBefore(dayjs(item.startDate), 'day')) &&
+      (!item.endDate || !today.isAfter(dayjs(item.endDate), 'day'))
+    );
+  });
+
+  const handleAddPackage = () => {
+    if (!selectedPackage) return;
+    const normalPrice = selectedPackage.items.reduce(
+      (sum, item) => sum + item.quantity * item.unitPrice,
+      0
+    );
+    const packageDiscount = Math.max(normalPrice - selectedPackage.promotionPrice, 0);
+    const packageItems = selectedPackage.items.map((item, index) => ({
+      serviceItemId: item.serviceItemId,
+      promotionPackageId: selectedPackage.id,
+      promotionPackageDiscount: index === 0 ? packageDiscount : 0,
+      description: item.serviceItem.name,
+      unit: item.serviceItem.unit,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    }));
+    const currentItems = methods.getValues('items');
+    if (currentItems.length === 1 && !currentItems[0].description) {
+      remove(0);
+    }
+    append(packageItems);
+    methods.setValue('discount', Number(methods.getValues('discount') || 0) + packageDiscount);
+    toast.success(`เพิ่มแพ็กเกจ “${selectedPackage.name}” แล้ว`);
+    setSelectedPackage(null);
+  };
+
+  const handleRemovePackage = (promotionPackageId: string) => {
+    const packageItemIndexes = values.items.reduce<number[]>((indexes, item, index) => {
+      if (item.promotionPackageId === promotionPackageId) indexes.push(index);
+      return indexes;
+    }, []);
+    const packageDiscount = packageItemIndexes.reduce(
+      (sum, index) => sum + Number(values.items[index].promotionPackageDiscount || 0),
+      0
+    );
+
+    remove(packageItemIndexes);
+    methods.setValue(
+      'discount',
+      Math.max(Number(methods.getValues('discount') || 0) - packageDiscount, 0)
+    );
   };
 
   return (
@@ -257,6 +341,47 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
           <Card sx={{ mt: 3 }}>
             <CardHeader title="รายการ" />
 
+            <Box sx={{ px: 3, pt: 1 }}>
+              <Card variant="outlined" sx={{ p: 2, bgcolor: 'background.neutral' }}>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1.5}
+                  alignItems={{ sm: 'center' }}
+                >
+                  <Autocomplete
+                    fullWidth
+                    options={availablePackages}
+                    value={selectedPackage}
+                    getOptionLabel={(option) => `${option.name} · ${fBaht(option.promotionPrice)}`}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(_event, value) => setSelectedPackage(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="เลือกแพ็กเกจ/โปรโมชั่น"
+                        placeholder="ค้นหาแพ็กเกจ"
+                      />
+                    )}
+                  />
+                  <Button
+                    variant="contained"
+                    disabled={!selectedPackage}
+                    onClick={handleAddPackage}
+                    startIcon={<Iconify icon="mingcute:add-line" />}
+                    sx={{ flexShrink: 0, minHeight: 54 }}
+                  >
+                    เพิ่มแพ็กเกจ
+                  </Button>
+                </Stack>
+                <Typography
+                  variant="caption"
+                  sx={{ display: 'block', mt: 1, color: 'text.secondary' }}
+                >
+                  รายการในแพ็กเกจจะถูกเพิ่มด้านล่าง และยังเพิ่มรายการบริการอื่นได้ตามปกติ
+                </Typography>
+              </Card>
+            </Box>
+
             <TableContainer sx={{ overflow: 'unset', px: 3, pt: 2 }}>
               <Scrollbar>
                 <Table sx={{ minWidth: 720 }}>
@@ -281,6 +406,71 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                     {fields.map((field, index) => {
                       const quantity = Number(values.items?.[index]?.quantity) || 0;
                       const unitPrice = Number(values.items?.[index]?.unitPrice) || 0;
+                      const promotionPackageId = values.items?.[index]?.promotionPackageId;
+                      const promotionPackage = promotionPackages.find(
+                        (item) => item.id === promotionPackageId
+                      );
+
+                      if (promotionPackageId) {
+                        const isFirstPackageItem =
+                          values.items.findIndex(
+                            (item) => item.promotionPackageId === promotionPackageId
+                          ) === index;
+
+                        if (!isFirstPackageItem) return null;
+
+                        const packageItems = values.items.filter(
+                          (item) => item.promotionPackageId === promotionPackageId
+                        );
+                        const packageNormalPrice = packageItems.reduce(
+                          (sum, item) =>
+                            sum + Number(item.quantity || 0) * Number(item.unitPrice || 0),
+                          0
+                        );
+                        const packageDiscount = packageItems.reduce(
+                          (sum, item) => sum + Number(item.promotionPackageDiscount || 0),
+                          0
+                        );
+                        const packagePrice = packageNormalPrice - packageDiscount;
+
+                        return (
+                          <TableRow key={field.id} sx={{ bgcolor: 'background.neutral' }}>
+                            <TableCell sx={{ py: 2.5 }}>
+                              <Stack spacing={1}>
+                                <Chip
+                                  size="small"
+                                  color="primary"
+                                  variant="soft"
+                                  icon={<Iconify icon={'solar:gift-bold-duotone' as any} />}
+                                  label={`แพ็กเกจ: ${promotionPackage?.name ?? 'แพ็กเกจ/โปรโมชั่น'}`}
+                                  sx={{ alignSelf: 'flex-start' }}
+                                />
+                                {packageItems.map((item, packageItemIndex) => (
+                                  <Typography
+                                    key={`${promotionPackageId}-${packageItemIndex}`}
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {item.description} × {item.quantity} {item.unit}
+                                  </Typography>
+                                ))}
+                              </Stack>
+                            </TableCell>
+                            <TableCell>แพ็กเกจ</TableCell>
+                            <TableCell align="right">1</TableCell>
+                            <TableCell align="right">{fBaht(packagePrice)}</TableCell>
+                            <TableCell align="right">{fBaht(packagePrice)}</TableCell>
+                            <TableCell>
+                              <IconButton
+                                color="error"
+                                onClick={() => handleRemovePackage(promotionPackageId)}
+                              >
+                                <Iconify icon="solar:trash-bin-trash-bold" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
 
                       return (
                         <TableRow key={field.id}>
@@ -374,7 +564,6 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
           </Card>
 
           <Card sx={{ mt: 3, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-          
             <Field.Text
               name="paymentTerms"
               label="เงื่อนไขการชำระเงิน"
@@ -402,7 +591,10 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                     name="includeVat"
                     control={control}
                     render={({ field }) => (
-                      <Switch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                      <Switch
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
                     )}
                   />
                 }

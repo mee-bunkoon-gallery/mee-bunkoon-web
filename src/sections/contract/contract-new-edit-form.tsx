@@ -1,14 +1,12 @@
 'use client';
 
 import type { IContract } from 'src/types/contract';
-import type { IEventType } from 'src/types/event-type';
-import type { ICompanyProfile } from 'src/types/settings';
-import type { ICustomer, IQuotation } from 'src/types/quotation';
+import type { IQuotation } from 'src/types/quotation';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch, Controller, useFieldArray } from 'react-hook-form';
@@ -37,15 +35,15 @@ import { ensureHtmlContent } from 'src/components/editor';
 import { LoadingScreen } from 'src/components/loading-screen';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getCustomers } from 'src/sections/customer/customer-api';
-import { getQuotations } from 'src/sections/quotation/quotation-api';
-import { getEventTypes } from 'src/sections/event-type/event-type-api';
-import { getCompanyProfile } from 'src/sections/settings/settings-api';
+import { useCustomersQuery } from 'src/sections/customer/customer-queries';
+import { useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
+import { useEventTypesQuery } from 'src/sections/event-type/event-type-queries';
+import { useCompanyProfileQuery } from 'src/sections/settings/settings-queries';
 
 import { ContractPdfDocument } from './contract-pdf-document';
-import { createContract, updateContract } from './contract-api';
 import { MentionTextField } from './contract-mention-text-field';
 import { ContractMentionExtension } from './contract-mention-extension';
+import { useCreateContractMutation, useUpdateContractMutation } from './contract-queries';
 import {
   parseContractClauses,
   CONTRACT_MENTION_FIELDS,
@@ -220,25 +218,24 @@ export function ContractNewEditForm({
 
   const previewDialog = useBoolean();
 
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [quotations, setQuotations] = useState<IQuotation[]>([]);
-  const [eventTypes, setEventTypes] = useState<IEventType[]>([]);
-  const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
+  const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
+  const { data: quotations = [], isError: isQuotationsError } = useQuotationsQuery();
+  const { data: eventTypes = [], isError: isEventTypesError } = useEventTypesQuery();
+  const { data: companyProfile } = useCompanyProfileQuery();
+  const createMutation = useCreateContractMutation();
+  const updateMutation = useUpdateContractMutation();
 
   useEffect(() => {
-    getCustomers()
-      .then(setCustomers)
-      .catch(() => toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ'));
-    getQuotations()
-      .then(setQuotations)
-      .catch(() => toast.error('โหลดรายการใบเสนอราคาไม่สำเร็จ'));
-    getEventTypes()
-      .then(setEventTypes)
-      .catch(() => toast.error('โหลดรายการประเภทงานไม่สำเร็จ'));
-    getCompanyProfile()
-      .then(setCompanyProfile)
-      .catch(() => {});
-  }, []);
+    if (isCustomersError) toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ');
+  }, [isCustomersError]);
+
+  useEffect(() => {
+    if (isQuotationsError) toast.error('โหลดรายการใบเสนอราคาไม่สำเร็จ');
+  }, [isQuotationsError]);
+
+  useEffect(() => {
+    if (isEventTypesError) toast.error('โหลดรายการประเภทงานไม่สำเร็จ');
+  }, [isEventTypesError]);
 
   const methods = useForm({
     resolver: zodResolver(ContractFormSchema),
@@ -336,8 +333,8 @@ export function ContractNewEditForm({
       };
 
       const contract = currentContract
-        ? await updateContract(currentContract.id, payload)
-        : await createContract(payload);
+        ? await updateMutation.mutateAsync({ id: currentContract.id, input: payload })
+        : await createMutation.mutateAsync(payload);
 
       toast.success(currentContract ? 'แก้ไขสัญญาแล้ว' : 'สร้างสัญญาแล้ว');
       router.push(paths.dashboard.contract.details(contract.id));

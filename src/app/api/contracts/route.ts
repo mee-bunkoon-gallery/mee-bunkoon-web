@@ -17,24 +17,35 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const status = new URL(request.url).searchParams.get('status');
+  const searchParams = new URL(request.url).searchParams;
+  const status = searchParams.get('status');
+  const rowsPerPageParam = searchParams.get('rowsPerPage');
 
   let query = supabase
     .from('contracts')
-    .select('*, customer:customers(*), quotation:quotations(id, quote_no, total)')
+    .select('*, customer:customers(*), quotation:quotations(id, quote_no, total)', {
+      count: 'exact',
+    })
     .order('created_at', { ascending: false });
 
   if (status) {
     query = query.eq('status', status);
   }
 
-  const { data, error } = await query;
+  if (rowsPerPageParam) {
+    const rowsPerPage = Math.min(Math.max(Number(rowsPerPageParam) || 10, 1), 100);
+    const page = Math.max(Number(searchParams.get('page')) || 0, 0);
+    const from = page * rowsPerPage;
+    query = query.range(from, from + rowsPerPage - 1);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ contracts: data.map(mapContract) });
+  return NextResponse.json({ contracts: data.map(mapContract), total: count ?? data.length });
 }
 
 export async function POST(request: Request) {

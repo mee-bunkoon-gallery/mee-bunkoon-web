@@ -1,12 +1,9 @@
 'use client';
 
-import type { IPayment } from 'src/types/payment';
-import type { IQuotation } from 'src/types/quotation';
-import type { ICompanyProfile } from 'src/types/settings';
-
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Card from '@mui/material/Card';
 import Link from '@mui/material/Link';
@@ -43,12 +40,12 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getQuotation } from './quotation-api';
-import { getPayments } from '../payment/payment-api';
 import { QUOTATION_STATUS_META } from './quotation-status';
-import { getCompanyProfile } from '../settings/settings-api';
+import { usePaymentsQuery } from '../payment/payment-queries';
 import { QuotationPdfDocument } from './quotation-pdf-document';
 import { PAYMENT_METHOD_LABEL } from '../payment/payment-method';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
+import { quotationKeys, useQuotationQuery } from './quotation-queries';
 import { QuotationSignatureDialog } from './quotation-signature-dialog';
 
 // ----------------------------------------------------------------------
@@ -69,35 +66,30 @@ type Props = {
 
 export function QuotationDetailsView({ quotationId }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [quotation, setQuotation] = useState<IQuotation | null>(null);
-  const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
-  const [payments, setPayments] = useState<IPayment[]>([]);
-  const [loading, setLoading] = useState(true);
   const [signatureSigner, setSignatureSigner] = useState<'issuer' | 'customer' | null>(null);
 
   const previewDialog = useBoolean();
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+  const { data: paymentsData } = usePaymentsQuery({ quotationId });
+  const payments = paymentsData ?? [];
+
+  const {
+    data: quotation,
+    isLoading,
+    isError,
+  } = useQuotationQuery(quotationId);
+
   useEffect(() => {
-    getCompanyProfile()
-      .then(setCompanyProfile)
-      .catch(() => {});
+    if (isError) {
+      toast.error('ไม่พบใบเสนอราคานี้');
+      router.replace(paths.dashboard.quotation.root);
+    }
+  }, [isError, router]);
 
-    getPayments({ quotationId })
-      .then(setPayments)
-      .catch(() => {});
-
-    getQuotation(quotationId)
-      .then(setQuotation)
-      .catch((error) => {
-        console.error(error);
-        toast.error('ไม่พบใบเสนอราคานี้');
-        router.replace(paths.dashboard.quotation.root);
-      })
-      .finally(() => setLoading(false));
-  }, [quotationId, router]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
@@ -657,7 +649,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
         signer={signatureSigner}
         onClose={() => setSignatureSigner(null)}
         onSigned={(signatureUrl) =>
-          setQuotation((current) => {
+          queryClient.setQueryData(quotationKeys.detail(quotationId), (current: typeof quotation) => {
             if (!current) return current;
             return signatureSigner === 'issuer'
               ? {

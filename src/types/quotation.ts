@@ -1,3 +1,5 @@
+import type { IColorTheme } from './color-theme';
+
 export type ICustomer = {
   id: string;
   name: string;
@@ -19,6 +21,8 @@ export type IServiceItem = {
   imageUrl: string | null;
   unit: string;
   unitPrice: number;
+  colorThemeIds: string[];
+  colorThemes: IColorTheme[];
   createdAt: string;
   updatedAt: string;
 };
@@ -28,6 +32,8 @@ export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'rejected';
 export type IQuotationItem = {
   id?: string;
   serviceItemId: string | null;
+  promotionPackageId?: string | null;
+  promotionPackageDiscount?: number;
   imageUrl?: string | null;
   description: string;
   unit: string | null;

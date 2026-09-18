@@ -9,6 +9,16 @@ export async function getEventTypes(): Promise<IEventType[]> {
   return eventTypes;
 }
 
+export async function getEventTypesPage(params: {
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ eventTypes: IEventType[]; total: number }> {
+  const qs = new URLSearchParams();
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ eventTypes: IEventType[]; total: number }>(`/api/event-types/?${qs}`);
+}
+
 export async function createEventType(input: EventTypeInput): Promise<IEventType> {
   const { eventType } = await apiFetch<{ eventType: IEventType }>('/api/event-types/', {
     method: 'POST',

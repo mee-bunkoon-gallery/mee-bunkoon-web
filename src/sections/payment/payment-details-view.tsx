@@ -1,11 +1,7 @@
 'use client';
 
-import type { IPayment } from 'src/types/payment';
-import type { IQuotation } from 'src/types/quotation';
-import type { ICompanyProfile } from 'src/types/settings';
-
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Card from '@mui/material/Card';
@@ -35,10 +31,10 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getPayment } from './payment-api';
-import { getQuotation } from '../quotation/quotation-api';
+import { usePaymentQuery } from './payment-queries';
 import { PaymentPdfDocument } from './payment-pdf-document';
-import { getCompanyProfile } from '../settings/settings-api';
+import { useQuotationQuery } from '../quotation/quotation-queries';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
 import { PAYMENT_METHOD_LABEL, PAYMENT_PURPOSE_LABEL } from './payment-method';
 
 // ----------------------------------------------------------------------
@@ -60,37 +56,26 @@ type Props = {
 export function PaymentDetailsView({ paymentId }: Props) {
   const router = useRouter();
 
-  const [payment, setPayment] = useState<IPayment | null>(null);
-  const [quotation, setQuotation] = useState<IQuotation | null>(null);
-  const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
   const previewDialog = useBoolean();
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+
+  const {
+    data: payment,
+    isLoading,
+    isError,
+  } = usePaymentQuery(paymentId);
+
+  const { data: quotation } = useQuotationQuery(payment?.quotationId ?? '');
+
   useEffect(() => {
-    getCompanyProfile()
-      .then(setCompanyProfile)
-      .catch(() => {});
+    if (isError) {
+      toast.error('ไม่พบใบเสร็จรับเงินนี้');
+      router.replace(paths.dashboard.payment.root);
+    }
+  }, [isError, router]);
 
-    getPayment(paymentId)
-      .then((currentPayment) => {
-        setPayment(currentPayment);
-
-        if (currentPayment.quotationId) {
-          getQuotation(currentPayment.quotationId)
-            .then(setQuotation)
-            .catch(() => {});
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error('ไม่พบใบเสร็จรับเงินนี้');
-        router.replace(paths.dashboard.payment.root);
-      })
-      .finally(() => setLoading(false));
-  }, [paymentId, router]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 

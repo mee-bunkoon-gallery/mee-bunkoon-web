@@ -1,13 +1,10 @@
 'use client';
 
-import type { IContract } from 'src/types/contract';
 import type { IJobQueue } from 'src/types/job-queue';
-import type { IColorTheme } from 'src/types/color-theme';
-import type { ICustomer, IQuotation } from 'src/types/quotation';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -25,13 +22,17 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getContracts } from 'src/sections/contract/contract-api';
-import { getCustomers } from 'src/sections/customer/customer-api';
-import { getQuotations } from 'src/sections/quotation/quotation-api';
-import { getColorThemes } from 'src/sections/color-theme/color-theme-api';
+import { useContractsQuery } from 'src/sections/contract/contract-queries';
+import { useCustomersQuery } from 'src/sections/customer/customer-queries';
+import { useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
+import { useColorThemesQuery } from 'src/sections/color-theme/color-theme-queries';
 
 import { JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
-import { createJob, deleteJob, updateJob } from './job-queue-api';
+import {
+  useCreateJobMutation,
+  useUpdateJobMutation,
+  useDeleteJobMutation,
+} from './job-queue-queries';
 
 // ----------------------------------------------------------------------
 
@@ -117,10 +118,31 @@ export function JobQueueNewEditForm({
   initialContractId,
 }: Props) {
   const router = useRouter();
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [colorThemes, setColorThemes] = useState<IColorTheme[]>([]);
-  const [quotations, setQuotations] = useState<IQuotation[]>([]);
-  const [contracts, setContracts] = useState<IContract[]>([]);
+
+  const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
+  const { data: quotations = [], isError: isQuotationsError } = useQuotationsQuery();
+  const { data: contracts = [], isError: isContractsError } = useContractsQuery();
+  const { data: colorThemes = [], isError: isColorThemesError } = useColorThemesQuery();
+
+  const createMutation = useCreateJobMutation();
+  const updateMutation = useUpdateJobMutation();
+  const deleteMutation = useDeleteJobMutation();
+
+  useEffect(() => {
+    if (isCustomersError) toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ');
+  }, [isCustomersError]);
+
+  useEffect(() => {
+    if (isQuotationsError) toast.error('โหลดรายการใบเสนอราคาไม่สำเร็จ');
+  }, [isQuotationsError]);
+
+  useEffect(() => {
+    if (isContractsError) toast.error('โหลดรายการสัญญาไม่สำเร็จ');
+  }, [isContractsError]);
+
+  useEffect(() => {
+    if (isColorThemesError) toast.error('โหลดรายการโทนสีไม่สำเร็จ');
+  }, [isColorThemesError]);
 
   const methods = useForm({
     resolver: zodResolver(JobQueueFormSchema),
@@ -133,20 +155,6 @@ export function JobQueueNewEditForm({
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
-
-  useEffect(() => {
-    Promise.all([getCustomers(), getQuotations(), getContracts(), getColorThemes()])
-      .then(([customerData, quotationData, contractData, colorThemeData]) => {
-        setCustomers(customerData);
-        setQuotations(quotationData);
-        setContracts(contractData);
-        setColorThemes(colorThemeData);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error('โหลดข้อมูลสำหรับลงคิวงานไม่สำเร็จ');
-      });
-  }, []);
 
   useEffect(() => {
     reset(toDefaultValues(currentJob, defaultDate ?? undefined));
@@ -194,7 +202,9 @@ export function JobQueueNewEditForm({
         status: data.status,
         note: data.note,
       };
-      const job = currentJob ? await updateJob(currentJob.id, payload) : await createJob(payload);
+      const job = currentJob
+        ? await updateMutation.mutateAsync({ id: currentJob.id, input: payload })
+        : await createMutation.mutateAsync(payload);
       toast.success(currentJob ? 'แก้ไขคิวงานแล้ว' : 'ลงคิวงานแล้ว');
       router.push(paths.dashboard.jobQueue.details(job.id));
     } catch (error) {
@@ -206,7 +216,7 @@ export function JobQueueNewEditForm({
   const handleDelete = async () => {
     if (!currentJob) return;
     try {
-      await deleteJob(currentJob.id);
+      await deleteMutation.mutateAsync(currentJob.id);
       toast.success('ลบคิวงานแล้ว');
       router.push(paths.dashboard.jobQueue.root);
     } catch (error) {

@@ -2,7 +2,7 @@
 
 import type { IQuotation } from 'src/types/quotation';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -28,44 +28,40 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
 import { QUOTATION_STATUS_META } from './quotation-status';
-import { getQuotations, deleteQuotation } from './quotation-api';
+import { useQuotationsPageQuery, useDeleteQuotationMutation } from './quotation-queries';
 
 // ----------------------------------------------------------------------
 
 export function QuotationListView() {
-  const [quotations, setQuotations] = useState<IQuotation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteTarget, setDeleteTarget] = useState<IQuotation | null>(null);
 
-  const fetchQuotations = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getQuotations();
-      setQuotations(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลใบเสนอราคาไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading } = useQuotationsPageQuery({ page, rowsPerPage });
+  const quotations = data?.quotations ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    fetchQuotations();
-  }, [fetchQuotations]);
+  const deleteMutation = useDeleteQuotationMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deleteQuotation(deleteTarget.id);
-      setQuotations((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบใบเสนอราคาแล้ว');
+      if (quotations.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -74,7 +70,7 @@ export function QuotationListView() {
     }
   };
 
-  const notFound = !loading && !quotations.length;
+  const notFound = !isLoading && !quotations.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -166,6 +162,14 @@ export function QuotationListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
 
       <ConfirmDialog

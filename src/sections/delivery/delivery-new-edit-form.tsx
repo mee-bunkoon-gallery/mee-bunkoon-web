@@ -2,13 +2,14 @@
 
 import type { IDelivery } from 'src/types/delivery';
 import type { IContract } from 'src/types/contract';
-import type { ICustomer, IQuotation } from 'src/types/quotation';
+import type { IQuotation } from 'src/types/quotation';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -26,10 +27,15 @@ import { toast } from 'src/components/snackbar';
 import { htmlToPlainText } from 'src/components/editor';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getCustomers } from 'src/sections/customer/customer-api';
+import { useCustomersQuery } from 'src/sections/customer/customer-queries';
 
+import { saveDeliveryImages } from './delivery-api';
 import { DELIVERY_METHOD_OPTIONS } from './delivery-status';
-import { createDelivery, updateDelivery, saveDeliveryImages } from './delivery-api';
+import {
+  deliveryKeys,
+  useCreateDeliveryMutation,
+  useUpdateDeliveryMutation,
+} from './delivery-queries';
 
 // ----------------------------------------------------------------------
 
@@ -132,12 +138,15 @@ export function DeliveryNewEditForm({
   contractId,
 }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
+  const createMutation = useCreateDeliveryMutation();
+  const updateMutation = useUpdateDeliveryMutation();
 
   useEffect(() => {
-    getCustomers().then(setCustomers).catch(() => toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ'));
-  }, []);
+    if (isCustomersError) toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ');
+  }, [isCustomersError]);
 
   const methods = useForm({
     resolver: zodResolver(DeliveryFormSchema),
@@ -169,10 +178,14 @@ export function DeliveryNewEditForm({
       };
 
       const delivery = currentDelivery
-        ? await updateDelivery(currentDelivery.id, payload)
-        : await createDelivery(payload);
+        ? await updateMutation.mutateAsync({ id: currentDelivery.id, input: payload })
+        : await createMutation.mutateAsync(payload);
 
-      await saveDeliveryImages(delivery.id, data.images);
+      const imageUrls = await saveDeliveryImages(delivery.id, data.images);
+
+      queryClient.setQueryData(deliveryKeys.detail(delivery.id), (current?: IDelivery) =>
+        current ? { ...current, imageUrls } : current
+      );
 
       toast.success(currentDelivery ? 'แก้ไขเอกสารส่งมอบงานแล้ว' : 'สร้างเอกสารส่งมอบงานแล้ว');
       router.push(paths.dashboard.delivery.details(delivery.id));

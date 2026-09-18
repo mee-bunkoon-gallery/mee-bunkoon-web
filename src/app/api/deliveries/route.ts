@@ -51,10 +51,11 @@ export async function GET(request: Request) {
   const quotationId = searchParams.get('quotationId');
   const contractId = searchParams.get('contractId');
   const status = searchParams.get('status');
+  const rowsPerPageParam = searchParams.get('rowsPerPage');
 
   let query = supabase
     .from('deliveries')
-    .select('*, customer:customers(*)')
+    .select('*, customer:customers(*)', { count: 'exact' })
     .order('created_at', { ascending: false });
 
   if (quotationId) {
@@ -67,13 +68,20 @@ export async function GET(request: Request) {
     query = query.eq('status', status);
   }
 
-  const { data, error } = await query;
+  if (rowsPerPageParam) {
+    const rowsPerPage = Math.min(Math.max(Number(rowsPerPageParam) || 10, 1), 100);
+    const page = Math.max(Number(searchParams.get('page')) || 0, 0);
+    const from = page * rowsPerPage;
+    query = query.range(from, from + rowsPerPage - 1);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ deliveries: data.map(mapDelivery) });
+  return NextResponse.json({ deliveries: data.map(mapDelivery), total: count ?? data.length });
 }
 
 export async function POST(request: Request) {

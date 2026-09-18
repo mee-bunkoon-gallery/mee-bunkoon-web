@@ -27,6 +27,7 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'ลงคิวงาน',
         path: paths.dashboard.jobQueue.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:calendar-date-bold" />,
       },
     ],
@@ -37,21 +38,25 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'ใบเสนอราคา',
         path: paths.dashboard.quotation.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:file-text-bold" />,
       },
       {
         title: 'สัญญาจ้างจัดงาน',
         path: paths.dashboard.contract.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:file-check-bold-duotone" />,
       },
       {
         title: 'ใบเสร็จรับเงิน',
         path: paths.dashboard.payment.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:wad-of-money-bold" />,
       },
       {
         title: 'เอกสารส่งมอบงาน',
         path: paths.dashboard.delivery.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:inbox-in-bold-duotone" />,
       },
     ],
@@ -68,7 +73,14 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'รายการบริการ',
         path: paths.dashboard.service.root,
+        deepMatch: true,
         icon: <Iconify icon="solar:box-minimalistic-bold" />,
+      },
+      {
+        title: 'แพ็กเกจ/โปรโมชั่น',
+        path: paths.dashboard.promotionPackage.root,
+        deepMatch: true,
+        icon: <Iconify icon={'solar:gift-bold-duotone' as any} />,
       },
       {
         title: 'โทนสี',

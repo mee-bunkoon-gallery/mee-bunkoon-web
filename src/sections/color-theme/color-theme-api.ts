@@ -9,6 +9,16 @@ export async function getColorThemes(): Promise<IColorTheme[]> {
   return colorThemes;
 }
 
+export async function getColorThemesPage(params: {
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ colorThemes: IColorTheme[]; total: number }> {
+  const qs = new URLSearchParams();
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ colorThemes: IColorTheme[]; total: number }>(`/api/color-themes/?${qs}`);
+}
+
 export async function createColorTheme(input: ColorThemeInput): Promise<IColorTheme> {
   const { colorTheme } = await apiFetch<{ colorTheme: IColorTheme }>('/api/color-themes/', {
     method: 'POST',

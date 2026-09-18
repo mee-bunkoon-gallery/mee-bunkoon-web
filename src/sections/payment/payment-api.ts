@@ -29,6 +29,16 @@ export async function getPayments(filter?: {
   return payments;
 }
 
+export async function getPaymentsPage(params: {
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ payments: IPayment[]; total: number }> {
+  const qs = new URLSearchParams();
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ payments: IPayment[]; total: number }>(`/api/payments/?${qs}`);
+}
+
 export async function getPayment(id: string): Promise<IPayment> {
   const { payment } = await apiFetch<{ payment: IPayment }>(`/api/payments/${id}/`);
   return payment;

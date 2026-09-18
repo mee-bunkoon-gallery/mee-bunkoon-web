@@ -3,9 +3,10 @@
 import type { ICompanyProfile } from 'src/types/settings';
 
 import * as z from 'zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -22,12 +23,12 @@ import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 import { LoadingScreen } from 'src/components/loading-screen';
 
+import { deleteCompanyLogo, uploadCompanyLogo } from './settings-api';
 import {
-  getCompanyProfile,
-  deleteCompanyLogo,
-  uploadCompanyLogo,
-  updateCompanyProfile,
-} from './settings-api';
+  companyProfileKeys,
+  useCompanyProfileQuery,
+  useUpdateCompanyProfileMutation,
+} from './settings-queries';
 
 // ----------------------------------------------------------------------
 
@@ -66,15 +67,15 @@ function toDefaultValues(profile: ICompanyProfile): CompanyProfileSchemaType {
 }
 
 export function CompanyProfileView() {
-  const [profile, setProfile] = useState<ICompanyProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: profile, isLoading: loading, isError } = useCompanyProfileQuery();
+  const updateMutation = useUpdateCompanyProfileMutation();
 
   useEffect(() => {
-    getCompanyProfile()
-      .then(setProfile)
-      .catch(() => toast.error('โหลดข้อมูลไม่สำเร็จ'))
-      .finally(() => setLoading(false));
-  }, []);
+    if (isError) {
+      toast.error('โหลดข้อมูลไม่สำเร็จ');
+    }
+  }, [isError]);
 
   const methods = useForm({
     resolver: zodResolver(CompanyProfileSchema),
@@ -98,7 +99,7 @@ export function CompanyProfileView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const updated = await updateCompanyProfile({
+      await updateMutation.mutateAsync({
         entityType: data.entityType,
         name: data.name,
         storeNameTh: data.storeNameTh,
@@ -110,13 +111,11 @@ export function CompanyProfileView() {
         address: data.address,
       });
 
-      let logoUrl = updated.logoUrl;
-
       if (data.logo instanceof File) {
-        logoUrl = await uploadCompanyLogo(data.logo);
+        await uploadCompanyLogo(data.logo);
+        await queryClient.invalidateQueries({ queryKey: companyProfileKeys.all });
       }
 
-      setProfile({ ...updated, logoUrl });
       toast.success('บันทึกข้อมูลแล้ว');
     } catch (error) {
       console.error(error);
@@ -128,7 +127,7 @@ export function CompanyProfileView() {
     try {
       await deleteCompanyLogo();
       methods.setValue('logo', null);
-      setProfile((prev) => (prev ? { ...prev, logoUrl: null } : prev));
+      await queryClient.invalidateQueries({ queryKey: companyProfileKeys.all });
       toast.success('ลบโลโก้แล้ว');
     } catch (error) {
       console.error(error);

@@ -2,7 +2,7 @@
 
 import type { IDelivery } from 'src/types/delivery';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -27,44 +27,40 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
-import { getDeliveries, deleteDelivery } from './delivery-api';
 import { DELIVERY_STATUS_META, DELIVERY_METHOD_LABEL } from './delivery-status';
+import { useDeliveriesPageQuery, useDeleteDeliveryMutation } from './delivery-queries';
 
 // ----------------------------------------------------------------------
 
 export function DeliveryListView() {
-  const [deliveries, setDeliveries] = useState<IDelivery[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteTarget, setDeleteTarget] = useState<IDelivery | null>(null);
 
-  const fetchDeliveries = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getDeliveries();
-      setDeliveries(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลเอกสารส่งมอบงานไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading } = useDeliveriesPageQuery({ page, rowsPerPage });
+  const deliveries = data?.deliveries ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    fetchDeliveries();
-  }, [fetchDeliveries]);
+  const deleteMutation = useDeleteDeliveryMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deleteDelivery(deleteTarget.id);
-      setDeliveries((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบเอกสารส่งมอบงานแล้ว');
+      if (deliveries.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -73,7 +69,7 @@ export function DeliveryListView() {
     }
   };
 
-  const notFound = !loading && !deliveries.length;
+  const notFound = !isLoading && !deliveries.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -165,6 +161,14 @@ export function DeliveryListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
 
       <ConfirmDialog

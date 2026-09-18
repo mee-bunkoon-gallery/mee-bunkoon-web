@@ -30,6 +30,18 @@ export async function getContracts(status?: string): Promise<IContract[]> {
   return contracts;
 }
 
+export async function getContractsPage(params: {
+  status?: string;
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ contracts: IContract[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set('status', params.status);
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ contracts: IContract[]; total: number }>(`/api/contracts/?${qs}`);
+}
+
 export async function getContract(id: string): Promise<IContract> {
   const { contract } = await apiFetch<{ contract: IContract }>(`/api/contracts/${id}/`);
   return contract;

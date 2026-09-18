@@ -1,12 +1,8 @@
 'use client';
 
-import type { IPayment } from 'src/types/payment';
-import type { IContract } from 'src/types/contract';
-import type { IDelivery } from 'src/types/delivery';
-import type { IQuotation } from 'src/types/quotation';
-import type { IJobQueue, IJobChecklistItem } from 'src/types/job-queue';
+import type { IJobChecklistItem } from 'src/types/job-queue';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -37,12 +33,12 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getPayments } from '../payment/payment-api';
-import { getContract } from '../contract/contract-api';
-import { getDeliveries } from '../delivery/delivery-api';
-import { getQuotation } from '../quotation/quotation-api';
 import { JOB_QUEUE_STATUS_META } from './job-queue-status';
-import { getJob, updateJobChecklist } from './job-queue-api';
+import { usePaymentsQuery } from '../payment/payment-queries';
+import { useContractQuery } from '../contract/contract-queries';
+import { useDeliveriesQuery } from '../delivery/delivery-queries';
+import { useQuotationQuery } from '../quotation/quotation-queries';
+import { useJobQuery, useUpdateJobChecklistMutation } from './job-queue-queries';
 
 function JobInfo({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -101,52 +97,35 @@ type JobChecklistDisplayItem = IJobChecklistItem & { imageUrl?: string | null };
 
 export function JobQueueDetailsView({ jobId }: Props) {
   const router = useRouter();
-  const [job, setJob] = useState<IJobQueue | null>(null);
-  const [quotation, setQuotation] = useState<IQuotation | null>(null);
-  const [contract, setContract] = useState<IContract | null>(null);
-  const [payments, setPayments] = useState<IPayment[]>([]);
-  const [deliveries, setDeliveries] = useState<IDelivery[]>([]);
-  const [loading, setLoading] = useState(true);
   const [pendingChecklist, setPendingChecklist] = useState<IJobChecklistItem[] | null>(null);
   const [confirmChecklistOpen, setConfirmChecklistOpen] = useState(false);
-  const [savingChecklist, setSavingChecklist] = useState(false);
   const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null);
 
-  const loadJob = useCallback(async () => {
-    try {
-      const currentJob = await getJob(jobId);
-      setJob(currentJob);
-      const documentFilter = currentJob.quotationId
-        ? { quotationId: currentJob.quotationId }
-        : currentJob.contractId
-          ? { contractId: currentJob.contractId }
-          : undefined;
-      const [sourceQuotation, sourceContract, sourcePayments, sourceDeliveries] = await Promise.all(
-        [
-          currentJob.quotationId ? getQuotation(currentJob.quotationId) : null,
-          currentJob.contractId ? getContract(currentJob.contractId) : null,
-          documentFilter ? getPayments(documentFilter) : [],
-          documentFilter ? getDeliveries(documentFilter) : [],
-        ]
-      );
-      setQuotation(sourceQuotation);
-      setContract(sourceContract);
-      setPayments(sourcePayments);
-      setDeliveries(sourceDeliveries);
-    } catch (error) {
-      console.error(error);
-      toast.error('ไม่พบรายละเอียดงานนี้');
-      router.replace(paths.dashboard.jobQueue.root);
-    } finally {
-      setLoading(false);
-    }
-  }, [jobId, router]);
+  const { data: job, isLoading, isError } = useJobQuery(jobId);
+
+  const documentFilter = job?.quotationId
+    ? { quotationId: job.quotationId }
+    : job?.contractId
+      ? { contractId: job.contractId }
+      : undefined;
+
+  const { data: quotation } = useQuotationQuery(job?.quotationId ?? '');
+  const { data: contract } = useContractQuery(job?.contractId ?? '');
+  const { data: paymentsData } = usePaymentsQuery(documentFilter ?? {});
+  const payments = paymentsData ?? [];
+  const { data: deliveriesData } = useDeliveriesQuery(documentFilter);
+  const deliveries = deliveriesData ?? [];
+
+  const checklistMutation = useUpdateJobChecklistMutation(jobId);
 
   useEffect(() => {
-    loadJob();
-  }, [loadJob]);
+    if (isError) {
+      toast.error('ไม่พบรายละเอียดงานนี้');
+      router.replace(paths.dashboard.jobQueue.root);
+    }
+  }, [isError, router]);
 
-  if (loading) return <LoadingScreen />;
+  if (isLoading) return <LoadingScreen />;
   if (!job) return null;
 
   const statusMeta = JOB_QUEUE_STATUS_META[job.status];
@@ -182,23 +161,19 @@ export function JobQueueDetailsView({ jobId }: Props) {
 
   const handleConfirmChecklist = async () => {
     const checklistToSave = quotationChecklist.map(({ imageUrl: _imageUrl, ...item }) => item);
-    setSavingChecklist(true);
 
     try {
-      const savedChecklist = await updateJobChecklist(job.id, checklistToSave);
-      setJob((currentJob) =>
-        currentJob ? { ...currentJob, checklist: savedChecklist } : currentJob
-      );
+      await checklistMutation.mutateAsync(checklistToSave);
       setPendingChecklist(null);
       setConfirmChecklistOpen(false);
       toast.success('ยืนยันรายการงานแล้ว');
     } catch (error) {
       console.error(error);
       toast.error('บันทึกรายการตรวจสอบไม่สำเร็จ');
-    } finally {
-      setSavingChecklist(false);
     }
   };
+
+  const savingChecklist = checklistMutation.isPending;
 
   return (
     <DashboardContent maxWidth="xl">

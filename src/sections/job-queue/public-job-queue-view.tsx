@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -32,31 +32,33 @@ type PublicJobResponse = {
   jobs: PublicJob[];
 };
 
+/**
+ * This page is public and unauthenticated — it hits `/api/public/jobs/` directly
+ * rather than going through `job-queue-api.ts` (which is gated by `apiFetch`'s auth).
+ * There's no shared query-hook file for this one-off public endpoint, so it's wrapped
+ * in a local inline query here instead.
+ */
+async function fetchPublicJobs(): Promise<PublicJobResponse> {
+  try {
+    const response = await fetch('/api/public/jobs/', { cache: 'no-store' });
+    const payload = await response.json();
+
+    if (!response.ok) throw new Error(payload.message || 'ไม่สามารถโหลดคิวงานได้');
+
+    return payload;
+  } catch (error) {
+    console.error(error);
+    return { company: null, jobs: [] };
+  }
+}
+
 export function PublicJobQueueView() {
-  const [data, setData] = useState<PublicJobResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ['public-jobs'],
+    queryFn: fetchPublicJobs,
+  });
 
-  const loadJobs = useCallback(async () => {
-    try {
-      const response = await fetch('/api/public/jobs/', { cache: 'no-store' });
-      const payload = await response.json();
-
-      if (!response.ok) throw new Error(payload.message || 'ไม่สามารถโหลดคิวงานได้');
-
-      setData(payload);
-    } catch (error) {
-      console.error(error);
-      setData({ company: null, jobs: [] });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadJobs();
-  }, [loadJobs]);
-
-  if (loading) return <LoadingScreen />;
+  if (isLoading) return <LoadingScreen />;
 
   const companyName = data?.company?.name || 'มีบุญคุณ แกลเลอรี่';
   const jobCount = data?.jobs.length ?? 0;

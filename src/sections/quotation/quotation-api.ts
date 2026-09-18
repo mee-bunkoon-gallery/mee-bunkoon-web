@@ -31,6 +31,18 @@ export async function getQuotations(status?: string): Promise<IQuotation[]> {
   return quotations;
 }
 
+export async function getQuotationsPage(params: {
+  status?: string;
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ quotations: IQuotation[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set('status', params.status);
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ quotations: IQuotation[]; total: number }>(`/api/quotations/?${qs}`);
+}
+
 export async function getQuotation(id: string): Promise<IQuotation> {
   const { quotation } = await apiFetch<{ quotation: IQuotation }>(`/api/quotations/${id}/`);
   return quotation;

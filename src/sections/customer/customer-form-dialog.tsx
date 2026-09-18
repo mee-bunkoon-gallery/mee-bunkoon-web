@@ -17,7 +17,7 @@ import DialogContent from '@mui/material/DialogContent';
 import { toast } from 'src/components/snackbar';
 import { Form, Field } from 'src/components/hook-form';
 
-import { createCustomer, updateCustomer } from './customer-api';
+import { useCreateCustomerMutation, useUpdateCustomerMutation } from './customer-queries';
 
 // ----------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   currentCustomer?: ICustomer | null;
-  onSuccess: (customer: ICustomer) => void;
+  onSuccess?: (customer: ICustomer) => void;
 };
 
 export function CustomerFormDialog({ open, onClose, currentCustomer, onSuccess }: Props) {
@@ -57,6 +57,9 @@ export function CustomerFormDialog({ open, onClose, currentCustomer, onSuccess }
     resolver: zodResolver(CustomerFormSchema),
     defaultValues,
   });
+
+  const createMutation = useCreateCustomerMutation();
+  const updateMutation = useUpdateCustomerMutation();
 
   const {
     reset,
@@ -86,11 +89,11 @@ export function CustomerFormDialog({ open, onClose, currentCustomer, onSuccess }
   const onSubmit = handleSubmit(async (data) => {
     try {
       const customer = currentCustomer
-        ? await updateCustomer(currentCustomer.id, data)
-        : await createCustomer(data);
+        ? await updateMutation.mutateAsync({ id: currentCustomer.id, input: data })
+        : await createMutation.mutateAsync(data);
 
       toast.success(currentCustomer ? 'แก้ไขข้อมูลลูกค้าแล้ว' : 'เพิ่มลูกค้าใหม่แล้ว');
-      onSuccess(customer);
+      onSuccess?.(customer);
       onClose();
     } catch (error) {
       console.error(error);

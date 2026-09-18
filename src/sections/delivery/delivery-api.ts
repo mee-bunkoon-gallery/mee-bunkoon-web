@@ -28,6 +28,16 @@ export async function getDeliveries(filter?: {
   return deliveries;
 }
 
+export async function getDeliveriesPage(params: {
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ deliveries: IDelivery[]; total: number }> {
+  const qs = new URLSearchParams();
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ deliveries: IDelivery[]; total: number }>(`/api/deliveries/?${qs}`);
+}
+
 export async function getDelivery(id: string): Promise<IDelivery> {
   const { delivery } = await apiFetch<{ delivery: IDelivery }>(`/api/deliveries/${id}/`);
   return delivery;

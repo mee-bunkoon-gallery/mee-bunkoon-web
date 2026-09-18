@@ -1,11 +1,6 @@
 'use client';
 
-import type { IPayment } from 'src/types/payment';
-import type { IContract } from 'src/types/contract';
-import type { IJobQueue } from 'src/types/job-queue';
-import type { IQuotation } from 'src/types/quotation';
-
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -34,15 +29,11 @@ import { Chart, useChart } from 'src/components/chart';
 
 import { useAuthContext } from 'src/auth/hooks';
 
-type DashboardData = {
-  jobs: IJobQueue[];
-  payments: IPayment[];
-  contracts: IContract[];
-  quotations: IQuotation[];
-};
+import { useJobsQuery } from '../job-queue/job-queue-queries';
+import { useContractsQuery } from '../contract/contract-queries';
+import { useAllPaymentsQuery } from '../payment/payment-queries';
+import { useQuotationsQuery } from '../quotation/quotation-queries';
 
-const EMPTY_DATA: DashboardData = { jobs: [], payments: [], contracts: [], quotations: [] };
-const DASHBOARD_ENDPOINTS = ['quotations', 'contracts', 'jobs', 'payments'] as const;
 const OUTLINED_CARD_SX = {
   height: 1,
   border: '1px solid',
@@ -132,58 +123,39 @@ function MetricCard({
 export function OverviewView() {
   const theme = useTheme();
   const { user } = useAuthContext();
-  const [data, setData] = useState<DashboardData>(EMPTY_DATA);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
+  const quotationsQuery = useQuotationsQuery();
+  const contractsQuery = useContractsQuery();
+  const jobsQuery = useJobsQuery();
+  const paymentsQuery = useAllPaymentsQuery();
 
-    Promise.allSettled(
-      DASHBOARD_ENDPOINTS.map((path) =>
-        fetch(`/api/${path}/`, { signal: controller.signal }).then((response) => {
-          if (!response.ok) throw new Error(`Unable to load ${path}`);
-          return response.json();
-        })
-      )
-    ).then((results) => {
-      if (controller.signal.aborted) return;
+  const quotations = quotationsQuery.data ?? [];
+  const contracts = contractsQuery.data ?? [];
+  const jobs = jobsQuery.data ?? [];
+  const payments = paymentsQuery.data ?? [];
 
-      const [quotations, contracts, jobs, payments] = results.map((result, index) => {
-        if (result.status === 'rejected') {
-          console.error(`Failed to load ${DASHBOARD_ENDPOINTS[index]}`, result.reason);
-          return null;
-        }
-        return result.value;
-      });
-
-      setData({
-        jobs: jobs?.jobs ?? [],
-        payments: payments?.payments ?? [],
-        contracts: contracts?.contracts ?? [],
-        quotations: quotations?.quotations ?? [],
-      });
-      setLoading(false);
-    });
-
-    return () => controller.abort();
-  }, []);
+  const loading =
+    quotationsQuery.isLoading ||
+    contractsQuery.isLoading ||
+    jobsQuery.isLoading ||
+    paymentsQuery.isLoading;
 
   const today = useMemo(() => new Date(), []);
   const currentMonth = useMemo(() => new Date(today.getFullYear(), today.getMonth(), 1), [today]);
-  const totalPaid = data.payments.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-  const monthPayments = data.payments.filter((item) => new Date(item.paymentDate) >= currentMonth);
+  const totalPaid = payments.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const monthPayments = payments.filter((item) => new Date(item.paymentDate) >= currentMonth);
   const monthPaid = monthPayments.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-  const acceptedSales = data.quotations
+  const acceptedSales = quotations
     .filter((item) => item.status === 'accepted')
     .reduce((sum, item) => sum + Number(item.total || 0), 0);
   const outstanding = Math.max(acceptedSales - totalPaid, 0);
-  const upcomingJobs = data.jobs
+  const upcomingJobs = jobs
     .filter((job) => new Date(`${job.jobDate}T23:59:59`) >= today && job.status !== 'cancelled')
     .sort((a, b) => a.jobDate.localeCompare(b.jobDate))
     .slice(0, 4);
   const currentYear = today.getFullYear();
   const monthlyIncome = MONTHS.map((_, month) =>
-    data.payments
+    payments
       .filter((item) => {
         const date = new Date(item.paymentDate);
         return date.getFullYear() === currentYear && date.getMonth() === month;
@@ -203,7 +175,7 @@ export function OverviewView() {
     tooltip: { y: { formatter: (value) => fBaht(value) } },
   });
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
-  const pendingContracts = data.contracts.filter((item) => item.status === 'draft').length;
+  const pendingContracts = contracts.filter((item) => item.status === 'draft').length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -371,20 +343,20 @@ export function OverviewView() {
               {[
                 {
                   label: 'ใบเสนอราคาอนุมัติแล้ว',
-                  value: data.quotations.filter((item) => item.status === 'accepted').length,
-                  total: data.quotations.length,
+                  value: quotations.filter((item) => item.status === 'accepted').length,
+                  total: quotations.length,
                   color: 'success' as const,
                 },
                 {
                   label: 'สัญญาลงนามแล้ว',
-                  value: data.contracts.filter((item) => item.status === 'signed').length,
-                  total: data.contracts.length,
+                  value: contracts.filter((item) => item.status === 'signed').length,
+                  total: contracts.length,
                   color: 'primary' as const,
                 },
                 {
                   label: 'คิวงานเสร็จสิ้น',
-                  value: data.jobs.filter((item) => item.status === 'completed').length,
-                  total: data.jobs.length,
+                  value: jobs.filter((item) => item.status === 'completed').length,
+                  total: jobs.length,
                   color: 'info' as const,
                 },
               ].map((item) => (
@@ -438,7 +410,7 @@ export function OverviewView() {
               {loading &&
                 [1, 2, 3].map((item) => <Skeleton key={item} height={72} sx={{ mx: 3 }} />)}
               {!loading &&
-                data.payments.slice(0, 4).map((payment) => (
+                payments.slice(0, 4).map((payment) => (
                   <Stack
                     key={payment.id}
                     direction="row"
@@ -474,7 +446,7 @@ export function OverviewView() {
                     </Box>
                   </Stack>
                 ))}
-              {!loading && data.payments.length === 0 && (
+              {!loading && payments.length === 0 && (
                 <Typography
                   variant="body2"
                   sx={{ py: 7, textAlign: 'center', color: 'text.secondary' }}

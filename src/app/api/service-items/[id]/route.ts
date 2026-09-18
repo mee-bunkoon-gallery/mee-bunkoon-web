@@ -5,6 +5,12 @@ import { createSupabaseServerClient } from 'src/lib/supabase/server';
 // ----------------------------------------------------------------------
 
 function mapServiceItem(row: any) {
+  const colorThemes = (row.color_themes ?? []).map((item: any) => ({
+    id: item.color_theme.id,
+    name: item.color_theme.name,
+    hexCode: item.color_theme.hex_code,
+    inUse: true,
+  }));
   return {
     id: row.id,
     name: row.name,
@@ -12,6 +18,8 @@ function mapServiceItem(row: any) {
     imageUrl: row.image_url,
     unit: row.unit,
     unitPrice: Number(row.unit_price),
+    colorThemeIds: colorThemes.map((item: any) => item.id),
+    colorThemes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -48,7 +56,11 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data, error } = await supabase.from('service_items').select('*').eq('id', id).single();
+  const { data, error } = await supabase
+    .from('service_items')
+    .select('*, color_themes:service_item_color_themes(color_theme:color_themes(*))')
+    .eq('id', id)
+    .single();
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 404 });
@@ -101,6 +113,23 @@ export async function PUT(request: Request, { params }: Params) {
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+
+  const { error: clearThemesError } = await supabase
+    .from('service_item_color_themes')
+    .delete()
+    .eq('service_item_id', id);
+  if (clearThemesError) {
+    return NextResponse.json({ message: clearThemesError.message }, { status: 400 });
+  }
+  if (body.colorThemeIds?.length) {
+    const { error: themesError } = await supabase.from('service_item_color_themes').insert(
+      body.colorThemeIds.map((colorThemeId: string) => ({
+        service_item_id: id,
+        color_theme_id: colorThemeId,
+      }))
+    );
+    if (themesError) return NextResponse.json({ message: themesError.message }, { status: 400 });
   }
 
   const [linkedItemsResult, previousNameItemsResult, currentNameItemsResult] = await Promise.all([
@@ -195,7 +224,14 @@ export async function PUT(request: Request, { params }: Params) {
     }
   }
 
-  return NextResponse.json({ serviceItem: mapServiceItem(data) });
+  const { data: savedServiceItem, error: readError } = await supabase
+    .from('service_items')
+    .select('*, color_themes:service_item_color_themes(color_theme:color_themes(*))')
+    .eq('id', id)
+    .single();
+  if (readError) return NextResponse.json({ message: readError.message }, { status: 400 });
+
+  return NextResponse.json({ serviceItem: mapServiceItem(savedServiceItem) });
 }
 
 export async function DELETE(_request: Request, { params }: Params) {

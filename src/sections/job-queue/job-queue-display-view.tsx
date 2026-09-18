@@ -1,9 +1,8 @@
 'use client';
 
 import type { IJobQueue } from 'src/types/job-queue';
-import type { ICompanyProfile } from 'src/types/settings';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -23,9 +22,9 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getJobs } from './job-queue-api';
+import { useJobsQuery } from './job-queue-queries';
 import { JOB_QUEUE_STATUS_META } from './job-queue-status';
-import { getCompanyProfile } from '../settings/settings-api';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
 
 // ----------------------------------------------------------------------
 
@@ -79,28 +78,18 @@ function JobRow({ job }: { job: IJobQueue }) {
 }
 
 export function JobQueueDisplayView() {
-  const [jobs, setJobs] = useState<IJobQueue[]>([]);
-  const [company, setCompany] = useState<ICompanyProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadData = useCallback(async () => {
-    try {
-      const [sourceJobs, companyProfile] = await Promise.all([getJobs(), getCompanyProfile()]);
-      setJobs(sourceJobs);
-      setCompany(companyProfile);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลคิวงานไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data: jobs = [], isLoading: isJobsLoading, isError: isJobsError } = useJobsQuery();
+  const {
+    data: company,
+    isLoading: isCompanyLoading,
+    isError: isCompanyError,
+  } = useCompanyProfileQuery();
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (isJobsError || isCompanyError) toast.error('โหลดข้อมูลคิวงานไม่สำเร็จ');
+  }, [isJobsError, isCompanyError]);
 
-  if (loading) return <LoadingScreen />;
+  if (isJobsLoading || isCompanyLoading) return <LoadingScreen />;
 
   const today = new Date().toISOString().slice(0, 10);
   const upcomingJobs = [...jobs]
@@ -108,7 +97,7 @@ export function JobQueueDisplayView() {
     .sort((a, b) => a.jobDate.localeCompare(b.jobDate));
 
   return (
-    <DashboardContent maxWidth="md">
+    <DashboardContent maxWidth="xl">
       <Box
         sx={{
           px: { xs: 2.5, sm: 4 },

@@ -1,15 +1,16 @@
 'use client';
 
-import type { EventClickArg, DateSelectArg } from '@fullcalendar/core';
+import type { DatesSetArg, EventClickArg, DateSelectArg } from '@fullcalendar/core';
 import type { IJobQueue } from 'src/types/job-queue';
 
+import dayjs from 'dayjs';
 import listPlugin from '@fullcalendar/list';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { useRef, useState, useEffect } from 'react';
 import thLocale from '@fullcalendar/core/locales/th';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useRef, useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -26,7 +27,7 @@ import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 
-import { getJobs } from './job-queue-api';
+import { useJobsQuery } from './job-queue-queries';
 import { JOB_QUEUE_STATUS_META, JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
 
 // ----------------------------------------------------------------------
@@ -52,21 +53,23 @@ export function JobQueueCalendarView() {
   const router = useRouter();
   const calendarRef = useRef<FullCalendar>(null);
 
-  const [jobs, setJobs] = useState<IJobQueue[]>([]);
+  const [range, setRange] = useState(() => ({
+    dateFrom: dayjs().startOf('month').format('YYYY-MM-DD'),
+    dateTo: dayjs().endOf('month').format('YYYY-MM-DD'),
+  }));
 
-  const fetchJobs = useCallback(async () => {
-    try {
-      const data = await getJobs();
-      setJobs(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลคิวงานไม่สำเร็จ');
-    }
-  }, []);
+  const { data: jobs = [], isError } = useJobsQuery(range);
 
   useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
+    if (isError) toast.error('โหลดข้อมูลคิวงานไม่สำเร็จ');
+  }, [isError]);
+
+  const handleDatesSet = (arg: DatesSetArg) => {
+    setRange({
+      dateFrom: dayjs(arg.start).format('YYYY-MM-DD'),
+      dateTo: dayjs(arg.end).format('YYYY-MM-DD'),
+    });
+  };
 
   const handleDateClick = (arg: DateSelectArg) => {
     router.push(`${paths.dashboard.jobQueue.new}?date=${arg.startStr}`);
@@ -164,6 +167,7 @@ export function JobQueueCalendarView() {
             events={jobs.map(jobToEvent)}
             select={handleDateClick}
             eventClick={handleEventClick}
+            datesSet={handleDatesSet}
           />
         </Box>
       </Card>

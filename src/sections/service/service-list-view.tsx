@@ -2,11 +2,12 @@
 
 import type { IServiceItem } from 'src/types/quotation';
 
-import { useBoolean } from 'minimal-shared/hooks';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -20,73 +21,63 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 import TableContainer from '@mui/material/TableContainer';
 
+import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
+
 import { fBaht } from 'src/utils/format-number';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
-import { ServiceFormDialog } from './service-form-dialog';
-import { getServiceItems, deleteServiceItem } from './service-api';
+import { useServiceItemsPageQuery, useDeleteServiceItemMutation } from './service-queries';
 
 // ----------------------------------------------------------------------
 
 export function ServiceListView() {
-  const [serviceItems, setServiceItems] = useState<IServiceItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentServiceItem, setCurrentServiceItem] = useState<IServiceItem | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<IServiceItem | null>(null);
 
-  const formDialog = useBoolean();
-
-  const fetchServiceItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getServiceItems();
-      setServiceItems(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลรายการบริการไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
-    fetchServiceItems();
-  }, [fetchServiceItems]);
+    setPage(0);
+  }, [debouncedSearch]);
 
-  const handleNew = () => {
-    setCurrentServiceItem(null);
-    formDialog.onTrue();
-  };
+  const { data, isLoading } = useServiceItemsPageQuery({
+    q: debouncedSearch,
+    page,
+    rowsPerPage,
+  });
+  const serviceItems = data?.serviceItems ?? [];
+  const total = data?.total ?? 0;
 
-  const handleEdit = (serviceItem: IServiceItem) => {
-    setCurrentServiceItem(serviceItem);
-    formDialog.onTrue();
-  };
+  const deleteMutation = useDeleteServiceItemMutation();
 
-  const handleSuccess = (serviceItem: IServiceItem) => {
-    setServiceItems((prev) => {
-      const exists = prev.some((row) => row.id === serviceItem.id);
-      return exists
-        ? prev.map((row) => (row.id === serviceItem.id ? serviceItem : row))
-        : [serviceItem, ...prev];
-    });
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deleteServiceItem(deleteTarget.id);
-      setServiceItems((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบรายการบริการแล้ว');
+      if (serviceItems.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -95,13 +86,7 @@ export function ServiceListView() {
     }
   };
 
-  const filteredServiceItems = serviceItems.filter((item) => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) return true;
-    return item.name.toLowerCase().includes(term);
-  });
-
-  const notFound = !loading && !filteredServiceItems.length;
+  const notFound = !isLoading && !serviceItems.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -118,9 +103,10 @@ export function ServiceListView() {
         <Typography variant="h4">รายการบริการ</Typography>
 
         <Button
+          component={RouterLink}
+          href={paths.dashboard.service.new}
           variant="contained"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={handleNew}
         >
           เพิ่มรายการบริการ
         </Button>
@@ -148,20 +134,24 @@ export function ServiceListView() {
 
         <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
           <Scrollbar>
-            <Table sx={{ minWidth: 720 }}>
+            <Table sx={{ minWidth: 900 }}>
               <TableHead>
                 <TableRow>
                   <TableCell>รูปภาพ</TableCell>
-                  <TableCell>ชื่อรายการบริการ</TableCell>
-                  <TableCell>รายละเอียด</TableCell>
-                  <TableCell>หน่วยนับ</TableCell>
-                  <TableCell align="right">ราคาต่อหน่วย</TableCell>
-                  <TableCell align="right">จัดการ</TableCell>
+                  <TableCell sx={{ minWidth: 300 }}>ชื่อรายการบริการ</TableCell>
+                  <TableCell sx={{ minWidth: 100 }}>โทนสี</TableCell>
+                  <TableCell sx={{ minWidth: 100 }}>หน่วยนับ</TableCell>
+                  <TableCell align="right" sx={{ minWidth: 140 }}>
+                    ราคาต่อหน่วย
+                  </TableCell>
+                  <TableCell align="right" sx={{ minWidth: 140 }}>
+                    จัดการ
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {filteredServiceItems.map((item) => (
+                {serviceItems.map((item) => (
                   <TableRow key={item.id} hover>
                     <TableCell>
                       <Avatar
@@ -174,14 +164,43 @@ export function ServiceListView() {
                     </TableCell>
                     <TableCell>
                       <Typography variant="subtitle2">{item.name}</Typography>
+                      <Typography variant="caption">{item.description || '-'}</Typography>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>
-                      {item.description || '-'}
+                    <TableCell>
+                      <Stack direction="row" flexWrap="wrap" gap={0.75}>
+                        {item.colorThemes.length ? (
+                          item.colorThemes.map((theme) => (
+                            <Chip
+                              key={theme.id}
+                              size="small"
+                              variant="outlined"
+                              label={theme.name}
+                              icon={
+                                <Box
+                                  sx={{
+                                    width: 10,
+                                    height: 10,
+                                    bgcolor: theme.hexCode,
+                                    borderRadius: '50%',
+                                  }}
+                                />
+                              }
+                            />
+                          ))
+                        ) : (
+                          <Typography variant="body2" color="text.disabled">
+                            -
+                          </Typography>
+                        )}
+                      </Stack>
                     </TableCell>
                     <TableCell>{item.unit}</TableCell>
                     <TableCell align="right">{fBaht(item.unitPrice)}</TableCell>
                     <TableCell align="right">
-                      <IconButton onClick={() => handleEdit(item)}>
+                      <IconButton
+                        component={RouterLink}
+                        href={paths.dashboard.service.edit(item.id)}
+                      >
                         <Iconify icon="solar:pen-bold" />
                       </IconButton>
                       <IconButton color="error" onClick={() => setDeleteTarget(item)}>
@@ -196,14 +215,15 @@ export function ServiceListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
-      </Card>
 
-      <ServiceFormDialog
-        open={formDialog.value}
-        onClose={formDialog.onFalse}
-        currentServiceItem={currentServiceItem}
-        onSuccess={handleSuccess}
-      />
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Card>
 
       <ConfirmDialog
         open={!!deleteTarget}

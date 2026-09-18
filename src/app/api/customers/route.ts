@@ -31,21 +31,33 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const q = new URL(request.url).searchParams.get('q');
+  const searchParams = new URL(request.url).searchParams;
+  const q = searchParams.get('q');
+  const rowsPerPageParam = searchParams.get('rowsPerPage');
 
-  let query = supabase.from('customers').select('*').order('created_at', { ascending: false });
+  let query = supabase
+    .from('customers')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false });
 
   if (q) {
     query = query.or(`name.ilike.%${q}%,phone.ilike.%${q}%,email.ilike.%${q}%`);
   }
 
-  const { data, error } = await query;
+  if (rowsPerPageParam) {
+    const rowsPerPage = Math.min(Math.max(Number(rowsPerPageParam) || 10, 1), 100);
+    const page = Math.max(Number(searchParams.get('page')) || 0, 0);
+    const from = page * rowsPerPage;
+    query = query.range(from, from + rowsPerPage - 1);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ customers: data.map(mapCustomer) });
+  return NextResponse.json({ customers: data.map(mapCustomer), total: count ?? data.length });
 }
 
 export async function POST(request: Request) {

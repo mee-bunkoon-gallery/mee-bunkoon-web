@@ -1,7 +1,7 @@
 'use client';
 
 import type { IPayment } from 'src/types/payment';
-import type { ICustomer, IQuotation } from 'src/types/quotation';
+import type { ICustomer } from 'src/types/quotation';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
@@ -23,11 +23,16 @@ import { useRouter } from 'src/routes/hooks';
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
-import { getCustomers } from 'src/sections/customer/customer-api';
-import { getQuotation, getQuotations } from 'src/sections/quotation/quotation-api';
+import { useCustomersQuery } from 'src/sections/customer/customer-queries';
+import { useQuotationQuery, useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
 
+import { uploadPaymentSlip } from './payment-api';
 import { PAYMENT_METHOD_OPTIONS, PAYMENT_PURPOSE_OPTIONS } from './payment-method';
-import { getPayments, createPayment, updatePayment, uploadPaymentSlip } from './payment-api';
+import {
+  usePaymentsQuery,
+  useCreatePaymentMutation,
+  useUpdatePaymentMutation,
+} from './payment-queries';
 
 // ----------------------------------------------------------------------
 
@@ -101,17 +106,35 @@ export function PaymentNewEditForm({
 }: Props) {
   const router = useRouter();
 
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [quotations, setQuotations] = useState<IQuotation[]>([]);
+  const [selectedQuotationId, setSelectedQuotationId] = useState<string | null>(null);
+
+  const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
+  const { data: quotations = [], isError: isQuotationsError } = useQuotationsQuery();
+
+  const createMutation = useCreatePaymentMutation();
+  const updateMutation = useUpdatePaymentMutation();
+
+  const {
+    data: selectedQuotationDetail,
+    isError: isSelectedQuotationError,
+  } = useQuotationQuery(selectedQuotationId ?? '');
+  const { data: selectedQuotationPayments } = usePaymentsQuery({
+    quotationId: selectedQuotationId ?? undefined,
+  });
 
   useEffect(() => {
-    getCustomers()
-      .then(setCustomers)
-      .catch(() => toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ'));
-    getQuotations()
-      .then(setQuotations)
-      .catch(() => toast.error('โหลดใบเสนอราคาไม่สำเร็จ'));
-  }, []);
+    if (isCustomersError) toast.error('โหลดรายชื่อลูกค้าไม่สำเร็จ');
+  }, [isCustomersError]);
+
+  useEffect(() => {
+    if (isQuotationsError) toast.error('โหลดใบเสนอราคาไม่สำเร็จ');
+  }, [isQuotationsError]);
+
+  useEffect(() => {
+    if (selectedQuotationId && isSelectedQuotationError) {
+      toast.error('โหลดข้อมูลใบเสนอราคาไม่สำเร็จ');
+    }
+  }, [selectedQuotationId, isSelectedQuotationError]);
 
   const methods = useForm({
     resolver: zodResolver(PaymentFormSchema),
@@ -141,6 +164,23 @@ export function PaymentNewEditForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayment, reset]);
 
+  useEffect(() => {
+    if (!selectedQuotationId || !selectedQuotationDetail) return;
+
+    const paid = (selectedQuotationPayments ?? []).reduce(
+      (sum, payment) => sum + payment.amount,
+      0
+    );
+
+    setValue(
+      'customer',
+      selectedQuotationDetail.customer
+        ? { id: selectedQuotationDetail.customer.id, name: selectedQuotationDetail.customer.name }
+        : null
+    );
+    setValue('amount', Math.max(selectedQuotationDetail.total - paid, 0));
+  }, [selectedQuotationId, selectedQuotationDetail, selectedQuotationPayments, setValue]);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       const payload = {
@@ -156,8 +196,8 @@ export function PaymentNewEditForm({
       };
 
       const payment = currentPayment
-        ? await updatePayment(currentPayment.id, payload)
-        : await createPayment(payload);
+        ? await updateMutation.mutateAsync({ id: currentPayment.id, input: payload })
+        : await createMutation.mutateAsync(payload);
 
       if (data.slip instanceof File) {
         await uploadPaymentSlip(payment.id, data.slip);
@@ -191,35 +231,13 @@ export function PaymentNewEditForm({
                         field.value ??
                         null
                       }
-                      onChange={async (_event, selectedQuotation) => {
+                      onChange={(_event, selectedQuotation) => {
                         field.onChange(
                           selectedQuotation
                             ? { id: selectedQuotation.id, quoteNo: selectedQuotation.quoteNo }
                             : null
                         );
-
-                        if (!selectedQuotation) return;
-
-                        try {
-                          const [quotation, existingPayments] = await Promise.all([
-                            getQuotation(selectedQuotation.id),
-                            getPayments({ quotationId: selectedQuotation.id }),
-                          ]);
-                          const paid = existingPayments.reduce(
-                            (sum, payment) => sum + payment.amount,
-                            0
-                          );
-
-                          setValue(
-                            'customer',
-                            quotation.customer
-                              ? { id: quotation.customer.id, name: quotation.customer.name }
-                              : null
-                          );
-                          setValue('amount', Math.max(quotation.total - paid, 0));
-                        } catch {
-                          toast.error('โหลดข้อมูลใบเสนอราคาไม่สำเร็จ');
-                        }
+                        setSelectedQuotationId(selectedQuotation ? selectedQuotation.id : null);
                       }}
                       renderInput={(params) => (
                         <TextField {...params} label="อ้างอิงใบเสนอราคา (ไม่บังคับ)" />

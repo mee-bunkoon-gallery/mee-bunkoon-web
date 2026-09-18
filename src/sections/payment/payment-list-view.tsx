@@ -2,7 +2,7 @@
 
 import type { IPayment } from 'src/types/payment';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -28,44 +28,40 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
-import { getPayments, deletePayment } from './payment-api';
 import { PAYMENT_METHOD_LABEL, PAYMENT_PURPOSE_LABEL } from './payment-method';
+import { usePaymentsPageQuery, useDeletePaymentMutation } from './payment-queries';
 
 // ----------------------------------------------------------------------
 
 export function PaymentListView() {
-  const [payments, setPayments] = useState<IPayment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteTarget, setDeleteTarget] = useState<IPayment | null>(null);
 
-  const fetchPayments = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getPayments();
-      setPayments(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลใบเสร็จรับเงินไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading } = usePaymentsPageQuery({ page, rowsPerPage });
+  const payments = data?.payments ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    fetchPayments();
-  }, [fetchPayments]);
+  const deleteMutation = useDeletePaymentMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deletePayment(deleteTarget.id);
-      setPayments((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบใบเสร็จรับเงินแล้ว');
+      if (payments.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -74,7 +70,7 @@ export function PaymentListView() {
     }
   };
 
-  const notFound = !loading && !payments.length;
+  const notFound = !isLoading && !payments.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -172,6 +168,14 @@ export function PaymentListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
 
       <ConfirmDialog

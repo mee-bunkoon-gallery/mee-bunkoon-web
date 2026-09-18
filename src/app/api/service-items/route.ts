@@ -5,6 +5,12 @@ import { createSupabaseServerClient } from 'src/lib/supabase/server';
 // ----------------------------------------------------------------------
 
 function mapServiceItem(row: any) {
+  const colorThemes = (row.color_themes ?? []).map((item: any) => ({
+    id: item.color_theme.id,
+    name: item.color_theme.name,
+    hexCode: item.color_theme.hex_code,
+    inUse: true,
+  }));
   return {
     id: row.id,
     name: row.name,
@@ -12,6 +18,8 @@ function mapServiceItem(row: any) {
     imageUrl: row.image_url,
     unit: row.unit,
     unitPrice: Number(row.unit_price),
+    colorThemeIds: colorThemes.map((item: any) => item.id),
+    colorThemes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -28,21 +36,38 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const q = new URL(request.url).searchParams.get('q');
+  const searchParams = new URL(request.url).searchParams;
+  const q = searchParams.get('q');
+  const rowsPerPageParam = searchParams.get('rowsPerPage');
 
-  let query = supabase.from('service_items').select('*').order('created_at', { ascending: false });
+  let query = supabase
+    .from('service_items')
+    .select('*, color_themes:service_item_color_themes(color_theme:color_themes(*))', {
+      count: 'exact',
+    })
+    .order('created_at', { ascending: false });
 
   if (q) {
     query = query.ilike('name', `%${q}%`);
   }
 
-  const { data, error } = await query;
+  if (rowsPerPageParam) {
+    const rowsPerPage = Math.min(Math.max(Number(rowsPerPageParam) || 10, 1), 100);
+    const page = Math.max(Number(searchParams.get('page')) || 0, 0);
+    const from = page * rowsPerPage;
+    query = query.range(from, from + rowsPerPage - 1);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ serviceItems: data.map(mapServiceItem) });
+  return NextResponse.json({
+    serviceItems: data.map(mapServiceItem),
+    total: count ?? data.length,
+  });
 }
 
 export async function POST(request: Request) {
@@ -79,5 +104,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ serviceItem: mapServiceItem(data) });
+  if (body.colorThemeIds?.length) {
+    const { error: themesError } = await supabase.from('service_item_color_themes').insert(
+      body.colorThemeIds.map((colorThemeId: string) => ({
+        service_item_id: data.id,
+        color_theme_id: colorThemeId,
+      }))
+    );
+    if (themesError) return NextResponse.json({ message: themesError.message }, { status: 400 });
+  }
+
+  const { data: savedServiceItem, error: readError } = await supabase
+    .from('service_items')
+    .select('*, color_themes:service_item_color_themes(color_theme:color_themes(*))')
+    .eq('id', data.id)
+    .single();
+  if (readError) return NextResponse.json({ message: readError.message }, { status: 400 });
+
+  return NextResponse.json({ serviceItem: mapServiceItem(savedServiceItem) });
 }

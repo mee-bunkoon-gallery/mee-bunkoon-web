@@ -6,14 +6,26 @@ function mapEventType(row: any, usedIds: Set<string>) {
   return { id: row.id, name: row.name, inUse: usedIds.has(row.id) };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  const { data, error } = await supabase.from('event_types').select('*').order('name');
+  const searchParams = new URL(request.url).searchParams;
+  const rowsPerPageParam = searchParams.get('rowsPerPage');
+
+  let query = supabase.from('event_types').select('*', { count: 'exact' }).order('name');
+
+  if (rowsPerPageParam) {
+    const rowsPerPage = Math.min(Math.max(Number(rowsPerPageParam) || 10, 1), 100);
+    const page = Math.max(Number(searchParams.get('page')) || 0, 0);
+    const from = page * rowsPerPage;
+    query = query.range(from, from + rowsPerPage - 1);
+  }
+
+  const { data, error, count } = await query;
   if (error) return NextResponse.json({ message: error.message }, { status: 400 });
 
   const { data: usedRows, error: usedError } = await supabase
@@ -24,7 +36,10 @@ export async function GET() {
 
   const usedIds = new Set((usedRows ?? []).map((row) => row.event_type_id as string));
 
-  return NextResponse.json({ eventTypes: data.map((row) => mapEventType(row, usedIds)) });
+  return NextResponse.json({
+    eventTypes: data.map((row) => mapEventType(row, usedIds)),
+    total: count ?? data.length,
+  });
 }
 
 export async function POST(request: Request) {

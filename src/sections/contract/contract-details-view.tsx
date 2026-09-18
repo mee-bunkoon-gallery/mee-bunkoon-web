@@ -1,12 +1,9 @@
 'use client';
 
-import type { IPayment } from 'src/types/payment';
-import type { IContract } from 'src/types/contract';
-import type { ICompanyProfile } from 'src/types/settings';
-
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -37,12 +34,12 @@ import { Iconify } from 'src/components/iconify';
 import { EditorContentView } from 'src/components/editor';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getContract } from './contract-api';
-import { getPayments } from '../payment/payment-api';
 import { CONTRACT_STATUS_META } from './contract-status';
-import { getCompanyProfile } from '../settings/settings-api';
+import { usePaymentsQuery } from '../payment/payment-queries';
 import { ContractPdfDocument } from './contract-pdf-document';
 import { PAYMENT_METHOD_LABEL } from '../payment/payment-method';
+import { contractKeys, useContractQuery } from './contract-queries';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
 import { ContractSignatureDialog } from './contract-signature-dialog';
 import {
   toClauseBodyHtml,
@@ -118,35 +115,29 @@ type Props = {
 
 export function ContractDetailsView({ contractId }: Props) {
   const router = useRouter();
-
-  const [contract, setContract] = useState<IContract | null>(null);
-  const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
-  const [payments, setPayments] = useState<IPayment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const previewDialog = useBoolean();
   const [signatureSigner, setSignatureSigner] = useState<'issuer' | 'customer' | null>(null);
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+  const { data: paymentsData } = usePaymentsQuery({ contractId });
+  const payments = paymentsData ?? [];
+
+  const {
+    data: contract,
+    isLoading,
+    isError,
+  } = useContractQuery(contractId);
+
   useEffect(() => {
-    getCompanyProfile()
-      .then(setCompanyProfile)
-      .catch(() => {});
+    if (isError) {
+      toast.error('ไม่พบสัญญานี้');
+      router.replace(paths.dashboard.contract.root);
+    }
+  }, [isError, router]);
 
-    getPayments({ contractId })
-      .then(setPayments)
-      .catch(() => {});
-
-    getContract(contractId)
-      .then(setContract)
-      .catch((error) => {
-        console.error(error);
-        toast.error('ไม่พบสัญญานี้');
-        router.replace(paths.dashboard.contract.root);
-      })
-      .finally(() => setLoading(false));
-  }, [contractId, router]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
@@ -174,7 +165,10 @@ export function ContractDetailsView({ contractId }: Props) {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.message);
-      setContract({ ...contract, idCardFrontUrl: payload.idCardFrontUrl });
+      queryClient.setQueryData(contractKeys.detail(contract.id), {
+        ...contract,
+        idCardFrontUrl: payload.idCardFrontUrl,
+      });
       toast.success('บันทึกหน้าบัตรประชาชนแล้ว');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'อัปโหลดรูปไม่สำเร็จ');
@@ -718,7 +712,7 @@ export function ContractDetailsView({ contractId }: Props) {
         signer={signatureSigner}
         onClose={() => setSignatureSigner(null)}
         onSigned={(signatureUrl) =>
-          setContract((current) => {
+          queryClient.setQueryData(contractKeys.detail(contractId), (current: typeof contract) => {
             if (!current) return current;
             return signatureSigner === 'issuer'
               ? { ...current, issuerSignatureUrl: signatureUrl }

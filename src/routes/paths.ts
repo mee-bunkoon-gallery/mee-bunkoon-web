@@ -143,6 +143,13 @@ export const paths = {
     },
     service: {
       root: `${ROOTS.DASHBOARD}/services`,
+      new: `${ROOTS.DASHBOARD}/services/new`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/services/${id}/edit`,
+    },
+    promotionPackage: {
+      root: `${ROOTS.DASHBOARD}/packages`,
+      new: `${ROOTS.DASHBOARD}/packages/new`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/packages/${id}/edit`,
     },
     colorTheme: {
       root: `${ROOTS.DASHBOARD}/color-themes`,

@@ -21,6 +21,18 @@ export async function getCustomers(q?: string): Promise<ICustomer[]> {
   return customers;
 }
 
+export async function getCustomersPage(params: {
+  q?: string;
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ customers: ICustomer[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params.q) qs.set('q', params.q);
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ customers: ICustomer[]; total: number }>(`/api/customers/?${qs}`);
+}
+
 export async function createCustomer(input: CustomerInput): Promise<ICustomer> {
   const { customer } = await apiFetch<{ customer: ICustomer }>('/api/customers/', {
     method: 'POST',

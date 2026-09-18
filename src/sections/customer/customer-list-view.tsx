@@ -2,8 +2,8 @@
 
 import type { ICustomer } from 'src/types/quotation';
 
+import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
-import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -23,40 +23,44 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
 import { CustomerFormDialog } from './customer-form-dialog';
-import { getCustomers, deleteCustomer } from './customer-api';
+import { useCustomersPageQuery, useDeleteCustomerMutation } from './customer-queries';
 
 // ----------------------------------------------------------------------
 
 export function CustomerListView() {
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentCustomer, setCurrentCustomer] = useState<ICustomer | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ICustomer | null>(null);
 
   const formDialog = useBoolean();
 
-  const fetchCustomers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getCustomers();
-      setCustomers(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลลูกค้าไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
-    fetchCustomers();
-  }, [fetchCustomers]);
+    setPage(0);
+  }, [debouncedSearch]);
+
+  const { data, isLoading } = useCustomersPageQuery({ q: debouncedSearch, page, rowsPerPage });
+  const customers = data?.customers ?? [];
+  const total = data?.total ?? 0;
+
+  const deleteMutation = useDeleteCustomerMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const handleNew = () => {
     setCurrentCustomer(null);
@@ -68,22 +72,15 @@ export function CustomerListView() {
     formDialog.onTrue();
   };
 
-  const handleSuccess = (customer: ICustomer) => {
-    setCustomers((prev) => {
-      const exists = prev.some((row) => row.id === customer.id);
-      return exists
-        ? prev.map((row) => (row.id === customer.id ? customer : row))
-        : [customer, ...prev];
-    });
-  };
-
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deleteCustomer(deleteTarget.id);
-      setCustomers((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบลูกค้าแล้ว');
+      if (customers.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -92,17 +89,7 @@ export function CustomerListView() {
     }
   };
 
-  const filteredCustomers = customers.filter((customer) => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) return true;
-    return (
-      customer.name.toLowerCase().includes(term) ||
-      customer.phone?.toLowerCase().includes(term) ||
-      customer.email?.toLowerCase().includes(term)
-    );
-  });
-
-  const notFound = !loading && !filteredCustomers.length;
+  const notFound = !isLoading && !customers.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -161,7 +148,7 @@ export function CustomerListView() {
               </TableHead>
 
               <TableBody>
-                {filteredCustomers.map((customer) => (
+                {customers.map((customer) => (
                   <TableRow key={customer.id} hover>
                     <TableCell>
                       <Typography variant="subtitle2">{customer.name}</Typography>
@@ -190,13 +177,20 @@ export function CustomerListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
 
       <CustomerFormDialog
         open={formDialog.value}
         onClose={formDialog.onFalse}
         currentCustomer={currentCustomer}
-        onSuccess={handleSuccess}
       />
 
       <ConfirmDialog

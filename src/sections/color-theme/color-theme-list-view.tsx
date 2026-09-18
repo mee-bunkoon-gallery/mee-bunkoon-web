@@ -2,7 +2,7 @@
 
 import type { IColorTheme } from 'src/types/color-theme';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -27,33 +27,61 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
+import { ColorPicker } from 'src/components/color-utils';
+import { TablePaginationCustom } from 'src/components/table';
 
 import {
-  getColorThemes,
-  createColorTheme,
-  updateColorTheme,
-  deleteColorTheme,
-} from './color-theme-api';
+  useColorThemesPageQuery,
+  useCreateColorThemeMutation,
+  useDeleteColorThemeMutation,
+  useUpdateColorThemeMutation,
+} from './color-theme-queries';
+
+const COLOR_OPTIONS = [
+  '#F44336',
+  '#E91E63',
+  '#9C27B0',
+  '#673AB7',
+  '#3F51B5',
+  '#2196F3',
+  '#03A9F4',
+  '#00BCD4',
+  '#009688',
+  '#4CAF50',
+  '#8BC34A',
+  '#CDDC39',
+  '#FFEB3B',
+  '#FFC107',
+  '#FF9800',
+  '#FF5722',
+  '#795548',
+  '#607D8B',
+  '#9E9E9E',
+  '#000000',
+];
+
+const isValidHex = (value: string) => /^#[0-9A-F]{6}$/i.test(value);
 
 export function ColorThemeListView() {
-  const [items, setItems] = useState<IColorTheme[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [hexCode, setHexCode] = useState('#000000');
 
-  const loadItems = useCallback(async () => {
-    try {
-      setItems(await getColorThemes());
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดรายการโทนสีไม่สำเร็จ');
-    }
-  }, []);
+  const { data } = useColorThemesPageQuery({ page, rowsPerPage });
+  const items = data?.colorThemes ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+  const createMutation = useCreateColorThemeMutation();
+  const updateMutation = useUpdateColorThemeMutation();
+  const deleteMutation = useDeleteColorThemeMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const closeDialog = () => {
     setOpen(false);
@@ -79,16 +107,10 @@ export function ColorThemeListView() {
   const handleSave = async () => {
     try {
       if (editingId) {
-        const updated = await updateColorTheme(editingId, { name, hexCode });
-        setItems((current) =>
-          current
-            .map((item) => (item.id === editingId ? updated : item))
-            .sort((a, b) => a.name.localeCompare(b.name))
-        );
+        await updateMutation.mutateAsync({ id: editingId, input: { name, hexCode } });
         toast.success('แก้ไขโทนสีแล้ว');
       } else {
-        const created = await createColorTheme({ name, hexCode });
-        setItems((current) => [...current, created].sort((a, b) => a.name.localeCompare(b.name)));
+        await createMutation.mutateAsync({ name, hexCode });
         toast.success('เพิ่มโทนสีแล้ว');
       }
       closeDialog();
@@ -99,9 +121,11 @@ export function ColorThemeListView() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteColorTheme(id);
-      setItems((current) => current.filter((item) => item.id !== id));
+      await deleteMutation.mutateAsync(id);
       toast.success('ลบโทนสีแล้ว');
+      if (items.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'ลบโทนสีไม่สำเร็จ');
     }
@@ -170,6 +194,14 @@ export function ColorThemeListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={closeDialog}>
         <DialogTitle>{editingId ? 'แก้ไขโทนสี' : 'เพิ่มโทนสี'}</DialogTitle>
@@ -184,15 +216,58 @@ export function ColorThemeListView() {
             <TextField
               label="รหัสสี"
               value={hexCode}
-              onChange={(event) => setHexCode(event.target.value)}
+              error={!!hexCode && !isValidHex(hexCode)}
+              helperText={
+                hexCode && !isValidHex(hexCode) ? 'กรุณากรอกรหัสสี เช่น #4CAF50' : undefined
+              }
+              onChange={(event) => setHexCode(event.target.value.toUpperCase())}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <Box
+                      component="input"
+                      type="color"
+                      aria-label="เลือกสีจากตารางสี"
+                      value={isValidHex(hexCode) ? hexCode : '#000000'}
+                      onChange={(event) => setHexCode(event.target.value.toUpperCase())}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        p: 0,
+                        mr: 1,
+                        border: 0,
+                        bgcolor: 'transparent',
+                        cursor: 'pointer',
+                      }}
+                    />
+                  ),
+                },
+              }}
             />
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                เลือกจากชุดสี
+              </Typography>
+              <ColorPicker
+                size={42}
+                limit={8}
+                variant="rounded"
+                options={COLOR_OPTIONS}
+                value={hexCode}
+                onChange={(value) => setHexCode(value as string)}
+              />
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button color="inherit" onClick={closeDialog}>
             ยกเลิก
           </Button>
-          <Button variant="contained" disabled={!name.trim()} onClick={handleSave}>
+          <Button
+            variant="contained"
+            disabled={!name.trim() || !isValidHex(hexCode)}
+            onClick={handleSave}
+          >
             บันทึก
           </Button>
         </DialogActions>

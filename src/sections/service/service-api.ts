@@ -10,6 +10,7 @@ export type ServiceItemInput = {
   description?: string;
   unit?: string;
   unitPrice: number;
+  colorThemeIds: string[];
 };
 
 export async function getServiceItems(q?: string): Promise<IServiceItem[]> {
@@ -18,6 +19,25 @@ export async function getServiceItems(q?: string): Promise<IServiceItem[]> {
     `/api/service-items/${qs}`
   );
   return serviceItems;
+}
+
+export async function getServiceItemsPage(params: {
+  q?: string;
+  page?: number;
+  rowsPerPage?: number;
+}): Promise<{ serviceItems: IServiceItem[]; total: number }> {
+  const qs = new URLSearchParams();
+  if (params.q) qs.set('q', params.q);
+  qs.set('page', String(params.page ?? 0));
+  qs.set('rowsPerPage', String(params.rowsPerPage ?? 10));
+  return apiFetch<{ serviceItems: IServiceItem[]; total: number }>(`/api/service-items/?${qs}`);
+}
+
+export async function getServiceItem(id: string): Promise<IServiceItem> {
+  const { serviceItem } = await apiFetch<{ serviceItem: IServiceItem }>(
+    `/api/service-items/${id}/`
+  );
+  return serviceItem;
 }
 
 export async function uploadServiceItemImage(id: string, file: File): Promise<string> {

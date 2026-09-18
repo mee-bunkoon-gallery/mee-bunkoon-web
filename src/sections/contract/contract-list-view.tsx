@@ -2,7 +2,7 @@
 
 import type { IContract } from 'src/types/contract';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -28,44 +28,40 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
 import { CONTRACT_STATUS_META } from './contract-status';
-import { getContracts, deleteContract } from './contract-api';
+import { useContractsPageQuery, useDeleteContractMutation } from './contract-queries';
 
 // ----------------------------------------------------------------------
 
 export function ContractListView() {
-  const [contracts, setContracts] = useState<IContract[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteTarget, setDeleteTarget] = useState<IContract | null>(null);
 
-  const fetchContracts = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getContracts();
-      setContracts(data);
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดข้อมูลสัญญาไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading } = useContractsPageQuery({ page, rowsPerPage });
+  const contracts = data?.contracts ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    fetchContracts();
-  }, [fetchContracts]);
+  const deleteMutation = useDeleteContractMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
     try {
-      await deleteContract(deleteTarget.id);
-      setContracts((prev) => prev.filter((row) => row.id !== deleteTarget.id));
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success('ลบสัญญาแล้ว');
+      if (contracts.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'ลบไม่สำเร็จ');
@@ -74,7 +70,7 @@ export function ContractListView() {
     }
   };
 
-  const notFound = !loading && !contracts.length;
+  const notFound = !isLoading && !contracts.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -175,6 +171,14 @@ export function ContractListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
 
       <ConfirmDialog

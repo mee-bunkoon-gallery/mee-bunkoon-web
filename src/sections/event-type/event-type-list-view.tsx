@@ -2,7 +2,7 @@
 
 import type { IEventType } from 'src/types/event-type';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -26,37 +26,35 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
-import { TableNoData } from 'src/components/table';
 import { Scrollbar } from 'src/components/scrollbar';
+import { TableNoData, TablePaginationCustom } from 'src/components/table';
 
 import {
-  getEventTypes,
-  createEventType,
-  updateEventType,
-  deleteEventType,
-} from './event-type-api';
+  useEventTypesPageQuery,
+  useCreateEventTypeMutation,
+  useDeleteEventTypeMutation,
+  useUpdateEventTypeMutation,
+} from './event-type-queries';
 
 export function EventTypeListView() {
-  const [items, setItems] = useState<IEventType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
 
-  const loadItems = useCallback(async () => {
-    try {
-      setItems(await getEventTypes());
-    } catch (error) {
-      console.error(error);
-      toast.error('โหลดรายการประเภทงานไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading } = useEventTypesPageQuery({ page, rowsPerPage });
+  const items = data?.eventTypes ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+  const createMutation = useCreateEventTypeMutation();
+  const updateMutation = useUpdateEventTypeMutation();
+  const deleteMutation = useDeleteEventTypeMutation();
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
 
   const closeDialog = () => {
     setOpen(false);
@@ -79,16 +77,10 @@ export function EventTypeListView() {
   const handleSave = async () => {
     try {
       if (editingId) {
-        const updated = await updateEventType(editingId, { name });
-        setItems((current) =>
-          current
-            .map((item) => (item.id === editingId ? updated : item))
-            .sort((a, b) => a.name.localeCompare(b.name))
-        );
+        await updateMutation.mutateAsync({ id: editingId, input: { name } });
         toast.success('แก้ไขประเภทงานแล้ว');
       } else {
-        const created = await createEventType({ name });
-        setItems((current) => [...current, created].sort((a, b) => a.name.localeCompare(b.name)));
+        await createMutation.mutateAsync({ name });
         toast.success('เพิ่มประเภทงานแล้ว');
       }
       closeDialog();
@@ -99,15 +91,17 @@ export function EventTypeListView() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteEventType(id);
-      setItems((current) => current.filter((item) => item.id !== id));
+      await deleteMutation.mutateAsync(id);
       toast.success('ลบประเภทงานแล้ว');
+      if (items.length === 1 && page > 0) {
+        setPage(page - 1);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'ลบประเภทงานไม่สำเร็จ');
     }
   };
 
-  const notFound = !loading && !items.length;
+  const notFound = !isLoading && !items.length;
 
   return (
     <DashboardContent maxWidth="xl">
@@ -161,6 +155,14 @@ export function EventTypeListView() {
             </Table>
           </Scrollbar>
         </TableContainer>
+
+        <TablePaginationCustom
+          page={page}
+          count={total}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_event, newPage) => setPage(newPage)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
       <Dialog fullWidth maxWidth="xs" open={open} onClose={closeDialog}>
         <DialogTitle>{editingId ? 'แก้ไขประเภทงาน' : 'เพิ่มประเภทงาน'}</DialogTitle>

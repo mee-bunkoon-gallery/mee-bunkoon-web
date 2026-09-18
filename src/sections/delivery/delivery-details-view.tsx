@@ -1,10 +1,7 @@
 'use client';
 
-import type { IDelivery } from 'src/types/delivery';
-import type { ICompanyProfile } from 'src/types/settings';
-
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Card from '@mui/material/Card';
@@ -33,9 +30,9 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
-import { getDelivery } from './delivery-api';
-import { getCompanyProfile } from '../settings/settings-api';
+import { useDeliveryQuery } from './delivery-queries';
 import { DeliveryPdfDocument } from './delivery-pdf-document';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
 import { DELIVERY_STATUS_META, DELIVERY_METHOD_LABEL } from './delivery-status';
 
 // ----------------------------------------------------------------------
@@ -64,28 +61,24 @@ type Props = {
 export function DeliveryDetailsView({ deliveryId }: Props) {
   const router = useRouter();
 
-  const [delivery, setDelivery] = useState<IDelivery | null>(null);
-  const [companyProfile, setCompanyProfile] = useState<ICompanyProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
   const previewDialog = useBoolean();
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+
+  const {
+    data: delivery,
+    isLoading,
+    isError,
+  } = useDeliveryQuery(deliveryId);
+
   useEffect(() => {
-    getCompanyProfile()
-      .then(setCompanyProfile)
-      .catch(() => {});
+    if (isError) {
+      toast.error('ไม่พบเอกสารส่งมอบงานนี้');
+      router.replace(paths.dashboard.delivery.root);
+    }
+  }, [isError, router]);
 
-    getDelivery(deliveryId)
-      .then(setDelivery)
-      .catch((error) => {
-        console.error(error);
-        toast.error('ไม่พบเอกสารส่งมอบงานนี้');
-        router.replace(paths.dashboard.delivery.root);
-      })
-      .finally(() => setLoading(false));
-  }, [deliveryId, router]);
-
-  if (loading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 

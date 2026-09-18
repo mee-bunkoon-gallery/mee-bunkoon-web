@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Fade from 'embla-carousel-fade';
-import { useState, useEffect } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useQuery } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -95,45 +96,49 @@ const ROYAL_IMAGE_ITEMS = [
   },
 ];
 
+async function fetchPublicCompany(): Promise<PublicCompany> {
+  const response = await fetch('/api/public/company/', { cache: 'no-store' });
+  if (!response.ok) return DEFAULT_COMPANY;
+
+  const payload = await response.json();
+  if (!payload?.company) return DEFAULT_COMPANY;
+
+  return {
+    name: payload.company.name || DEFAULT_COMPANY.name,
+    nameEn: payload.company.nameEn || DEFAULT_COMPANY.nameEn,
+    address: payload.company.address || DEFAULT_COMPANY.address,
+    phone: payload.company.phone || DEFAULT_COMPANY.phone,
+    logoUrl: payload.company.logoUrl ?? null,
+  };
+}
+
+async function fetchPublicDeliveries(): Promise<PublicDelivery[]> {
+  const response = await fetch('/api/public/deliveries/', { cache: 'no-store' });
+  if (!response.ok) return [];
+
+  const payload = await response.json();
+  return payload?.deliveries ?? [];
+}
+
 export function HomeView() {
   const theme = useTheme();
-  const [company, setCompany] = useState<PublicCompany>(DEFAULT_COMPANY);
-  const [deliveries, setDeliveries] = useState<PublicDelivery[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const heroCarousel = useCarousel({ loop: true, duration: 80 }, [
     Fade(),
     Autoplay({ playOnInit: true, delay: 5000 }),
   ]);
 
-  useEffect(() => {
-    fetch('/api/public/company/', { cache: 'no-store' })
-      .then(async (response) => {
-        if (!response.ok) return null;
-        return response.json();
-      })
-      .then((payload) => {
-        if (payload?.company) {
-          setCompany({
-            name: payload.company.name || DEFAULT_COMPANY.name,
-            nameEn: payload.company.nameEn || DEFAULT_COMPANY.nameEn,
-            address: payload.company.address || DEFAULT_COMPANY.address,
-            phone: payload.company.phone || DEFAULT_COMPANY.phone,
-            logoUrl: payload.company.logoUrl ?? null,
-          });
-        }
-      })
-      .catch(() => undefined);
-  }, []);
+  const { data: company = DEFAULT_COMPANY } = useQuery({
+    queryKey: ['public-company'],
+    queryFn: fetchPublicCompany,
+    retry: false,
+  });
 
-  useEffect(() => {
-    fetch('/api/public/deliveries/', { cache: 'no-store' })
-      .then(async (response) => {
-        if (!response.ok) return null;
-        return response.json();
-      })
-      .then((payload) => setDeliveries(payload?.deliveries ?? []))
-      .catch(() => setDeliveries([]));
-  }, []);
+  const { data: deliveries = [] } = useQuery({
+    queryKey: ['public-deliveries'],
+    queryFn: fetchPublicDeliveries,
+    retry: false,
+  });
 
   const deliveryImages = deliveries
     .flatMap((delivery) =>

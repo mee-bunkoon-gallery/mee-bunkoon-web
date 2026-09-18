@@ -43,6 +43,8 @@ function mapQuotation(row: any) {
       .map((item: any) => ({
         id: item.id,
         serviceItemId: item.service_item_id,
+        promotionPackageId: item.promotion_package_id,
+        promotionPackageDiscount: Number(item.promotion_package_discount || 0),
         imageUrl: item.service_item?.image_url ?? null,
         description: item.description,
         unit: item.unit,
@@ -118,6 +120,8 @@ export async function PUT(request: Request, { params }: Params) {
 
   const items: {
     serviceItemId?: string | null;
+    promotionPackageId?: string | null;
+    promotionPackageDiscount?: number;
     description: string;
     unit?: string | null;
     quantity: number;
@@ -175,6 +179,8 @@ export async function PUT(request: Request, { params }: Params) {
     items.map((item, index) => ({
       quotation_id: id,
       service_item_id: item.serviceItemId || null,
+      promotion_package_id: item.promotionPackageId || null,
+      promotion_package_discount: item.promotionPackageDiscount || 0,
       position: index,
       description: item.description,
       unit: item.unit || null,

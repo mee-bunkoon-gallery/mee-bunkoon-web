@@ -14,6 +14,7 @@ import { themeConfig, ThemeProvider, primary as primaryColor } from 'src/theme';
 import { Snackbar } from 'src/components/snackbar';
 import { LocatorJS } from 'src/components/locator-js';
 import { ProgressBar } from 'src/components/progress-bar';
+import { QueryProvider } from 'src/components/query-provider';
 import { MotionLazy } from 'src/components/animate/motion-lazy';
 import { detectSettings } from 'src/components/settings/server';
 import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/settings';
@@ -100,29 +101,31 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         />
 
         <I18nProvider lang={appConfig.i18nLang}>
-          <AuthProvider>
-            <SettingsProvider
-              defaultSettings={defaultSettings}
-              cookieSettings={appConfig.cookieSettings}
-            >
-              <LocalizationProvider>
-                <AppRouterCacheProvider options={{ key: 'css' }}>
-                  <ThemeProvider
-                    modeStorageKey={themeConfig.modeStorageKey}
-                    defaultMode={themeConfig.defaultMode}
-                  >
-                    <MotionLazy>
-                      <LocatorJS />
-                      <Snackbar />
-                      <ProgressBar />
-                      <SettingsDrawer defaultSettings={defaultSettings} />
-                      {children}
-                    </MotionLazy>
-                  </ThemeProvider>
-                </AppRouterCacheProvider>
-              </LocalizationProvider>
-            </SettingsProvider>
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <SettingsProvider
+                defaultSettings={defaultSettings}
+                cookieSettings={appConfig.cookieSettings}
+              >
+                <LocalizationProvider>
+                  <AppRouterCacheProvider options={{ key: 'css' }}>
+                    <ThemeProvider
+                      modeStorageKey={themeConfig.modeStorageKey}
+                      defaultMode={themeConfig.defaultMode}
+                    >
+                      <MotionLazy>
+                        <LocatorJS />
+                        <Snackbar />
+                        <ProgressBar />
+                        <SettingsDrawer defaultSettings={defaultSettings} />
+                        {children}
+                      </MotionLazy>
+                    </ThemeProvider>
+                  </AppRouterCacheProvider>
+                </LocalizationProvider>
+              </SettingsProvider>
+            </AuthProvider>
+          </QueryProvider>
         </I18nProvider>
       </body>
     </html>
