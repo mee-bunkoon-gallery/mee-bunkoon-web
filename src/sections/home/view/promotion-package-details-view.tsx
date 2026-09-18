@@ -57,7 +57,7 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
       sx={{
         minHeight: '100vh',
         px: { xs: 2, sm: 3, md: 8 },
-        pt: { xs: 11, sm: 13, md: 16 },
+        pt: { xs: 11, sm: 13, md: 14 },
         pb: { xs: 8, md: 12 },
         bgcolor: 'background.default',
       }}
