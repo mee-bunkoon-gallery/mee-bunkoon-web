@@ -196,7 +196,7 @@ export function OverviewView() {
             icon={<Iconify icon="solar:calendar-date-bold" width={17} />}
             label={fDate(today)}
             variant="outlined"
-            sx={{ bgcolor: 'background.paper' }}
+            sx={{ bgcolor: 'background.paper', height: '40px', px: 2 }}
           />
           <Button
             component={RouterLink}
