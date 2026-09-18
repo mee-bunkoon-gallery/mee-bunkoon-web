@@ -130,15 +130,21 @@ export function SupabaseSignInView() {
 
   return (
     <Card
-      sx={{ p: { xs: 3, sm: 4.5 }, border: '1px solid', borderColor: 'divider', boxShadow: 12 }}
+      sx={{
+        p: { xs: 3, sm: 5 },
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: { xs: 2.5, sm: 3 },
+        boxShadow: '0 24px 64px rgba(13, 32, 61, 0.12)',
+      }}
     >
       <Box
         sx={{
-          width: 52,
-          height: 52,
+          width: 56,
+          height: 56,
           mb: 3,
           display: 'grid',
-          borderRadius: 1.5,
+          borderRadius: 2,
           placeItems: 'center',
           color: 'primary.main',
           bgcolor: 'primary.lighter',

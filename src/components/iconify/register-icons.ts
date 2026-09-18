@@ -1,10 +1,11 @@
-import type { IconifyJSON } from '@iconify/react';
-
-import { addCollection } from '@iconify/react';
-
 import allIcons from './icon-sets';
 
 // ----------------------------------------------------------------------
+
+type IconSet = {
+  prefix: string;
+  icons: Record<string, (typeof allIcons)[keyof typeof allIcons]>;
+};
 
 export const iconSets = Object.entries(allIcons).reduce((acc, [key, value]) => {
   const [prefix, iconName] = key.split(':');
@@ -22,30 +23,11 @@ export const iconSets = Object.entries(allIcons).reduce((acc, [key, value]) => {
   }
 
   return acc;
-}, [] as IconifyJSON[]);
+}, [] as IconSet[]);
 
 export const allIconNames = Object.keys(allIcons) as IconifyName[];
 
 export type IconifyName = keyof typeof allIcons;
 
-// ----------------------------------------------------------------------
-
-let areIconsRegistered = false;
-
-export function registerIcons() {
-  if (areIconsRegistered) {
-    return;
-  }
-
-  iconSets.forEach((iconSet) => {
-    const iconSetConfig = {
-      ...iconSet,
-      width: (iconSet.prefix === 'carbon' && 32) || 24,
-      height: (iconSet.prefix === 'carbon' && 32) || 24,
-    };
-
-    addCollection(iconSetConfig);
-  });
-
-  areIconsRegistered = true;
-}
+// Kept as a compatibility no-op for modules that imported the old Iconify setup.
+export function registerIcons() {}

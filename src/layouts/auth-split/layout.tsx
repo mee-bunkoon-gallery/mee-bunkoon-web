@@ -55,7 +55,11 @@ export function AuthSplitLayout({
           This is an info Alert.
         </Alert>
       ),
-      leftArea: <CompanyLogo />,
+      leftArea: (
+        <Box sx={{ display: { xs: 'flex', [layoutQuery]: 'none' } }}>
+          <CompanyLogo />
+        </Box>
+      ),
       rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
           <Link
@@ -64,10 +68,18 @@ export function AuthSplitLayout({
             color="inherit"
             underline="none"
             sx={{
+              px: 1.5,
+              py: 0.75,
+              borderRadius: 1.5,
               display: 'inline-flex',
               alignItems: 'center',
               gap: 0.75,
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
               typography: 'subtitle2',
+              transition: (theme) => theme.transitions.create(['color', 'border-color']),
+              '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
             }}
           >
             <Iconify icon="eva:arrow-ios-back-fill" width={18} />
@@ -153,7 +165,7 @@ export function AuthSplitLayout({
       /** **************************************
        * @Styles
        *************************************** */
-      cssVars={{ '--layout-auth-content-width': '460px', ...cssVars }}
+      cssVars={{ '--layout-auth-content-width': '520px', ...cssVars }}
       sx={sx}
     >
       {renderMain()}

@@ -41,7 +41,7 @@ export function HeaderSection({
   disableOffset,
   disableElevation,
   defaultColor,
-  layoutQuery = 'lg',
+  layoutQuery = 'xl',
   ...other
 }: HeaderSectionProps) {
   const { offsetTop: isOffset } = useScrollOffsetTop();
@@ -142,7 +142,7 @@ const HeaderRoot = styled(AppBar, {
 
 const HeaderContainer = styled(Container, {
   shouldForwardProp: (prop: string) => !['layoutQuery', 'sx'].includes(prop),
-})<Pick<HeaderSectionProps, 'layoutQuery'>>(({ layoutQuery = 'lg', theme }) => ({
+})<Pick<HeaderSectionProps, 'layoutQuery'>>(({ layoutQuery = 'xl', theme }) => ({
   width: 'calc(100% - 40px)',
   maxWidth: '1280px !important',
   paddingLeft: '0 !important',

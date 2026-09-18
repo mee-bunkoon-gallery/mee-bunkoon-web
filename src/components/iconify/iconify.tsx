@@ -1,44 +1,296 @@
 'use client';
 
-import type { IconProps } from '@iconify/react';
+import type { BoxProps } from '@mui/material/Box';
+import type { RemixiconComponentType } from '@remixicon/react';
 import type { IconifyName } from './register-icons';
 
-import { useId } from 'react';
-import { Icon } from '@iconify/react';
 import { mergeClasses } from 'minimal-shared/utils';
+import {
+  RiLink,
+  RiAddLine,
+  RiEyeFill,
+  RiBikeFill,
+  RiGiftFill,
+  RiMailFill,
+  RiMenuFill,
+  RiMoreFill,
+  RiStarFill,
+  RiStarLine,
+  RiTimeFill,
+  RiWifiFill,
+  RiAppleFill,
+  RiCloseLine,
+  RiCloudFill,
+  RiGroupFill,
+  RiHeartFill,
+  RiHeartLine,
+  RiHome5Fill,
+  RiImageFill,
+  RiMore2Fill,
+  RiPauseFill,
+  RiPhoneFill,
+  RiReplyFill,
+  RiShareFill,
+  RiUser3Fill,
+  RiCameraFill,
+  RiEyeOffFill,
+  RiGithubFill,
+  RiGoogleFill,
+  RiListCheck2,
+  RiSearchFill,
+  RiTiktokFill,
+  RiUploadFill,
+  RiZoomInFill,
+  RiAndroidFill,
+  RiArchiveFill,
+  RiAttachment2,
+  RiFilter3Fill,
+  RiMapPin2Fill,
+  RiPaletteFill,
+  RiPrinterFill,
+  RiRefreshFill,
+  RiUserAddFill,
+  RiVidiconFill,
+  RiWindowsFill,
+  RiZoomOutFill,
+  RiArrowUpSFill,
+  RiDownloadFill,
+  RiFacebookFill,
+  RiFileTextFill,
+  RiLinkedinFill,
+  RiSuitcaseFill,
+  RiTwitterXFill,
+  RiVolumeUpFill,
+  RiBluetoothFill,
+  RiFolderAddFill,
+  RiInstagramFill,
+  RiSettings3Fill,
+  RiArrowDownSFill,
+  RiArrowLeftSFill,
+  RiDeleteBin6Fill,
+  RiFullscreenFill,
+  RiLayoutGridFill,
+  RiPlayCircleFill,
+  RiSendPlane2Fill,
+  RiArrowRightSFill,
+  RiCloseCircleFill,
+  RiInformationFill,
+  RiShieldCheckFill,
+  RiAlarmWarningFill,
+  RiArrowRightUpLine,
+  RiLockPasswordFill,
+  RiUploadCloud2Fill,
+  RiArrowLeftDownLine,
+  RiCalendarEventFill,
+  RiShoppingCart2Fill,
+  RiVerifiedBadgeFill,
+  RiCheckboxCircleFill,
+  RiDownloadCloud2Fill,
+  RiFolderDownloadFill,
+  RiFullscreenExitFill,
+} from '@remixicon/react';
 
-import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 
 import { iconifyClasses } from './classes';
-import { allIconNames, registerIcons } from './register-icons';
 
 // ----------------------------------------------------------------------
 
-export type IconifyProps = React.ComponentProps<typeof IconRoot> &
-  Omit<IconProps, 'icon'> & {
-    icon: IconifyName;
-  };
+export type IconifyProps = Omit<BoxProps, 'children'> & {
+  icon: IconifyName;
+  width?: number | string;
+  height?: number | string;
+};
+
+const REMIX_ICONS = {
+  RiAddLine,
+  RiAlarmWarningFill,
+  RiAndroidFill,
+  RiAppleFill,
+  RiArchiveFill,
+  RiArrowDownSFill,
+  RiArrowLeftDownLine,
+  RiArrowLeftSFill,
+  RiArrowRightSFill,
+  RiArrowRightUpLine,
+  RiArrowUpSFill,
+  RiAttachment2,
+  RiBikeFill,
+  RiBluetoothFill,
+  RiCalendarEventFill,
+  RiCameraFill,
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiCloseLine,
+  RiCloudFill,
+  RiDeleteBin6Fill,
+  RiDownloadCloud2Fill,
+  RiDownloadFill,
+  RiEyeFill,
+  RiEyeOffFill,
+  RiFacebookFill,
+  RiFileTextFill,
+  RiFilter3Fill,
+  RiFolderAddFill,
+  RiFolderDownloadFill,
+  RiFullscreenExitFill,
+  RiFullscreenFill,
+  RiGiftFill,
+  RiGithubFill,
+  RiGoogleFill,
+  RiGroupFill,
+  RiHeartFill,
+  RiHeartLine,
+  RiHome5Fill,
+  RiImageFill,
+  RiInformationFill,
+  RiInstagramFill,
+  RiLayoutGridFill,
+  RiLink,
+  RiLinkedinFill,
+  RiListCheck2,
+  RiLockPasswordFill,
+  RiMailFill,
+  RiMapPin2Fill,
+  RiMenuFill,
+  RiMore2Fill,
+  RiMoreFill,
+  RiPaletteFill,
+  RiPauseFill,
+  RiPhoneFill,
+  RiPlayCircleFill,
+  RiPrinterFill,
+  RiRefreshFill,
+  RiReplyFill,
+  RiSearchFill,
+  RiSendPlane2Fill,
+  RiSettings3Fill,
+  RiShareFill,
+  RiShieldCheckFill,
+  RiShoppingCart2Fill,
+  RiStarFill,
+  RiStarLine,
+  RiSuitcaseFill,
+  RiTiktokFill,
+  RiTimeFill,
+  RiTwitterXFill,
+  RiUploadCloud2Fill,
+  RiUploadFill,
+  RiUser3Fill,
+  RiUserAddFill,
+  RiVerifiedBadgeFill,
+  RiVidiconFill,
+  RiVolumeUpFill,
+  RiWifiFill,
+  RiWindowsFill,
+  RiZoomInFill,
+  RiZoomOutFill,
+} satisfies Record<string, RemixiconComponentType>;
+
+type RemixIconName = keyof typeof REMIX_ICONS;
+type IconRule = [keywords: string[], icon: RemixIconName];
+
+const ICON_RULES: IconRule[] = [
+  [['arrow-ios-back', 'arrowhead-left', 'chevron-left'], 'RiArrowLeftSFill'],
+  [['arrow-ios-forward', 'arrowhead-right', 'chevron-right', 'arrow-forward'], 'RiArrowRightSFill'],
+  [['arrow-ios-down', 'arrow-downward', 'chevron-down', 'arrow-drop-down'], 'RiArrowDownSFill'],
+  [['arrow-ios-up', 'arrow-upward'], 'RiArrowUpSFill'],
+  [['arrow-right-up', 'diagonal-arrow-right-up', 'external-link'], 'RiArrowRightUpLine'],
+  [['diagonal-arrow-left-down'], 'RiArrowLeftDownLine'],
+  [['close-circle', 'forbidden-circle'], 'RiCloseCircleFill'],
+  [['close', 'minimize-line'], 'RiCloseLine'],
+  [['check-circle', 'checkmark-circle', 'verified-check', 'done-all'], 'RiCheckboxCircleFill'],
+  [['danger', 'warning'], 'RiAlarmWarningFill'],
+  [['info'], 'RiInformationFill'],
+  [['add-folder', 'gallery-add'], 'RiFolderAddFill'],
+  [['user-plus'], 'RiUserAddFill'],
+  [['add', 'cart-plus'], 'RiAddLine'],
+  [['trash'], 'RiDeleteBin6Fill'],
+  [['search'], 'RiSearchFill'],
+  [['eye-closed'], 'RiEyeOffFill'],
+  [['eye'], 'RiEyeFill'],
+  [['calendar', 'sort-by-time'], 'RiCalendarEventFill'],
+  [['clock', 'time'], 'RiTimeFill'],
+  [['camera'], 'RiCameraFill'],
+  [['cloud-upload'], 'RiUploadCloud2Fill'],
+  [['cloud-download'], 'RiDownloadCloud2Fill'],
+  [['upload'], 'RiUploadFill'],
+  [['download'], 'RiDownloadFill'],
+  [['archive-down'], 'RiFolderDownloadFill'],
+  [['archive', 'inbox'], 'RiArchiveFill'],
+  [['attach'], 'RiAttachment2'],
+  [['home'], 'RiHome5Fill'],
+  [['settings'], 'RiSettings3Fill'],
+  [['profile', 'user-id', 'user-rounded'], 'RiUser3Fill'],
+  [['users-group'], 'RiGroupFill'],
+  [['mail', 'letter'], 'RiMailFill'],
+  [['phone'], 'RiPhoneFill'],
+  [['location'], 'RiMapPin2Fill'],
+  [['gift', 'confetti'], 'RiGiftFill'],
+  [['shield'], 'RiShieldCheckFill'],
+  [['lock', 'vpn-key'], 'RiLockPasswordFill'],
+  [['heart-outline'], 'RiHeartLine'],
+  [['heart'], 'RiHeartFill'],
+  [['star-outline'], 'RiStarLine'],
+  [['star', 'award'], 'RiStarFill'],
+  [['image', 'gallery'], 'RiImageFill'],
+  [['palette', 'pallete', 'format-color'], 'RiPaletteFill'],
+  [['file', 'notes', 'notebook', 'invoice', 'bill-list'], 'RiFileTextFill'],
+  [['cart'], 'RiShoppingCart2Fill'],
+  [['filter'], 'RiFilter3Fill'],
+  [['menu-dots', 'more-horizontal'], 'RiMoreFill'],
+  [['more-vertical'], 'RiMore2Fill'],
+  [['menu'], 'RiMenuFill'],
+  [['view-module', 'view-quilt', 'dot-grid'], 'RiLayoutGridFill'],
+  [['list', 'view-list'], 'RiListCheck2'],
+  [['play'], 'RiPlayCircleFill'],
+  [['pause', 'stop'], 'RiPauseFill'],
+  [['video', 'videocamera'], 'RiVidiconFill'],
+  [['volume'], 'RiVolumeUpFill'],
+  [['printer'], 'RiPrinterFill'],
+  [['refresh', 'restart'], 'RiRefreshFill'],
+  [['reply', 'forward'], 'RiReplyFill'],
+  [['send'], 'RiSendPlane2Fill'],
+  [['share', 'export'], 'RiShareFill'],
+  [['import'], 'RiDownloadFill'],
+  [['link'], 'RiLink'],
+  [['quit-full-screen', 'collapse'], 'RiFullscreenExitFill'],
+  [['fullscreen', 'full-screen', 'fit-to-screen', 'expand'], 'RiFullscreenFill'],
+  [['zoom-in'], 'RiZoomInFill'],
+  [['zoom-out'], 'RiZoomOutFill'],
+  [['facebook'], 'RiFacebookFill'],
+  [['instagram'], 'RiInstagramFill'],
+  [['tiktok'], 'RiTiktokFill'],
+  [['twitter'], 'RiTwitterXFill'],
+  [['linkedin'], 'RiLinkedinFill'],
+  [['github'], 'RiGithubFill'],
+  [['google'], 'RiGoogleFill'],
+  [['android'], 'RiAndroidFill'],
+  [['apple'], 'RiAppleFill'],
+  [['windows'], 'RiWindowsFill'],
+  [['wifi'], 'RiWifiFill'],
+  [['bluetooth'], 'RiBluetoothFill'],
+  [['bicycle'], 'RiBikeFill'],
+  [['suitcase', 'case-minimalistic'], 'RiSuitcaseFill'],
+  [['cloud'], 'RiCloudFill'],
+  [['verified'], 'RiVerifiedBadgeFill'],
+];
+
+function resolveRemixIcon(name: string): RemixiconComponentType {
+  const normalizedName = name.toLowerCase();
+  const iconName = ICON_RULES.find(([keywords]) =>
+    keywords.some((keyword) => normalizedName.includes(keyword))
+  )?.[1];
+
+  return iconName ? REMIX_ICONS[iconName] : RiInformationFill;
+}
 
 export function Iconify({ className, icon, width = 20, height, sx, ...other }: IconifyProps) {
-  const uniqueId = useId();
-
-  if (!allIconNames.includes(icon)) {
-    console.warn(
-      [
-        `Icon "${icon}" is currently loaded online, which may cause flickering effects.`,
-        `To ensure a smoother experience, please register your icon collection for offline use.`,
-        `More information is available at: https://docs.minimals.cc/icons/`,
-      ].join('\n')
-    );
-  }
-
-  registerIcons();
+  const RemixIcon = resolveRemixIcon(icon);
 
   return (
-    <IconRoot
-      ssr
-      id={uniqueId}
-      icon={icon}
+    <Box
+      component={RemixIcon}
       className={mergeClasses([iconifyClasses.root, className])}
       sx={[
         {
@@ -53,7 +305,3 @@ export function Iconify({ className, icon, width = 20, height, sx, ...other }: I
     />
   );
 }
-
-// ----------------------------------------------------------------------
-
-const IconRoot = styled(Icon)``;

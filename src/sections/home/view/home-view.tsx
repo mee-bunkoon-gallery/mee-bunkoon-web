@@ -162,7 +162,7 @@ export function HomeView() {
             inset: 0,
             position: 'absolute',
             background:
-              'linear-gradient(90deg, rgba(4,28,19,0.94) 0%, rgba(4,28,19,0.72) 48%, rgba(4,28,19,0.18) 100%), linear-gradient(0deg, rgba(4,28,19,0.55), transparent 55%)',
+              'linear-gradient(90deg, rgba(4, 7, 28, 0.94) 0%, rgba(4,28,19,0.72) 48%, rgba(4,28,19,0.18) 100%), linear-gradient(0deg, rgba(4,28,19,0.55), transparent 55%)',
           }}
         />
         <Box

@@ -46,12 +46,12 @@ export function AuthSplitSection({
           px: 3,
           pb: 3,
           width: 1,
-          maxWidth: 560,
+          maxWidth: 'clamp(480px, 40vw, 680px)',
           display: 'none',
           position: 'relative',
-          pt: 'var(--layout-header-desktop-height)',
+          pt: 3,
           [theme.breakpoints.up(layoutQuery)]: {
-            gap: 8,
+            gap: 5,
             display: 'flex',
             alignItems: 'center',
             flexDirection: 'column',
@@ -62,28 +62,36 @@ export function AuthSplitSection({
       ]}
       {...other}
     >
-      <Box sx={{ maxWidth: 380, color: 'common.white', textAlign: 'center' }}>
+      <Box sx={{ maxWidth: 440, color: 'common.white', textAlign: 'center' }}>
         <Box
           sx={{
-            width: 112,
-            height: 112,
+            width: 124,
+            height: 124,
             mx: 'auto',
-            mb: 4,
-            p: 1.5,
-            borderRadius: 2,
-            bgcolor: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.16)',
+            mb: 4.5,
+            p: 1.75,
+            borderRadius: 3,
+            backdropFilter: 'blur(10px)',
+            bgcolor: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            boxShadow: '0 20px 48px rgba(0,0,0,0.2)',
           }}
         >
           <Logo sx={{ width: 1, height: 1 }} />
         </Box>
-        <Typography variant="h3" sx={{ textAlign: 'center' }}>
+        <Typography variant="h2" sx={{ fontSize: { md: 36, lg: 42 }, textAlign: 'center' }}>
           {title}
         </Typography>
 
         {subtitle && (
           <Typography
-            sx={{ color: 'rgba(255,255,255,0.7)', textAlign: 'center', mt: 2, lineHeight: 1.8 }}
+            sx={{
+              color: 'rgba(255,255,255,0.72)',
+              textAlign: 'center',
+              mt: 2,
+              fontSize: 16,
+              lineHeight: 1.8,
+            }}
           >
             {subtitle}
           </Typography>
