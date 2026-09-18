@@ -31,13 +31,6 @@ const HERO_IMAGES = [
   '/assets/background/hero-3.jpg',
 ];
 
-const FALLBACK_GALLERY = [
-  '/assets/mee-bunkoon/hero-1.jpg',
-  '/assets/mee-bunkoon/hero-2.jpg',
-  '/assets/mee-bunkoon/hero-3.jpg',
-  '/assets/mee-bunkoon/hero-4.jpg',
-];
-
 const DEFAULT_COMPANY = {
   name: 'มีบุญคุณ แกลเลอรี่',
   nameEn: 'MEE BUNKOON GALLERY',
@@ -47,13 +40,21 @@ const DEFAULT_COMPANY = {
 };
 
 type PublicCompany = typeof DEFAULT_COMPANY;
-type GalleryImage = { title: string; subtitle?: string; src: string };
+type GalleryImage = { title: string; subtitle?: string; src: string; album?: string[] };
 type PublicDelivery = {
   id: string;
+  jobId: string;
+  jobTitle: string;
   deliveryNo: string;
   deliveryDate: string;
   itemsDelivered: string | null;
   imageUrls: string[];
+};
+type PortfolioWork = {
+  id: string;
+  title: string;
+  subtitle: string;
+  images: string[];
 };
 
 const HIGHLIGHTS = [
@@ -122,28 +123,55 @@ export function HomeView() {
     retry: false,
   });
 
-  const deliveryImages: GalleryImage[] = deliveries
-    .flatMap((delivery) =>
-      delivery.imageUrls.map((src) => ({
+  const portfolioWorks: PortfolioWork[] = deliveries
+    .filter((delivery) => delivery.imageUrls.length > 0)
+    .map((delivery) => ({
+      id: delivery.id,
+      title: delivery.jobTitle || delivery.itemsDelivered || 'ผลงานของเรา',
+      subtitle: `${fDate(delivery.deliveryDate)} · ${delivery.deliveryNo}`,
+      images: delivery.imageUrls.slice(0, 5),
+    }))
+    .slice(0, 6);
+
+  const galleryImages: GalleryImage[] = portfolioWorks
+    .flatMap((work) =>
+      work.images.map((src) => ({
         src,
-        title: delivery.itemsDelivered || 'ผลงานของเรา',
-        subtitle: `${fDate(delivery.deliveryDate)} · ภาพบรรยากาศงาน`,
+        title: work.title,
+        subtitle: work.subtitle,
+        album: work.images,
       }))
     )
     .slice(0, 6);
-  const galleryImages: GalleryImage[] = deliveryImages.length
-    ? deliveryImages
-    : FALLBACK_GALLERY.map((src) => ({ src, title: 'ตัวอย่างผลงานของเรา' }));
 
   return (
-    <Box component="main" sx={{ overflow: 'hidden', bgcolor: 'common.white' }}>
+    <Box
+      component="main"
+      sx={{
+        width: 1,
+        overflow: 'hidden',
+        bgcolor: '#fffdf9',
+      }}
+    >
       <Box
         component="section"
-        sx={{ minHeight: { xs: 760, md: 820 }, position: 'relative', bgcolor: '#071d15' }}
+        sx={{ minHeight: { xs: 700, md: 760 }, position: 'relative', bgcolor: '#fffdf9' }}
       >
         <Carousel
           carousel={heroCarousel}
-          sx={{ m: 0, inset: 0, width: 1, height: 1, position: 'absolute' }}
+          sx={{
+            m: 0,
+            top: { xs: 96, md: 112 },
+            right: { xs: 16, sm: 32, md: 64 },
+            bottom: { xs: 32, md: 48 },
+            left: { xs: 16, sm: 32, md: 64 },
+            width: 'auto',
+            height: 'auto',
+            overflow: 'hidden',
+            borderRadius: { xs: 2.5, md: 4 },
+            position: 'absolute',
+            boxShadow: '0 28px 70px rgba(56,45,24,0.16)',
+          }}
           slotProps={{ container: { height: 1 }, slide: { height: 1 } }}
         >
           {HERO_IMAGES.map((src, index) => (
@@ -159,31 +187,36 @@ export function HomeView() {
         </Carousel>
         <Box
           sx={{
-            inset: 0,
+            top: { xs: 96, md: 112 },
+            right: { xs: 16, sm: 32, md: 64 },
+            bottom: { xs: 32, md: 48 },
+            left: { xs: 16, sm: 32, md: 64 },
+            overflow: 'hidden',
+            borderRadius: { xs: 2.5, md: 4 },
             position: 'absolute',
             background:
-              'linear-gradient(90deg, rgba(4, 7, 28, 0.94) 0%, rgba(4,28,19,0.72) 48%, rgba(4,28,19,0.18) 100%), linear-gradient(0deg, rgba(4,28,19,0.55), transparent 55%)',
+              'linear-gradient(90deg, rgba(23,18,10,0.78) 0%, rgba(23,18,10,0.44) 48%, rgba(23,18,10,0.12) 100%), linear-gradient(0deg, rgba(23,18,10,0.42), transparent 55%)',
           }}
         />
         <Box
           sx={{
             mx: 'auto',
-            px: { xs: 2.5, sm: 0 },
-            pt: { xs: 18, md: 21 },
-            pb: 9,
-            maxWidth: 1280,
+            px: { xs: 5, sm: 8, md: 13 },
+            pt: { xs: 17, md: 19 },
+            pb: { xs: 7, md: 8 },
+            maxWidth: 1440,
             minHeight: 'inherit',
             display: 'flex',
             position: 'relative',
             alignItems: 'center',
           }}
         >
-          <Box sx={{ maxWidth: 760, color: 'common.white' }}>
+          <Box sx={{ zIndex: 1, maxWidth: 720, color: 'common.white' }}>
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
               <Box sx={{ width: 46, height: 2, bgcolor: 'secondary.main' }} />
               <Typography
                 variant="overline"
-                sx={{ color: 'secondary.light', fontWeight: 800, letterSpacing: 2.2 }}
+                sx={{ color: 'secondary.light', fontWeight: 800, letterSpacing: 2.6 }}
               >
                 {company.nameEn}
               </Typography>
@@ -191,14 +224,24 @@ export function HomeView() {
             <Typography
               component="h1"
               sx={{
-                fontSize: { xs: 50, sm: 68, md: 84 },
-                fontWeight: 800,
+                fontSize: { xs: 43, sm: 64, md: 78 },
+                fontWeight: 700,
                 lineHeight: 1.08,
-                letterSpacing: -2,
+                letterSpacing: -1.5,
               }}
             >
               ให้ทุกช่วงเวลาสำคัญ
-              <Box component="span" sx={{ display: 'block', color: 'secondary.light' }}>
+              <Box
+                component="span"
+                sx={{
+                  display: 'block',
+                  color: 'secondary.light',
+                  background: 'linear-gradient(110deg, #f4d98f, #fff1bd 52%, #d7b66d)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
                 งดงามในแบบของคุณ
               </Box>
             </Typography>
@@ -206,7 +249,7 @@ export function HomeView() {
               sx={{
                 mt: 3,
                 maxWidth: 620,
-                color: 'rgba(255,255,255,0.78)',
+                color: 'rgba(255,255,255,0.8)',
                 fontSize: 18,
                 lineHeight: 1.8,
               }}
@@ -222,7 +265,7 @@ export function HomeView() {
                 variant="contained"
                 color="secondary"
                 endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
-                sx={{ px: 3.5 }}
+                sx={{ px: 3.5, color: '#33240b', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}
               >
                 ดูแพ็กเกจและโปรโมชั่น
               </Button>
@@ -231,7 +274,7 @@ export function HomeView() {
                 href={paths.jobQueue}
                 size="large"
                 variant="outlined"
-                sx={{ px: 3.5, color: 'common.white', borderColor: 'rgba(255,255,255,0.48)' }}
+                sx={{ px: 3.5, color: 'common.white', borderColor: 'rgba(255,255,255,0.58)' }}
               >
                 ตรวจสอบคิวงาน
               </Button>
@@ -240,8 +283,8 @@ export function HomeView() {
           <Stack
             spacing={1.2}
             sx={{
-              right: 64,
-              bottom: 64,
+              right: 96,
+              bottom: 76,
               display: { xs: 'none', md: 'flex' },
               position: 'absolute',
             }}
@@ -260,7 +303,7 @@ export function HomeView() {
                   border: 0,
                   cursor: 'pointer',
                   bgcolor:
-                    index === heroCarousel.dots.selectedIndex ? 'secondary.main' : 'grey.500',
+                    index === heroCarousel.dots.selectedIndex ? 'secondary.light' : 'grey.400',
                   transition: 'width 180ms ease',
                 }}
               />
@@ -269,60 +312,87 @@ export function HomeView() {
         </Box>
       </Box>
 
-      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, position: 'relative', zIndex: 2 }}>
+      <Box
+        component="section"
+        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 6, md: 10 }, position: 'relative', zIndex: 2 }}
+      >
         <Box
           sx={{
             mx: 'auto',
-            mt: { xs: -4, md: -6 },
             maxWidth: 1280,
             display: 'grid',
-            overflow: 'hidden',
-            borderRadius: 2,
-            bgcolor: 'common.white',
-            boxShadow: '0 24px 70px rgba(5,37,24,0.14)',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+            gap: { xs: 4, md: 7 },
+            alignItems: 'center',
+            gridTemplateColumns: { xs: '1fr', md: '0.9fr 1.1fr' },
           }}
         >
-          {HIGHLIGHTS.map((item, index) => (
-            <Stack
-              key={item.title}
-              direction="row"
-              spacing={2}
-              sx={{
-                p: { xs: 3, md: 4 },
-              }}
-            >
-              <Box
+          <Box>
+            <Typography variant="overline" sx={{ color: 'secondary.dark', letterSpacing: 2 }}>
+              WHY CHOOSE US
+            </Typography>
+            <Typography variant="h2" sx={{ mt: 1.5 }}>
+              เพราะทุกงานสำคัญ ควรมีรายละเอียดที่พิเศษ
+            </Typography>
+            <Typography sx={{ mt: 2, color: 'text.secondary', lineHeight: 1.9 }}>
+              เราผสานประสบการณ์ ความคิดสร้างสรรค์ และการดูแลอย่างใกล้ชิด
+              เพื่อเปลี่ยนภาพในใจให้กลายเป็นบรรยากาศจริงที่น่าจดจำ
+            </Typography>
+          </Box>
+          <Stack spacing={1.5}>
+            {HIGHLIGHTS.map((item) => (
+              <Stack
+                key={item.title}
+                direction="row"
+                spacing={2}
                 sx={{
-                  width: 48,
-                  height: 48,
-                  flexShrink: 0,
-                  display: 'grid',
-                  borderRadius: 1.5,
-                  placeItems: 'center',
-                  color: 'primary.main',
-                  bgcolor: 'secondary.lighter',
+                  p: 2.5,
+                  borderRadius: 2,
+                  bgcolor: '#f8f3e8',
+                  border: '1px solid rgba(181,137,55,0.2)',
                 }}
               >
-                <Iconify icon={item.icon as any} width={26} />
-              </Box>
-              <Box>
-                <Typography variant="h6">{item.title}</Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ mt: 0.75, color: 'text.secondary', lineHeight: 1.7 }}
+                <Box
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    flexShrink: 0,
+                    display: 'grid',
+                    borderRadius: 1.5,
+                    placeItems: 'center',
+                    color: 'secondary.dark',
+                    bgcolor: 'common.white',
+                    border: '1px solid rgba(181,137,55,0.22)',
+                  }}
                 >
-                  {item.body}
-                </Typography>
-              </Box>
-            </Stack>
-          ))}
+                  <Iconify icon={item.icon as any} width={26} />
+                </Box>
+                <Box>
+                  <Typography variant="h6">{item.title}</Typography>
+                  <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
+                    {item.body}
+                  </Typography>
+                </Box>
+              </Stack>
+            ))}
+          </Stack>
         </Box>
       </Box>
 
       {promotionPackages.length > 0 && (
-        <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 } }}>
-          <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
+        <Box
+          component="section"
+          sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#fffdf9' }}
+        >
+          <Box
+            sx={{
+              mx: 'auto',
+              p: { xs: 2.5, sm: 4, md: 5 },
+              maxWidth: 1280,
+              borderRadius: { xs: 2.5, md: 4 },
+              bgcolor: '#f8f3e8',
+              border: '1px solid rgba(181,137,55,0.16)',
+            }}
+          >
             <SectionHeading
               eyebrow="SELECTED PACKAGES"
               title="แพ็กเกจที่ออกแบบมาเพื่อวันสำคัญ"
@@ -340,7 +410,7 @@ export function HomeView() {
             />
             <Box
               sx={{
-                mt: 5,
+                mt: 4,
                 display: 'grid',
                 gap: 3,
                 gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
@@ -358,7 +428,8 @@ export function HomeView() {
                     borderRadius: 2,
                     position: 'relative',
                     textDecoration: 'none',
-                    boxShadow: '0 16px 45px rgba(5,37,24,0.12)',
+                    border: '1px solid rgba(181,137,55,0.22)',
+                    boxShadow: '0 18px 48px rgba(96,70,25,0.12)',
                     '&:hover img': { transform: 'scale(1.05)' },
                     '&:focus-visible': { outline: '3px solid', outlineColor: 'secondary.main' },
                   }}
@@ -418,73 +489,84 @@ export function HomeView() {
         </Box>
       )}
 
-      <Box
-        component="section"
-        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#f4f1e9' }}
-      >
-        <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
-          <SectionHeading
-            eyebrow="OUR PORTFOLIO"
-            title="รายละเอียดที่เปลี่ยนงานหนึ่งงานให้เป็นความทรงจำ"
-            description="ชมบรรยากาศและรายละเอียดจากงานจริงที่เราได้รับความไว้วางใจให้ดูแล"
-          />
-          <Box
-            sx={{
-              mt: 5,
-              display: 'grid',
-              gap: 2,
-              gridAutoRows: { xs: 220, md: 260 },
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-            }}
-          >
-            {galleryImages.map((image, index) => (
-              <Box
-                key={`${image.src}-${index}`}
-                component="button"
-                type="button"
-                aria-label={`ดูภาพ ${image.title}`}
-                onClick={() => setSelectedImage(image)}
-                sx={{
-                  p: 0,
-                  border: 0,
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  borderRadius: 1.5,
-                  position: 'relative',
-                  gridColumn: { md: index === 0 ? 'span 2' : 'span 1' },
-                  gridRow: { md: index === 0 ? 'span 2' : 'span 1' },
-                  '&:hover img': { transform: 'scale(1.05)' },
-                  '&:focus-visible': { outline: '3px solid', outlineColor: 'primary.main' },
-                }}
-              >
-                <Image
-                  src={image.src}
-                  alt={image.title}
-                  sx={{ width: 1, height: 1, '& img': { transition: 'transform 300ms ease' } }}
-                />
+      {galleryImages.length > 0 && (
+        <Box
+          component="section"
+          sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#f8f3e8' }}
+        >
+          <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
+            <SectionHeading
+              eyebrow="OUR PORTFOLIO"
+              title="รายละเอียดที่เปลี่ยนงานหนึ่งงานให้เป็นความทรงจำ"
+              description="ชมบรรยากาศและรายละเอียดจากงานจริงที่เราได้รับความไว้วางใจให้ดูแล"
+            />
+            <Box
+              sx={{
+                mt: 5,
+                display: 'grid',
+                gap: 2,
+                gridAutoRows: { xs: 220, md: 260 },
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+              }}
+            >
+              {galleryImages.map((image, index) => (
                 <Box
+                  key={`${image.src}-${index}`}
+                  component="button"
+                  type="button"
+                  aria-label={`ดูอัลบั้ม ${image.title}`}
+                  onClick={() => setSelectedImage(image)}
                   sx={{
-                    inset: 0,
-                    p: 2.5,
-                    display: 'flex',
-                    color: 'common.white',
-                    textAlign: 'left',
-                    position: 'absolute',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    background: 'linear-gradient(180deg, transparent 45%, rgba(4,28,19,0.76) 100%)',
+                    p: 0,
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    borderRadius: 1.5,
+                    border: '1px solid rgba(181,137,55,0.18)',
+                    position: 'relative',
+                    gridColumn: { md: index === 0 ? 'span 2' : 'span 1' },
+                    gridRow: { md: index === 0 ? 'span 2' : 'span 1' },
+                    '&:hover img': { transform: 'scale(1.05)' },
+                    '&:focus-visible': { outline: '3px solid', outlineColor: 'secondary.main' },
                   }}
                 >
-                  <Typography variant="subtitle1">{image.title}</Typography>
-                  {image.subtitle && <Typography variant="caption">{image.subtitle}</Typography>}
+                  <Image
+                    src={image.src}
+                    alt={image.title}
+                    sx={{ width: 1, height: 1, '& img': { transition: 'transform 300ms ease' } }}
+                  />
+                  <Box
+                    sx={{
+                      inset: 0,
+                      p: 2.5,
+                      display: 'flex',
+                      color: 'common.white',
+                      textAlign: 'left',
+                      position: 'absolute',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                      background:
+                        'linear-gradient(180deg, transparent 45%, rgba(23,18,10,0.78) 100%)',
+                    }}
+                  >
+                    <Typography variant="subtitle1">{image.title}</Typography>
+                    {image.subtitle && <Typography variant="caption">{image.subtitle}</Typography>}
+                    {!!image.album?.length && (
+                      <Typography variant="caption" sx={{ mt: 0.5, color: 'secondary.light' }}>
+                        ดูอัลบั้ม {image.album.length} ภาพ
+                      </Typography>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              ))}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      )}
 
-      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 } }}>
+      <Box
+        component="section"
+        sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 9, md: 14 }, bgcolor: '#fffdf9' }}
+      >
         <Box
           sx={{
             mx: 'auto',
@@ -500,7 +582,7 @@ export function HomeView() {
               src="/assets/mee-bunkoon/bg-1.jpg"
               alt="ทีมงานมีบุญคุณ แกลเลอรี่"
               ratio="4/3"
-              sx={{ borderRadius: 2 }}
+              sx={{ borderRadius: 2, border: '1px solid rgba(181,137,55,0.22)' }}
             />
             <Box
               sx={{
@@ -509,14 +591,15 @@ export function HomeView() {
                 p: 2.5,
                 maxWidth: 220,
                 borderRadius: 1.5,
-                color: 'common.white',
+                color: '#33240b',
                 position: 'absolute',
-                bgcolor: 'primary.main',
-                boxShadow: 12,
+                bgcolor: 'secondary.light',
+                border: '1px solid rgba(155,107,32,0.25)',
+                boxShadow: '0 16px 36px rgba(96,70,25,0.18)',
               }}
             >
               <Typography variant="h4">ใส่ใจทุกขั้นตอน</Typography>
-              <Typography variant="body2" sx={{ mt: 0.75, color: 'rgba(255,255,255,0.7)' }}>
+              <Typography variant="body2" sx={{ mt: 0.75, color: 'rgba(51,36,11,0.7)' }}>
                 ตั้งแต่แนวคิดแรกจนถึงวันส่งมอบงาน
               </Typography>
             </Box>
@@ -552,7 +635,10 @@ export function HomeView() {
         </Box>
       </Box>
 
-      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 8 } }}>
+      <Box
+        component="section"
+        sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 10, md: 20 }, bgcolor: '#fffdf9' }}
+      >
         <Box
           sx={{
             mx: 'auto',
@@ -560,10 +646,13 @@ export function HomeView() {
             py: { xs: 6, md: 8 },
             maxWidth: 1280,
             overflow: 'hidden',
-            color: 'common.white',
+            color: 'text.primary',
             borderRadius: 2.5,
             position: 'relative',
-            bgcolor: 'primary.main',
+            border: '1px solid rgba(181,137,55,0.28)',
+            background:
+              'radial-gradient(circle at 90% 20%, rgba(215,182,109,0.28), transparent 30%), linear-gradient(135deg, #fffdf9, #f6ecd6)',
+            boxShadow: '0 24px 60px rgba(96,70,25,0.1)',
           }}
         >
           <Box sx={{ zIndex: 1, maxWidth: 760, position: 'relative' }}>
@@ -573,7 +662,7 @@ export function HomeView() {
             <Typography variant="h2" sx={{ mt: 1.5 }}>
               พร้อมเริ่มต้นวางแผนงานสำคัญของคุณหรือยัง?
             </Typography>
-            <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.72)', lineHeight: 1.8 }}>
+            <Typography sx={{ mt: 2, color: 'text.secondary', lineHeight: 1.8 }}>
               พูดคุยกับเราเพื่อเลือกแพ็กเกจ เช็กวันว่าง และออกแบบรูปแบบงานที่เหมาะกับคุณ
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 4 }}>
@@ -592,7 +681,7 @@ export function HomeView() {
                 href={paths.jobQueue}
                 size="large"
                 variant="outlined"
-                sx={{ color: 'common.white', borderColor: 'rgba(255,255,255,0.45)' }}
+                sx={{ color: 'text.primary', borderColor: 'rgba(155,107,32,0.42)' }}
               >
                 ดูคิวงาน
               </Button>
@@ -603,7 +692,7 @@ export function HomeView() {
 
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="lg"
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
         slotProps={{ paper: { sx: { overflow: 'hidden', borderRadius: 2, bgcolor: '#071d15' } } }}
@@ -634,8 +723,61 @@ export function HomeView() {
               component="img"
               src={selectedImage.src}
               alt={selectedImage.title}
-              sx={{ width: 1, maxHeight: '78vh', display: 'block', objectFit: 'contain' }}
+              sx={{
+                width: 1,
+                height: { xs: '52vh', md: '68vh' },
+                display: 'block',
+                objectFit: 'contain',
+              }}
             />
+          )}
+          {!!selectedImage?.album?.length && (
+            <Box
+              sx={{
+                gap: 1,
+                p: 1.5,
+                display: 'flex',
+                overflowX: 'auto',
+                borderTop: '1px solid rgba(255,255,255,0.12)',
+              }}
+            >
+              {selectedImage.album.map((src, index) => {
+                const isSelected = src === selectedImage.src;
+
+                return (
+                  <Box
+                    key={src}
+                    component="button"
+                    type="button"
+                    aria-label={`เลือกดูภาพที่ ${index + 1}`}
+                    onClick={() =>
+                      setSelectedImage((current) => (current ? { ...current, src } : current))
+                    }
+                    sx={{
+                      p: 0,
+                      width: { xs: 72, sm: 96 },
+                      height: { xs: 54, sm: 68 },
+                      border: '2px solid',
+                      flexShrink: 0,
+                      cursor: 'pointer',
+                      overflow: 'hidden',
+                      borderRadius: 1,
+                      borderColor: isSelected ? 'secondary.main' : 'transparent',
+                      opacity: isSelected ? 1 : 0.58,
+                      transition: 'opacity 180ms ease, border-color 180ms ease',
+                      '&:hover': { opacity: 1 },
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={src}
+                      alt={`${selectedImage.title} ภาพที่ ${index + 1}`}
+                      sx={{ width: 1, height: 1, display: 'block', objectFit: 'cover' }}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
           )}
         </DialogContent>
       </Dialog>
