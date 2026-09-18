@@ -6,13 +6,12 @@ import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/t
 import type { Orientation } from './sortable-list';
 
 import { varAlpha } from 'minimal-shared/utils';
+import { RiCloseCircleFill, RiInformationFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
-
-import { Iconify } from 'src/components/iconify';
 
 import { dndClasses } from './classes';
 
@@ -124,10 +123,10 @@ export function ItemActions({ onDelete, dragHandleRef, sx, ...other }: ItemActio
       {...other}
     >
       <IconButton {...buttonProps} onClick={onDelete} className={dndClasses.removeBtn}>
-        <Iconify icon="solar:close-circle-bold" />
+        <RiCloseCircleFill />
       </IconButton>
       <IconButton {...buttonProps} ref={dragHandleRef}>
-        <Iconify icon="custom:drag-dots-fill" />
+        <RiInformationFill />
       </IconButton>
     </Box>
   );

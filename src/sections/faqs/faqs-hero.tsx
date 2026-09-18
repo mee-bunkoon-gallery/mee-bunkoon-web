@@ -1,6 +1,7 @@
 import type { BoxProps } from '@mui/material/Box';
 
 import { m } from 'framer-motion';
+import { RiSearchFill } from '@remixicon/react';
 import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
@@ -11,7 +12,6 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
 import { CONFIG } from 'src/global-config';
 
-import { Iconify } from 'src/components/iconify';
 import { varFade, AnimateText, MotionContainer, animateTextClasses } from 'src/components/animate';
 
 // ----------------------------------------------------------------------
@@ -66,7 +66,7 @@ export function FaqsHero({ sx, ...other }: BoxProps) {
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                      <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
                     </InputAdornment>
                   ),
                 },

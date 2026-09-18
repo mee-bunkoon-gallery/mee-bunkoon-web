@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { RiFullscreenFill, RiFullscreenExitFill } from '@remixicon/react';
 
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-
-import { Iconify } from '../../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -25,13 +24,7 @@ export function FullScreenButton() {
   return (
     <Tooltip title={fullscreen ? 'Exit' : 'Fullscreen'}>
       <IconButton onClick={handleToggleFullscreen} color={fullscreen ? 'primary' : 'default'}>
-        <Iconify
-          icon={
-            fullscreen
-              ? 'solar:quit-full-screen-square-outline'
-              : 'solar:full-screen-square-outline'
-          }
-        />
+        {fullscreen ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
       </IconButton>
     </Tooltip>
   );

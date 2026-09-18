@@ -1,8 +1,9 @@
 'use client';
 
+import { RiInformationFill, RiAlarmWarningFill, RiCheckboxCircleFill } from '@remixicon/react';
+
 import Portal from '@mui/material/Portal';
 
-import { Iconify } from '../iconify';
 import { SnackbarRoot } from './styles';
 import { snackbarClasses } from './classes';
 
@@ -43,12 +44,10 @@ export function Snackbar() {
         }}
         icons={{
           loading: <span className={snackbarClasses.loadingIcon} />,
-          info: <Iconify className={snackbarClasses.iconSvg} icon="solar:info-circle-bold" />,
-          success: <Iconify className={snackbarClasses.iconSvg} icon="solar:check-circle-bold" />,
-          warning: (
-            <Iconify className={snackbarClasses.iconSvg} icon="solar:danger-triangle-bold" />
-          ),
-          error: <Iconify className={snackbarClasses.iconSvg} icon="solar:danger-bold" />,
+          info: <RiInformationFill className={snackbarClasses.iconSvg} />,
+          success: <RiCheckboxCircleFill className={snackbarClasses.iconSvg} />,
+          warning: <RiAlarmWarningFill className={snackbarClasses.iconSvg} />,
+          error: <RiAlarmWarningFill className={snackbarClasses.iconSvg} />,
         }}
       />
     </Portal>

@@ -114,10 +114,9 @@ export function PaymentNewEditForm({
   const createMutation = useCreatePaymentMutation();
   const updateMutation = useUpdatePaymentMutation();
 
-  const {
-    data: selectedQuotationDetail,
-    isError: isSelectedQuotationError,
-  } = useQuotationQuery(selectedQuotationId ?? '');
+  const { data: selectedQuotationDetail, isError: isSelectedQuotationError } = useQuotationQuery(
+    selectedQuotationId ?? ''
+  );
   const { data: selectedQuotationPayments } = usePaymentsQuery({
     quotationId: selectedQuotationId ?? undefined,
   });

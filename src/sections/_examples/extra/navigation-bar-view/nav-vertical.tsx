@@ -1,4 +1,5 @@
 import { isEqual } from 'es-toolkit';
+import { RiStarFill } from '@remixicon/react';
 import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
@@ -16,7 +17,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { CONFIG } from 'src/global-config';
 
-import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 import {
   navSectionCssVars,
@@ -176,7 +176,7 @@ function ControlsPanel({ config, onChangeConfig, canReset, onReset }: ControlsPa
             }}
           >
             <Badge color="error" variant="dot" invisible={!canReset}>
-              <Iconify icon="solar:restart-bold" />
+              <RiStarFill />
             </Badge>
           </IconButton>
         )}

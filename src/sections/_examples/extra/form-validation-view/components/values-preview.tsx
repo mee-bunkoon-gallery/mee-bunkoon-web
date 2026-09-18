@@ -4,6 +4,7 @@ import type { Theme, SxProps } from '@mui/material/styles';
 import { useState } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
 import { useFormContext } from 'react-hook-form';
+import { RiCloseLine, RiArrowDownSFill, RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Portal from '@mui/material/Portal';
@@ -12,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import ButtonBase from '@mui/material/ButtonBase';
 import IconButton from '@mui/material/IconButton';
 
-import { Iconify } from 'src/components/iconify';
 import { getFileMeta } from 'src/components/file-thumbnail';
 
 // ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ export function ValuesPreview({ sx, onCloseDebug }: Props) {
             Debug
           </Typography>
           <IconButton onClick={onCloseDebug}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </Box>
 
@@ -157,10 +157,7 @@ function Group({ label, children, sx }: GroupProps) {
         }}
       >
         {label}
-        <Iconify
-          width={16}
-          icon={expanded ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
-        />
+        {expanded ? <RiArrowDownSFill size={16} /> : <RiArrowRightSFill size={16} />}
       </ButtonBase>
 
       <Collapse in={expanded}>

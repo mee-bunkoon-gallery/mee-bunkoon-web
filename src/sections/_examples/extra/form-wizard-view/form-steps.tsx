@@ -1,3 +1,5 @@
+import { RiStarFill, RiCheckboxCircleFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Step from '@mui/material/Step';
 import Button from '@mui/material/Button';
@@ -5,7 +7,6 @@ import MuiStepper from '@mui/material/Stepper';
 import StepLabel from '@mui/material/StepLabel';
 import Typography from '@mui/material/Typography';
 
-import { Iconify } from 'src/components/iconify';
 import { Field } from 'src/components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -39,7 +40,7 @@ export function Stepper({ steps, activeStep }: StepperProps) {
                   }}
                 >
                   {completed ? (
-                    <Iconify width={16} icon="eva:checkmark-fill" />
+                    <RiCheckboxCircleFill size={16} />
                   ) : (
                     <Box sx={{ typography: 'subtitle2' }}>{index + 1}</Box>
                   )}
@@ -115,11 +116,7 @@ export function StepCompleted({ onReset }: { onReset: () => void }) {
       }}
     >
       <Typography variant="subtitle1">All steps completed - you&apos;re finished</Typography>
-      <Button
-        variant="outlined"
-        onClick={onReset}
-        startIcon={<Iconify icon="solar:restart-bold" />}
-      >
+      <Button variant="outlined" onClick={onReset} startIcon={<RiStarFill />}>
         Reset
       </Button>
     </Box>

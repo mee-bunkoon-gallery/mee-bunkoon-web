@@ -4,6 +4,16 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  RiEyeFill,
+  RiEditLine,
+  RiCloseLine,
+  RiArchiveFill,
+  RiFolderAddFill,
+  RiCalendarEventFill,
+  RiDownloadCloud2Fill,
+  RiMoneyDollarCircleFill,
+} from '@remixicon/react';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -30,7 +40,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { EditorContentView } from 'src/components/editor';
 import { LoadingScreen } from 'src/components/loading-screen';
 
@@ -124,11 +133,7 @@ export function ContractDetailsView({ contractId }: Props) {
   const { data: paymentsData } = usePaymentsQuery({ contractId });
   const payments = paymentsData ?? [];
 
-  const {
-    data: contract,
-    isLoading,
-    isError,
-  } = useContractQuery(contractId);
+  const { data: contract, isLoading, isError } = useContractQuery(contractId);
 
   useEffect(() => {
     if (isError) {
@@ -233,7 +238,7 @@ export function ContractDetailsView({ contractId }: Props) {
             component={RouterLink}
             href={paths.dashboard.contract.edit(contract.id)}
             variant="outlined"
-            startIcon={<Iconify icon="solar:pen-bold" />}
+            startIcon={<RiEditLine />}
           >
             แก้ไข
           </Button>
@@ -242,7 +247,7 @@ export function ContractDetailsView({ contractId }: Props) {
             component={RouterLink}
             href={`${paths.dashboard.payment.new}?contractId=${contract.id}`}
             variant="outlined"
-            startIcon={<Iconify icon="solar:wad-of-money-bold" />}
+            startIcon={<RiMoneyDollarCircleFill />}
           >
             ออกใบเสร็จรับเงิน
           </Button>
@@ -251,7 +256,7 @@ export function ContractDetailsView({ contractId }: Props) {
             component={RouterLink}
             href={`${paths.dashboard.delivery.new}?contractId=${contract.id}`}
             variant="outlined"
-            startIcon={<Iconify icon="solar:inbox-in-bold-duotone" />}
+            startIcon={<RiArchiveFill />}
           >
             ส่งมอบงาน
           </Button>
@@ -260,16 +265,12 @@ export function ContractDetailsView({ contractId }: Props) {
             component={RouterLink}
             href={`${paths.dashboard.jobQueue.new}?contractId=${contract.id}`}
             variant="outlined"
-            startIcon={<Iconify icon="solar:calendar-date-bold" />}
+            startIcon={<RiCalendarEventFill />}
           >
             ลงคิวงาน
           </Button>
 
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="solar:eye-bold" />}
-            onClick={previewDialog.onTrue}
-          >
+          <Button variant="contained" startIcon={<RiEyeFill />} onClick={previewDialog.onTrue}>
             พรีวิว PDF
           </Button>
         </Box>
@@ -439,7 +440,7 @@ export function ContractDetailsView({ contractId }: Props) {
               size="small"
               variant="outlined"
               sx={{ mt: 2 }}
-              startIcon={<Iconify icon="solar:gallery-add-bold" />}
+              startIcon={<RiFolderAddFill />}
             >
               {contract.idCardFrontUrl ? 'เปลี่ยนรูป' : 'แนบรูปหน้าบัตร'}
               <input
@@ -666,7 +667,7 @@ export function ContractDetailsView({ contractId }: Props) {
         >
           พรีวิว PDF — {contract.contractNo}
           <IconButton onClick={previewDialog.onFalse}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </DialogTitle>
 
@@ -699,7 +700,7 @@ export function ContractDetailsView({ contractId }: Props) {
             }
             fileName={`${contract.contractNo}.pdf`}
           >
-            <Button variant="contained" startIcon={<Iconify icon="eva:cloud-download-fill" />}>
+            <Button variant="contained" startIcon={<RiDownloadCloud2Fill />}>
               ดาวน์โหลด PDF
             </Button>
           </PDFDownloadLink>

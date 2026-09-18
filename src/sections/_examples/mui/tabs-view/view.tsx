@@ -5,13 +5,12 @@ import type { TabProps } from '@mui/material/Tab';
 import { Fragment } from 'react';
 import { upperFirst } from 'es-toolkit';
 import { useTabs } from 'minimal-shared/hooks';
+import { RiHeartFill, RiPhoneFill } from '@remixicon/react';
 
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Paper from '@mui/material/Paper';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, contentStyles, ComponentLayout } from '../../layout';
 
@@ -23,39 +22,39 @@ const ICON_POSITIONS = ['top', 'bottom', 'start', 'end'] as const;
 const TABS: TabProps[] = [
   {
     value: 'one',
-    icon: <Iconify width={24} icon="solar:phone-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item one',
   },
   {
     value: 'two',
-    icon: <Iconify width={24} icon="solar:heart-bold" />,
+    icon: <RiHeartFill size={24} />,
     label: 'Item two',
   },
   {
     value: 'three',
-    icon: <Iconify width={24} icon="solar:headphones-round-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item three',
     disabled: true,
   },
   {
     value: 'four',
-    icon: <Iconify width={24} icon="solar:headphones-round-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item four',
   },
   {
     value: 'five',
-    icon: <Iconify width={24} icon="solar:headphones-round-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item five',
     disabled: true,
   },
   {
     value: 'six',
-    icon: <Iconify width={24} icon="solar:headphones-round-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item six',
   },
   {
     value: 'seven',
-    icon: <Iconify width={24} icon="solar:headphones-round-bold" />,
+    icon: <RiPhoneFill size={24} />,
     label: 'Item seven',
   },
 ];

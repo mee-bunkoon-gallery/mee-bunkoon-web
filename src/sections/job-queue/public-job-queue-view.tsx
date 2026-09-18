@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { RiTimeFill, RiCalendarEventFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import { fDate } from 'src/utils/format-time';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { JOB_QUEUE_STATUS_META } from './job-queue-status';
@@ -209,7 +209,7 @@ export function PublicJobQueueView() {
                         flexDirection: { sm: 'column' },
                       }}
                     >
-                      <Iconify icon="solar:calendar-date-bold" width={26} />
+                      <RiCalendarEventFill size={26} />
                       <Typography variant="subtitle2" sx={{ textAlign: { sm: 'center' } }}>
                         {fDate(job.jobDate)}
                       </Typography>
@@ -232,7 +232,7 @@ export function PublicJobQueueView() {
                         color: 'text.secondary',
                       }}
                     >
-                      <Iconify icon="solar:clock-circle-outline" width={18} />
+                      <RiTimeFill size={18} />
                       <Typography variant="body2">{time}</Typography>
                     </Box>
                   </Box>
@@ -275,11 +275,7 @@ export function PublicJobQueueView() {
                   bgcolor: 'background.neutral',
                 }}
               >
-                <Iconify
-                  icon="solar:calendar-date-bold"
-                  width={32}
-                  sx={{ color: 'text.disabled' }}
-                />
+                <Box component={RiCalendarEventFill} width={32} sx={{ color: 'text.disabled' }} />
               </Box>
               <Typography variant="subtitle1" sx={{ mt: 2 }}>
                 ยังไม่มีคิวงานที่กำลังจะมาถึง

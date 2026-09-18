@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { RiFileCopyLine } from '@remixicon/react';
 import { useDoubleClick, useCopyToClipboard } from 'minimal-shared/hooks';
 
 import Tooltip from '@mui/material/Tooltip';
@@ -10,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox } from '../../layout';
 
@@ -60,7 +60,7 @@ export function CopyToClipboard() {
                 <InputAdornment position="end">
                   <Tooltip title="Copy">
                     <IconButton onClick={() => handleCopy(value)}>
-                      <Iconify icon="solar:copy-bold" width={24} />
+                      <RiFileCopyLine size={24} />
                     </IconButton>
                   </Tooltip>
                 </InputAdornment>

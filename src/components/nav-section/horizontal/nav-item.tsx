@@ -4,12 +4,12 @@ import type { CSSObject } from '@mui/material/styles';
 import type { NavItemProps } from '../types';
 
 import { mergeClasses } from 'minimal-shared/utils';
+import { RiArrowRightSFill, RiInformationFill } from '@remixicon/react';
 
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
 
-import { Iconify } from '../../iconify';
 import { createNavItem } from '../utils';
 import { navItemStyles, navSectionClasses } from '../styles';
 
@@ -82,7 +82,6 @@ export function NavItem({
         <Tooltip title={caption} arrow>
           <ItemCaptionIcon
             {...ownerState}
-            icon="eva:info-outline"
             className={navSectionClasses.item.caption}
             sx={slotProps?.caption}
           />
@@ -96,12 +95,7 @@ export function NavItem({
       )}
 
       {hasChild && (
-        <ItemArrow
-          {...ownerState}
-          icon={navItem.subItem ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-downward-fill'}
-          className={navSectionClasses.item.arrow}
-          sx={slotProps?.arrow}
-        />
+        <ItemArrow {...ownerState} className={navSectionClasses.item.arrow} sx={slotProps?.arrow} />
       )}
     </ItemRoot>
   );
@@ -196,11 +190,13 @@ const ItemTitle = styled('span', { shouldForwardProp })<StyledState>(({ theme })
 /**
  * @slot caption icon
  */
-const ItemCaptionIcon = styled(Iconify, { shouldForwardProp })<StyledState>(({ theme }) => ({
-  ...navItemStyles.captionIcon,
-  color: 'var(--nav-item-caption-color)',
-  variants: [{ props: { variant: 'rootItem' }, style: { marginLeft: theme.spacing(0.75) } }],
-}));
+const ItemCaptionIcon = styled(RiInformationFill, { shouldForwardProp })<StyledState>(
+  ({ theme }) => ({
+    ...navItemStyles.captionIcon,
+    color: 'var(--nav-item-caption-color)',
+    variants: [{ props: { variant: 'rootItem' }, style: { marginLeft: theme.spacing(0.75) } }],
+  })
+);
 
 /**
  * @slot info
@@ -212,7 +208,7 @@ const ItemInfo = styled('span', { shouldForwardProp })<StyledState>(({ theme }) 
 /**
  * @slot arrow
  */
-const ItemArrow = styled(Iconify, { shouldForwardProp })<StyledState>(({ theme }) => ({
+const ItemArrow = styled(RiArrowRightSFill, { shouldForwardProp })<StyledState>(({ theme }) => ({
   ...navItemStyles.arrow(theme),
   variants: [{ props: { variant: 'subItem' }, style: { marginRight: theme.spacing(-0.5) } }],
 }));

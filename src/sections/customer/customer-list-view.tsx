@@ -4,6 +4,7 @@ import type { ICustomer } from 'src/types/quotation';
 
 import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
+import { RiAddLine, RiEditLine, RiSearchLine, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -22,7 +23,6 @@ import TableContainer from '@mui/material/TableContainer';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { TableNoData, TablePaginationCustom } from 'src/components/table';
@@ -105,11 +105,7 @@ export function CustomerListView() {
       >
         <Typography variant="h4">ลูกค้า</Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={handleNew}
-        >
+        <Button variant="contained" startIcon={<RiAddLine />} onClick={handleNew}>
           เพิ่มลูกค้า
         </Button>
       </Box>
@@ -126,7 +122,7 @@ export function CustomerListView() {
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                    <RiSearchLine />
                   </InputAdornment>
                 ),
               },
@@ -163,10 +159,10 @@ export function CustomerListView() {
                     <TableCell>{customer.email || '-'}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleEdit(customer)}>
-                        <Iconify icon="solar:pen-bold" />
+                        <RiEditLine />
                       </IconButton>
                       <IconButton color="error" onClick={() => setDeleteTarget(customer)}>
-                        <Iconify icon="solar:trash-bin-trash-bold" />
+                        <RiDeleteBin6Fill />
                       </IconButton>
                     </TableCell>
                   </TableRow>

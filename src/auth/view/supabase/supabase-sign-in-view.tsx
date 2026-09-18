@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RiEyeFill, RiEyeOffFill, RiLockPasswordFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -19,7 +20,6 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
-import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { useAuthContext } from '../../hooks';
@@ -103,9 +103,7 @@ export function SupabaseSignInView() {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={showPassword.onToggle} edge="end">
-                    <Iconify
-                      icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
-                    />
+                    {showPassword.value ? <RiEyeFill /> : <RiEyeOffFill />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -150,7 +148,7 @@ export function SupabaseSignInView() {
           bgcolor: 'primary.lighter',
         }}
       >
-        <Iconify icon="solar:lock-password-outline" width={28} />
+        <RiLockPasswordFill size={28} />
       </Box>
       <Typography variant="h3">เข้าสู่ระบบหลังบ้าน</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 4 }}>

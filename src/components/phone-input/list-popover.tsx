@@ -2,6 +2,7 @@ import type { PhoneCountry, CountryListProps } from './types';
 
 import { useMemo } from 'react';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiCloseLine, RiSearchFill, RiArrowDownSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
@@ -14,7 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { Iconify } from '../iconify';
 import { FlagIcon } from '../flag-icon';
 import { SearchNotFound } from '../search-not-found';
 
@@ -98,8 +98,8 @@ export function CountryListPopover({
       {renderFlag()}
 
       {!disabled && (
-        <Iconify
-          icon="eva:chevron-down-fill"
+        <Box
+          component={RiArrowDownSFill}
           sx={{
             ml: 0.25,
             flexShrink: 0,
@@ -187,13 +187,13 @@ export function CountryListPopover({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                  <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
                 </InputAdornment>
               ),
               endAdornment: searchCountry && (
                 <InputAdornment position="end">
                   <IconButton size="small" edge="end" onClick={() => onSearchCountry('')}>
-                    <Iconify width={16} icon="mingcute:close-line" />
+                    <RiCloseLine size={16} />
                   </IconButton>
                 </InputAdornment>
               ),

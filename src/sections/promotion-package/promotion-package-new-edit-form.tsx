@@ -8,6 +8,7 @@ import * as z from 'zod';
 import dayjs from 'dayjs';
 import { useMemo, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RiAddLine, RiDeleteBin6Fill } from '@remixicon/react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -29,7 +30,6 @@ import { RouterLink } from 'src/routes/components';
 import { fBaht } from 'src/utils/format-number';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
 import { useServiceItemsQuery } from '../service/service-queries';
@@ -327,7 +327,7 @@ export function PromotionPackageNewEditForm({
                           disabled={fields.length === 1}
                           onClick={() => remove(index)}
                         >
-                          <Iconify icon="solar:trash-bin-trash-bold" />
+                          <RiDeleteBin6Fill />
                         </IconButton>
                       </Grid>
                     </Grid>
@@ -336,7 +336,7 @@ export function PromotionPackageNewEditForm({
               </Card>
               <Button
                 variant="outlined"
-                startIcon={<Iconify icon="mingcute:add-line" />}
+                startIcon={<RiAddLine />}
                 onClick={() => append(emptyItem)}
                 sx={{ alignSelf: 'flex-start' }}
               >

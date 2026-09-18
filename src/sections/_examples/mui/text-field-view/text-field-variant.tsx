@@ -1,6 +1,7 @@
 import type { TextFieldProps } from '@mui/material/TextField';
 
 import { useState, useCallback } from 'react';
+import { RiEyeFill, RiCloseLine, RiUser3Fill, RiInformationFill } from '@remixicon/react';
 
 import Input from '@mui/material/Input';
 import Select from '@mui/material/Select';
@@ -13,8 +14,6 @@ import FormControl from '@mui/material/FormControl';
 import FilledInput from '@mui/material/FilledInput';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox } from '../../layout';
 
@@ -105,7 +104,7 @@ export function TextFieldVariant({ variant }: Props) {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="solar:user-rounded-bold" width={24} />
+                  <RiUser3Fill size={24} />
                 </InputAdornment>
               ),
             },
@@ -119,7 +118,7 @@ export function TextFieldVariant({ variant }: Props) {
           defaultValue="Default value"
           helperText={
             <>
-              <Iconify icon="eva:info-outline" />
+              <RiInformationFill />
               Helper text
             </>
           }
@@ -127,7 +126,7 @@ export function TextFieldVariant({ variant }: Props) {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="solar:user-rounded-bold" width={24} />
+                  <RiUser3Fill size={24} />
                 </InputAdornment>
               ),
             },
@@ -181,7 +180,7 @@ export function TextFieldVariant({ variant }: Props) {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="solar:user-rounded-bold" width={24} />
+                  <RiUser3Fill size={24} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -196,11 +195,7 @@ export function TextFieldVariant({ variant }: Props) {
                       event.preventDefault()
                     }
                   >
-                    {values.showPassword ? (
-                      <Iconify icon="solar:eye-bold" width={24} />
-                    ) : (
-                      <Iconify icon="solar:eye-closed-bold" width={24} />
-                    )}
+                    {values.showPassword ? <RiEyeFill size={24} /> : <RiCloseLine size={24} />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -216,7 +211,7 @@ export function TextFieldVariant({ variant }: Props) {
           defaultValue="2Minimal"
           helperText={
             <>
-              <Iconify icon="eva:info-outline" />
+              <RiInformationFill />
               Helper text
             </>
           }

@@ -4,6 +4,7 @@ import type { BadgeProps } from '@mui/material/Badge';
 import type { IconButtonProps } from '@mui/material/IconButton';
 
 import { m } from 'framer-motion';
+import { RiGroupFill } from '@remixicon/react';
 import { usePopover } from 'minimal-shared/hooks';
 
 import Badge from '@mui/material/Badge';
@@ -16,7 +17,6 @@ import ListItemText from '@mui/material/ListItemText';
 
 import { fToNow } from 'src/utils/format-time';
 
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { CustomPopover } from 'src/components/custom-popover';
 import { varTap, varHover, transitionTap } from 'src/components/animate';
@@ -85,7 +85,7 @@ export function ContactsPopover({ data = [], sx, ...other }: ContactsPopoverProp
         ]}
         {...other}
       >
-        <Iconify icon="solar:users-group-rounded-bold-duotone" width={24} />
+        <RiGroupFill size={24} />
       </IconButton>
 
       {renderMenuList()}

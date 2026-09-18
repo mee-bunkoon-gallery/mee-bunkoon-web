@@ -1,9 +1,9 @@
 import type { BoxProps } from '@mui/material/Box';
 
+import { RiGithubFill, RiGoogleFill, RiTwitterXFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -33,13 +33,13 @@ export function FormSocials({
       {...other}
     >
       <IconButton color="inherit" onClick={signInWithGoogle}>
-        <Iconify width={22} icon="socials:google" />
+        <RiGoogleFill size={22} />
       </IconButton>
       <IconButton color="inherit" onClick={singInWithGithub}>
-        <Iconify width={22} icon="socials:github" />
+        <RiGithubFill size={22} />
       </IconButton>
       <IconButton color="inherit" onClick={signInWithTwitter}>
-        <Iconify width={22} icon="socials:twitter" />
+        <RiTwitterXFill size={22} />
       </IconButton>
     </Box>
   );

@@ -1,6 +1,7 @@
 import type { TableHeadCellProps } from 'src/components/table';
 
 import { useState, useEffect } from 'react';
+import { RiFilter3Fill, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -13,7 +14,6 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import {
   useTable,
@@ -83,7 +83,7 @@ export function SortingSelectingTable() {
 
         <Tooltip title="Filter list">
           <IconButton>
-            <Iconify icon="ic:round-filter-list" />
+            <RiFilter3Fill />
           </IconButton>
         </Tooltip>
       </Box>
@@ -102,7 +102,7 @@ export function SortingSelectingTable() {
           action={
             <Tooltip title="Delete">
               <IconButton color="primary">
-                <Iconify icon="solar:trash-bin-trash-bold" />
+                <RiDeleteBin6Fill />
               </IconButton>
             </Tooltip>
           }

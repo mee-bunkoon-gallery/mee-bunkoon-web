@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useBoolean } from 'minimal-shared/hooks';
+import { RiEyeFill, RiEditLine, RiCloseLine, RiDownloadCloud2Fill } from '@remixicon/react';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -27,7 +28,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { useDeliveryQuery } from './delivery-queries';
@@ -65,11 +65,7 @@ export function DeliveryDetailsView({ deliveryId }: Props) {
 
   const { data: companyProfile } = useCompanyProfileQuery();
 
-  const {
-    data: delivery,
-    isLoading,
-    isError,
-  } = useDeliveryQuery(deliveryId);
+  const { data: delivery, isLoading, isError } = useDeliveryQuery(deliveryId);
 
   useEffect(() => {
     if (isError) {
@@ -113,16 +109,12 @@ export function DeliveryDetailsView({ deliveryId }: Props) {
             component={RouterLink}
             href={paths.dashboard.delivery.edit(delivery.id)}
             variant="outlined"
-            startIcon={<Iconify icon="solar:pen-bold" />}
+            startIcon={<RiEditLine />}
           >
             แก้ไข
           </Button>
 
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="solar:eye-bold" />}
-            onClick={previewDialog.onTrue}
-          >
+          <Button variant="contained" startIcon={<RiEyeFill />} onClick={previewDialog.onTrue}>
             พรีวิว PDF
           </Button>
         </Box>
@@ -270,7 +262,7 @@ export function DeliveryDetailsView({ deliveryId }: Props) {
         >
           พรีวิว PDF — {delivery.deliveryNo}
           <IconButton onClick={previewDialog.onFalse}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </DialogTitle>
 
@@ -303,7 +295,7 @@ export function DeliveryDetailsView({ deliveryId }: Props) {
             }
             fileName={`${delivery.deliveryNo}.pdf`}
           >
-            <Button variant="contained" startIcon={<Iconify icon="eva:cloud-download-fill" />}>
+            <Button variant="contained" startIcon={<RiDownloadCloud2Fill />}>
               ดาวน์โหลด PDF
             </Button>
           </PDFDownloadLink>

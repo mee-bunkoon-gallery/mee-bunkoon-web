@@ -3,14 +3,13 @@
 import type { PaginationProps } from '@mui/material/Pagination';
 
 import { useState, useCallback } from 'react';
+import { RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem';
 import TablePagination from '@mui/material/TablePagination';
-
-import { Iconify } from 'src/components/iconify';
 
 import { PaginationItems } from './pagination-items';
 import { ComponentBox, contentStyles, ComponentLayout } from '../../layout';
@@ -141,9 +140,9 @@ export function PaginationView() {
               <PaginationItem
                 slots={{
                   previous: () => (
-                    <Iconify icon="eva:arrow-forward-fill" sx={{ transform: 'scaleX(-1)' }} />
+                    <Box component={RiArrowRightSFill} sx={{ transform: 'scaleX(-1)' }} />
                   ),
-                  next: () => <Iconify icon="eva:arrow-forward-fill" />,
+                  next: () => <RiArrowRightSFill />,
                 }}
                 {...item}
                 color="info"

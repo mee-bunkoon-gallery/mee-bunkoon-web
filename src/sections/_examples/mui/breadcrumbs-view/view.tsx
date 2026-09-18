@@ -1,11 +1,18 @@
 'use client';
 
+import {
+  RiAddLine,
+  RiHome5Fill,
+  RiListCheck2,
+  RiSparklingFill,
+  RiNotification3Fill,
+} from '@remixicon/react';
+
 import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 
-import { Iconify } from 'src/components/iconify';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
@@ -35,11 +42,11 @@ const DEMO_COMPONENTS = [
       <ComponentBox>
         <Breadcrumbs>
           <Link color="inherit" href="#" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Iconify icon="solar:home-angle-bold-duotone" />
+            <RiHome5Fill />
             Material-UI
           </Link>
           <Link color="inherit" href="#" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Iconify icon="solar:atom-bold-duotone" />
+            <RiSparklingFill />
             Core
           </Link>
           <Typography
@@ -50,7 +57,7 @@ const DEMO_COMPONENTS = [
               color: 'text.primary',
             }}
           >
-            <Iconify icon="solar:bell-bing-bold-duotone" />
+            <RiNotification3Fill />
             Breadcrumb
           </Typography>
         </Breadcrumbs>
@@ -67,11 +74,11 @@ const DEMO_COMPONENTS = [
               {
                 name: 'Home',
                 href: '#',
-                icon: <Iconify icon="solar:home-angle-bold-duotone" />,
+                icon: <RiHome5Fill />,
               },
-              { name: 'Link1', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
-              { name: 'Link2', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
-              { name: 'Link3', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
+              { name: 'Link1', href: '#', icon: <RiListCheck2 /> },
+              { name: 'Link2', href: '#', icon: <RiListCheck2 /> },
+              { name: 'Link3', icon: <RiListCheck2 /> },
             ]}
           />
         </ComponentBox>
@@ -83,18 +90,18 @@ const DEMO_COMPONENTS = [
               {
                 name: 'Home',
                 href: '#',
-                icon: <Iconify icon="solar:home-angle-bold-duotone" />,
+                icon: <RiHome5Fill />,
               },
-              { name: 'Link1', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
-              { name: 'Link2', href: '#', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
-              { name: 'Link3', icon: <Iconify icon="solar:box-minimalistic-bold" /> },
+              { name: 'Link1', href: '#', icon: <RiListCheck2 /> },
+              { name: 'Link2', href: '#', icon: <RiListCheck2 /> },
+              { name: 'Link3', icon: <RiListCheck2 /> },
             ]}
             moreLinks={[
               'https://www.w3schools.com/cssref/pr_padding-right.php',
               'https://www.w3schools.com/cssref/css3_pr_overflow-x.php',
             ]}
             action={
-              <Button variant="contained" startIcon={<Iconify icon="mingcute:add-line" />}>
+              <Button variant="contained" startIcon={<RiAddLine />}>
                 Add product
               </Button>
             }

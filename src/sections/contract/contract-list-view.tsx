@@ -3,6 +3,13 @@
 import type { IContract } from 'src/types/contract';
 
 import { useState } from 'react';
+import {
+  RiAddLine,
+  RiEyeFill,
+  RiEditLine,
+  RiFileCopyLine,
+  RiDeleteBin6Fill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -27,7 +34,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { TableNoData, TablePaginationCustom } from 'src/components/table';
@@ -90,7 +96,7 @@ export function ContractListView() {
           component={RouterLink}
           href={paths.dashboard.contract.new}
           variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
+          startIcon={<RiAddLine />}
         >
           สร้างสัญญา
         </Button>
@@ -129,9 +135,7 @@ export function ContractListView() {
                         </Link>
                       </TableCell>
                       <TableCell>{contract.customer?.name ?? '-'}</TableCell>
-                      <TableCell>
-                        {contract.eventDate ? fDate(contract.eventDate) : '-'}
-                      </TableCell>
+                      <TableCell>{contract.eventDate ? fDate(contract.eventDate) : '-'}</TableCell>
                       <TableCell align="right">{fBaht(contract.totalAmount)}</TableCell>
                       <TableCell>
                         <Label variant="soft" color={statusMeta.color}>
@@ -143,23 +147,23 @@ export function ContractListView() {
                           component={RouterLink}
                           href={paths.dashboard.contract.details(contract.id)}
                         >
-                          <Iconify icon="solar:eye-bold" />
+                          <RiEyeFill />
                         </IconButton>
                         <IconButton
                           component={RouterLink}
                           href={paths.dashboard.contract.edit(contract.id)}
                         >
-                          <Iconify icon="solar:pen-bold" />
+                          <RiEditLine />
                         </IconButton>
                         <IconButton
                           component={RouterLink}
                           href={`${paths.dashboard.contract.new}?duplicateId=${contract.id}`}
                           title="ทำสำเนาสัญญา"
                         >
-                          <Iconify icon="solar:copy-bold" />
+                          <RiFileCopyLine />
                         </IconButton>
                         <IconButton color="error" onClick={() => setDeleteTarget(contract)}>
-                          <Iconify icon="solar:trash-bin-trash-bold" />
+                          <RiDeleteBin6Fill />
                         </IconButton>
                       </TableCell>
                     </TableRow>

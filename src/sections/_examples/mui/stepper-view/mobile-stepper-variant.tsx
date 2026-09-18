@@ -1,6 +1,7 @@
 import type { MobileStepperProps } from '@mui/material/MobileStepper';
 
 import { useState, useCallback } from 'react';
+import { RiArrowLeftSFill, RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -9,8 +10,6 @@ import Divider from '@mui/material/Divider';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import MobileStepper from '@mui/material/MobileStepper';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -35,8 +34,8 @@ export function MobileStepperVariant({ dataSteps, ...other }: Props) {
     setActiveStep((prev) => prev - 1);
   }, []);
 
-  const renderLeftIcon = () => <Iconify icon="eva:arrow-ios-back-fill" />;
-  const renderRightIcon = () => <Iconify icon="eva:arrow-ios-forward-fill" />;
+  const renderLeftIcon = () => <RiArrowLeftSFill />;
+  const renderRightIcon = () => <RiArrowRightSFill />;
 
   return (
     <Paper variant="outlined">

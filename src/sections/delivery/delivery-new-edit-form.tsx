@@ -69,7 +69,9 @@ function toDefaultValues(
 ): DeliveryFormSchemaType {
   if (delivery) {
     return {
-      customer: delivery.customer ? { id: delivery.customer.id, name: delivery.customer.name } : null,
+      customer: delivery.customer
+        ? { id: delivery.customer.id, name: delivery.customer.name }
+        : null,
       deliveryDate: dayjs(delivery.deliveryDate).format(),
       deliveryMethod: delivery.deliveryMethod,
       itemsDelivered: delivery.itemsDelivered ?? '',
@@ -287,13 +289,7 @@ export function DeliveryNewEditForm({
         </Grid>
       </Card>
 
-      <Button
-        type="submit"
-        variant="contained"
-        size="large"
-        loading={isSubmitting}
-        sx={{ mt: 3 }}
-      >
+      <Button type="submit" variant="contained" size="large" loading={isSubmitting} sx={{ mt: 3 }}>
         {currentDelivery ? 'บันทึกการแก้ไข' : 'สร้างเอกสารส่งมอบงาน'}
       </Button>
     </Form>

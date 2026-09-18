@@ -1,12 +1,11 @@
 import type { UploadProps } from '../types';
 
+import { RiAddLine } from '@remixicon/react';
 import { useDropzone } from 'react-dropzone';
 import { mergeClasses } from 'minimal-shared/utils';
 
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-
-import { Iconify } from 'src/components/iconify';
 
 import { uploadClasses } from '../classes';
 import { RejectedFiles } from '../components/rejected-files';
@@ -50,7 +49,7 @@ export function UploadAvatar({
 
   const renderPlaceholder = () => (
     <PlaceholderContainer className={uploadClasses.placeholder.root}>
-      <Iconify icon="solar:camera-add-bold" width={32} className={uploadClasses.placeholder.icon} />
+      <RiAddLine size={32} className={uploadClasses.placeholder.icon} />
       <Typography variant="caption" className={uploadClasses.placeholder.title}>
         {hasSelectedFile ? 'Update photo' : 'Upload photo'}
       </Typography>

@@ -60,7 +60,9 @@ function renderInline(nodes: ChildNode[], flags: InlineFlags, textStyle: Style):
         case 'strong':
         case 'b':
           return (
-            <Fragment key={index}>{renderInline(children, { ...flags, bold: true }, textStyle)}</Fragment>
+            <Fragment key={index}>
+              {renderInline(children, { ...flags, bold: true }, textStyle)}
+            </Fragment>
           );
         case 'u':
           return (
@@ -72,7 +74,9 @@ function renderInline(nodes: ChildNode[], flags: InlineFlags, textStyle: Style):
         case 'strike':
         case 'del':
           return (
-            <Fragment key={index}>{renderInline(children, { ...flags, strike: true }, textStyle)}</Fragment>
+            <Fragment key={index}>
+              {renderInline(children, { ...flags, strike: true }, textStyle)}
+            </Fragment>
           );
         case 'a':
           return (
@@ -120,7 +124,10 @@ function renderBlock(node: ChildNode, index: number, textStyle: Style): ReactNod
     return (
       <Text
         key={index}
-        style={[textStyle, { fontWeight: 'bold', fontSize: Math.max(10, 15 - level), marginBottom: 4 }]}
+        style={[
+          textStyle,
+          { fontWeight: 'bold', fontSize: Math.max(10, 15 - level), marginBottom: 4 },
+        ]}
       >
         {renderInline(children, {}, textStyle)}
       </Text>
@@ -129,14 +136,18 @@ function renderBlock(node: ChildNode, index: number, textStyle: Style): ReactNod
 
   if (tag === 'ul' || tag === 'ol') {
     const items = children.filter(
-      (child) => child.nodeType === Node.ELEMENT_NODE && (child as HTMLElement).tagName.toLowerCase() === 'li'
+      (child) =>
+        child.nodeType === Node.ELEMENT_NODE &&
+        (child as HTMLElement).tagName.toLowerCase() === 'li'
     ) as HTMLElement[];
 
     return (
       <View key={index} style={{ marginBottom: 4 }}>
         {items.map((item, itemIndex) => (
           <View key={itemIndex} style={{ flexDirection: 'row', marginBottom: 2 }}>
-            <Text style={[textStyle, { width: 14 }]}>{tag === 'ol' ? `${itemIndex + 1}.` : '•'}</Text>
+            <Text style={[textStyle, { width: 14 }]}>
+              {tag === 'ol' ? `${itemIndex + 1}.` : '•'}
+            </Text>
             <Text style={[textStyle, { flex: 1 }]}>
               {renderInline(Array.from(item.childNodes), {}, textStyle)}
             </Text>

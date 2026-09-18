@@ -3,10 +3,10 @@
 import type { ChipProps } from '@mui/material/Chip';
 import type { Theme, SxProps } from '@mui/material/styles';
 
+import { RiDeleteBin6Fill } from '@remixicon/react';
+
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
-
-import { Iconify } from '../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -35,11 +35,7 @@ export function FiltersResult({
       <ResultContent>
         {children}
 
-        <Button
-          color="error"
-          onClick={onReset}
-          startIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
-        >
+        <Button color="error" onClick={onReset} startIcon={<RiDeleteBin6Fill />}>
           Clear
         </Button>
       </ResultContent>

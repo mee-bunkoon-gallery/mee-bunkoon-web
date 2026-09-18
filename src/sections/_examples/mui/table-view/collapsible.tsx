@@ -1,4 +1,5 @@
 import { useBoolean } from 'minimal-shared/hooks';
+import { RiArrowUpSFill, RiArrowDownSFill } from '@remixicon/react';
 
 import Table from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
@@ -10,7 +11,6 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
 // ----------------------------------------------------------------------
@@ -121,9 +121,7 @@ function CollapsibleTableRow({ row }: CollapsibleTableRowProps) {
             color={collapsible.value ? 'inherit' : 'default'}
             onClick={collapsible.onToggle}
           >
-            <Iconify
-              icon={collapsible.value ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
-            />
+            {collapsible.value ? <RiArrowUpSFill /> : <RiArrowDownSFill />}
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">

@@ -1,6 +1,13 @@
 import type { BoxProps } from '@mui/material/Box';
 
 import { m } from 'framer-motion';
+import {
+  RiLink,
+  RiFacebookFill,
+  RiTwitterXFill,
+  RiInstagramFill,
+  RiArrowRightSFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -12,7 +19,6 @@ import Typography from '@mui/material/Typography';
 import { _socials, _carouselsMembers } from 'src/_mock';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { varFade, MotionViewport } from 'src/components/animate';
 import { Carousel, useCarousel, CarouselArrowFloatButtons } from 'src/components/carousel';
 
@@ -77,7 +83,7 @@ export function AboutTeam({ sx, ...other }: BoxProps) {
           size="large"
           color="inherit"
           variant="outlined"
-          endIcon={<Iconify icon="eva:arrow-ios-forward-fill" width={24} />}
+          endIcon={<RiArrowRightSFill size={24} />}
           sx={{ mx: 'auto' }}
         >
           All members
@@ -118,10 +124,10 @@ function MemberCard({ member }: MemberCardProps) {
       >
         {_socials.map((social) => (
           <IconButton key={social.label}>
-            {social.value === 'twitter' && <Iconify icon="socials:twitter" />}
-            {social.value === 'facebook' && <Iconify icon="socials:facebook" />}
-            {social.value === 'instagram' && <Iconify icon="socials:instagram" />}
-            {social.value === 'linkedin' && <Iconify icon="socials:linkedin" />}
+            {social.value === 'twitter' && <RiTwitterXFill />}
+            {social.value === 'facebook' && <RiFacebookFill />}
+            {social.value === 'instagram' && <RiInstagramFill />}
+            {social.value === 'linkedin' && <RiLink />}
           </IconButton>
         ))}
       </Box>

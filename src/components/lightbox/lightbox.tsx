@@ -4,10 +4,20 @@ import type { LightboxProps } from './types';
 
 import { mergeClasses } from 'minimal-shared/utils';
 import ReactLightbox, { useLightboxState } from 'yet-another-react-lightbox';
+import {
+  RiCloseLine,
+  RiPauseFill,
+  RiZoomInFill,
+  RiZoomOutFill,
+  RiArrowLeftSFill,
+  RiFullscreenFill,
+  RiPlayCircleFill,
+  RiArrowRightSFill,
+  RiFullscreenExitFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 
-import { Iconify } from '../iconify';
 import { getPlugins } from './utils';
 import { lightboxClasses } from './classes';
 
@@ -56,15 +66,15 @@ export function Lightbox({
         ],
       }}
       render={{
-        iconClose: () => <Iconify width={24} icon="carbon:close" />,
-        iconZoomIn: () => <Iconify width={24} icon="carbon:zoom-in" />,
-        iconZoomOut: () => <Iconify width={24} icon="carbon:zoom-out" />,
-        iconSlideshowPlay: () => <Iconify width={24} icon="carbon:play" />,
-        iconSlideshowPause: () => <Iconify width={24} icon="carbon:pause" />,
-        iconPrev: () => <Iconify width={32} icon="carbon:chevron-left" />,
-        iconNext: () => <Iconify width={32} icon="carbon:chevron-right" />,
-        iconExitFullscreen: () => <Iconify width={24} icon="carbon:center-to-fit" />,
-        iconEnterFullscreen: () => <Iconify width={24} icon="carbon:fit-to-screen" />,
+        iconClose: () => <RiCloseLine size={24} />,
+        iconZoomIn: () => <RiZoomInFill size={24} />,
+        iconZoomOut: () => <RiZoomOutFill size={24} />,
+        iconSlideshowPlay: () => <RiPlayCircleFill size={24} />,
+        iconSlideshowPause: () => <RiPauseFill size={24} />,
+        iconPrev: () => <RiArrowLeftSFill size={32} />,
+        iconNext: () => <RiArrowRightSFill size={32} />,
+        iconExitFullscreen: () => <RiFullscreenExitFill size={24} />,
+        iconEnterFullscreen: () => <RiFullscreenFill size={24} />,
       }}
       className={mergeClasses([lightboxClasses.root, className])}
       {...other}

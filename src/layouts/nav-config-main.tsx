@@ -1,8 +1,8 @@
 import type { NavMainProps } from './main/nav/types';
 
-import { paths } from 'src/routes/paths';
+import { RiGiftFill, RiHome5Fill, RiSparklingFill } from '@remixicon/react';
 
-import { Iconify } from 'src/components/iconify';
+import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -10,24 +10,24 @@ export const navData: NavMainProps['data'] = [
   {
     title: 'มีบุญคุณ แกลเลอรี่',
     path: '/',
-    icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
+    icon: <RiHome5Fill size={22} />,
   },
   {
     title: 'คิวงาน',
     path: paths.jobQueue,
     deepMatch: true,
-    icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
+    icon: <RiSparklingFill size={22} />,
   },
   {
     title: 'โปรโมชั่น',
     path: paths.promotionPackages.root,
     deepMatch: true,
-    icon: <Iconify width={22} icon={'solar:gift-bold-duotone' as any} />,
+    icon: <RiGiftFill size={22} />,
   },
   // {
   //   title: 'Pages',
   //   path: '/pages',
-  //   icon: <Iconify width={22} icon="solar:file-bold-duotone" />,
+  //   icon: <RiFileTextFill size={22}   />,
   //   children: [
   //     {
   //       subheader: 'Other',
@@ -79,7 +79,7 @@ export const navData: NavMainProps['data'] = [
   // },
   // {
   //   title: 'Docs',
-  //   icon: <Iconify width={22} icon="solar:notebook-bold-duotone" />,
+  //   icon: <RiFileTextFill size={22}   />,
   //   path: paths.docs,
   // },
 ];

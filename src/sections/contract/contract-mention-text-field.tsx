@@ -53,7 +53,9 @@ export function MentionTextField({
   const [activeIndex, setActiveIndex] = useState(0);
 
   const options = match
-    ? mentionOptions.filter((option) => option.label.toLowerCase().includes(match.query.toLowerCase()))
+    ? mentionOptions.filter((option) =>
+        option.label.toLowerCase().includes(match.query.toLowerCase())
+      )
     : [];
 
   const closeMention = useCallback(() => setMatch(null), []);

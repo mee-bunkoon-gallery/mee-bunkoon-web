@@ -10,6 +10,14 @@ import dynamic from 'next/dynamic';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch, Controller, useFieldArray } from 'react-hook-form';
+import {
+  RiAddLine,
+  RiEyeFill,
+  RiCloseLine,
+  RiArrowUpSFill,
+  RiArrowDownSFill,
+  RiDeleteBin6Fill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -30,7 +38,6 @@ import { useRouter } from 'src/routes/hooks';
 import { CONFIG } from 'src/global-config';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { ensureHtmlContent } from 'src/components/editor';
 import { LoadingScreen } from 'src/components/loading-screen';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
@@ -523,7 +530,7 @@ export function ContractNewEditForm({
                           disabled={index === 0}
                           onClick={() => moveClause(index, index - 1)}
                         >
-                          <Iconify icon="eva:arrow-upward-fill" width={18} />
+                          <RiArrowUpSFill size={18} />
                         </IconButton>
                         <IconButton
                           type="button"
@@ -531,7 +538,7 @@ export function ContractNewEditForm({
                           disabled={index === clauseFields.length - 1}
                           onClick={() => moveClause(index, index + 1)}
                         >
-                          <Iconify icon="eva:arrow-downward-fill" width={18} />
+                          <RiArrowDownSFill size={18} />
                         </IconButton>
                         <IconButton
                           type="button"
@@ -539,7 +546,7 @@ export function ContractNewEditForm({
                           color="error"
                           onClick={() => removeClause(index)}
                         >
-                          <Iconify icon="solar:trash-bin-trash-bold" width={18} />
+                          <RiDeleteBin6Fill size={18} />
                         </IconButton>
                       </Box>
                     </Box>
@@ -578,7 +585,7 @@ export function ContractNewEditForm({
                 type="button"
                 size="small"
                 sx={{ mt: clauseFields.length ? 2 : 0 }}
-                startIcon={<Iconify icon="mingcute:add-line" />}
+                startIcon={<RiAddLine />}
                 onClick={() => appendClause(createEmptyContractClause())}
               >
                 เพิ่มข้อ
@@ -602,7 +609,7 @@ export function ContractNewEditForm({
               variant="outlined"
               size="large"
               disabled={!previewContract}
-              startIcon={<Iconify icon="solar:eye-bold" />}
+              startIcon={<RiEyeFill />}
               onClick={previewDialog.onTrue}
               sx={{ mt: 3 }}
             >
@@ -635,7 +642,7 @@ export function ContractNewEditForm({
         >
           พรีวิว PDF
           <IconButton type="button" onClick={previewDialog.onFalse}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </DialogTitle>
 

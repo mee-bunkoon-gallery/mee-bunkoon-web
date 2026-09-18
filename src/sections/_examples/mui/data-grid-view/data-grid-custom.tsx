@@ -10,6 +10,7 @@ import type { IDateValue } from 'src/types/common';
 import type { CustomToolbarSettingsButtonProps } from 'src/components/custom-data-grid';
 
 import { useRef, useMemo, useState, useImperativeHandle } from 'react';
+import { RiEyeFill, RiEditLine, RiDeleteBin6Fill, RiCheckboxCircleFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -23,7 +24,6 @@ import { fPercent } from 'src/utils/format-number';
 import { fDate, fTime } from 'src/utils/format-time';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { EmptyContent } from 'src/components/empty-content';
 import {
   ToolbarContainer,
@@ -137,7 +137,7 @@ const baseColumns: GridColDef[] = [
     width: 80,
     renderCell: (params) =>
       params.row.isAdmin ? (
-        <Iconify icon="solar:check-circle-bold" sx={{ color: 'primary.main' }} />
+        <Box component={RiCheckboxCircleFill} sx={{ color: 'primary.main' }} />
       ) : (
         '-'
       ),
@@ -189,19 +189,19 @@ const baseColumns: GridColDef[] = [
       <CustomGridActionsCellItem
         showInMenu
         label="View"
-        icon={<Iconify icon="solar:eye-bold" />}
+        icon={<RiEyeFill />}
         onClick={() => console.info('VIEW', params.row.id)}
       />,
       <CustomGridActionsCellItem
         showInMenu
         label="Edit"
-        icon={<Iconify icon="solar:pen-bold" />}
+        icon={<RiEditLine />}
         onClick={() => console.info('EDIT', params.row.id)}
       />,
       <CustomGridActionsCellItem
         showInMenu
         label="Delete"
-        icon={<Iconify icon="solar:trash-bin-trash-bold" />}
+        icon={<RiDeleteBin6Fill />}
         onClick={() => console.info('DELETE', params.row.id)}
         style={{ color: 'var(--palette-error-main)' }}
       />,

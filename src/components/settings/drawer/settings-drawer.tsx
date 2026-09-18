@@ -4,6 +4,7 @@ import type { SettingsState, SettingsDrawerProps } from '../types';
 
 import { useEffect, useCallback } from 'react';
 import { hasKeys, varAlpha } from 'minimal-shared/utils';
+import { RiStarFill, RiCloseLine } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
@@ -19,7 +20,6 @@ import { primaryColorPresets } from 'src/theme/with-settings';
 
 import { Label } from '../../label';
 import { settingIcons } from './icons';
-import { Iconify } from '../../iconify';
 import { BaseOption } from './base-option';
 import { Scrollbar } from '../../scrollbar';
 import { SmallBlock, LargeBlock } from './styles';
@@ -78,14 +78,14 @@ export function SettingsDrawer({ sx, defaultSettings }: SettingsDrawerProps) {
       <Tooltip title="Reset all">
         <IconButton onClick={handleReset}>
           <Badge color="error" variant="dot" invisible={!settings.canReset}>
-            <Iconify icon="solar:restart-bold" />
+            <RiStarFill />
           </Badge>
         </IconButton>
       </Tooltip>
 
       <Tooltip title="Close">
         <IconButton onClick={settings.onCloseDrawer}>
-          <Iconify icon="mingcute:close-line" />
+          <RiCloseLine />
         </IconButton>
       </Tooltip>
     </Box>

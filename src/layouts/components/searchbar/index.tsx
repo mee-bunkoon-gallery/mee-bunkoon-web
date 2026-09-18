@@ -4,6 +4,7 @@ import type { BoxProps } from '@mui/material/Box';
 import type { Breakpoint } from '@mui/material/styles';
 import type { NavSectionProps } from 'src/components/nav-section';
 
+import { RiSearchFill } from '@remixicon/react';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { varAlpha } from 'minimal-shared/utils';
@@ -21,7 +22,6 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 import InputBase, { inputBaseClasses } from '@mui/material/InputBase';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SearchNotFound } from 'src/components/search-not-found';
 
@@ -119,7 +119,7 @@ export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps)
           },
         }}
       >
-        <Iconify icon="eva:search-fill" />
+        <RiSearchFill />
       </Box>
 
       <Label
@@ -195,7 +195,7 @@ export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps)
           onChange={handleSearch}
           startAdornment={
             <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" width={24} sx={{ color: 'text.disabled' }} />
+              <Box component={RiSearchFill} width={24} sx={{ color: 'text.disabled' }} />
             </InputAdornment>
           }
           endAdornment={<Label sx={{ letterSpacing: 1, color: 'text.secondary' }}>esc</Label>}

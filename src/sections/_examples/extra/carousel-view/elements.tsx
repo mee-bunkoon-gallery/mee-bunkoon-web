@@ -1,10 +1,10 @@
 import type { BoxProps } from '@mui/material/Box';
 import type { ButtonProps } from '@mui/material/Button';
 
+import { RiPlayCircleFill, RiPauseCircleFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ export function PlayButton({ sx, isPlaying, ...other }: ButtonProps & { isPlayin
       size="small"
       color={isPlaying ? 'error' : 'primary'}
       variant="contained"
-      startIcon={<Iconify icon={isPlaying ? 'solar:stop-circle-bold' : 'solar:play-circle-bold'} />}
+      startIcon={isPlaying ? <RiPauseCircleFill /> : <RiPlayCircleFill />}
       sx={[
         {
           top: 24,

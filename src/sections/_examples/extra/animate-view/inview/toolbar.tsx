@@ -1,11 +1,11 @@
 import type { BoxProps } from '@mui/material/Box';
 
+import { RiStarFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import IconButton from '@mui/material/IconButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ export function Toolbar({
         />
       )}
       <IconButton onClick={onRefresh}>
-        <Iconify icon="solar:restart-bold" />
+        <RiStarFill />
       </IconButton>
     </Box>
   );

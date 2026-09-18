@@ -2,6 +2,7 @@ import type { FabProps } from '@mui/material/Fab';
 
 import { m } from 'framer-motion';
 import { upperFirst } from 'es-toolkit';
+import { RiMailFill } from '@remixicon/react';
 
 import Fab from '@mui/material/Fab';
 import Divider from '@mui/material/Divider';
@@ -9,7 +10,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { colorKeys } from 'src/theme/core';
 
-import { Iconify } from 'src/components/iconify';
 import { varTap, transitionTap } from 'src/components/animate';
 
 import { ComponentBox } from '../../layout';
@@ -22,7 +22,7 @@ const COLORS = ['default', 'inherit', ...colorKeys.palette] as const;
 // ----------------------------------------------------------------------
 
 export function FloatingActionButton() {
-  const renderIcon = () => <Iconify icon="solar:letter-outline" width={24} />;
+  const renderIcon = () => <RiMailFill size={24} />;
 
   const renderDivider = () => <Divider sx={{ width: 1, borderStyle: 'dashed' }} />;
 
@@ -96,7 +96,7 @@ export function FloatingActionButton() {
             color="info"
             size={size}
           >
-            <Iconify icon="solar:letter-outline" width={24} />
+            <RiMailFill size={24} />
             {upperFirst(size)}
           </Fab>
         ))}

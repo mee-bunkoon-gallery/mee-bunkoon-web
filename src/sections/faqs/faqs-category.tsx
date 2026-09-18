@@ -1,3 +1,4 @@
+import { RiListCheck2 } from '@remixicon/react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -8,8 +9,6 @@ import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 
 import { CONFIG } from 'src/global-config';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +57,7 @@ export function FaqsCategory() {
           }),
         ]}
       >
-        <Button startIcon={<Iconify icon="solar:list-bold" />} onClick={navOpen.onTrue}>
+        <Button startIcon={<RiListCheck2 />} onClick={navOpen.onTrue}>
           Categories
         </Button>
       </Box>

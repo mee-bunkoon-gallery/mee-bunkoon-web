@@ -3,6 +3,13 @@
 import type { IJobChecklistItem } from 'src/types/job-queue';
 
 import { useState, useEffect } from 'react';
+import {
+  RiEditLine,
+  RiTimeFill,
+  RiListCheck2,
+  RiFileTextFill,
+  RiCheckboxCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -30,7 +37,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { JOB_QUEUE_STATUS_META } from './job-queue-status';
@@ -64,10 +70,14 @@ function DocumentState({
 }) {
   const content = (
     <Box sx={{ gap: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>
-      <Iconify
-        width={20}
-        icon={ready ? 'solar:check-circle-bold' : 'solar:clock-circle-bold'}
-        sx={{ color: ready ? 'success.main' : 'warning.main', flexShrink: 0 }}
+      <Box
+        component={ready ? RiCheckboxCircleFill : RiTimeFill}
+        sx={{
+          width: 20,
+          height: 20,
+          color: ready ? 'success.main' : 'warning.main',
+          flexShrink: 0,
+        }}
       />
       <Box sx={{ minWidth: 0 }}>
         <Typography variant="subtitle2">{label}</Typography>
@@ -197,7 +207,7 @@ export function JobQueueDetailsView({ jobId }: Props) {
           component={RouterLink}
           href={paths.dashboard.jobQueue.edit(job.id)}
           variant="contained"
-          startIcon={<Iconify icon="solar:pen-bold" />}
+          startIcon={<RiEditLine />}
           sx={{ alignSelf: { xs: 'stretch', md: 'auto' } }}
         >
           แก้ไขงาน
@@ -329,7 +339,7 @@ export function JobQueueDetailsView({ jobId }: Props) {
                   variant="contained"
                   disabled={!pendingChecklist || savingChecklist}
                   onClick={() => setConfirmChecklistOpen(true)}
-                  startIcon={<Iconify icon="solar:check-circle-bold" />}
+                  startIcon={<RiCheckboxCircleFill />}
                 >
                   ยืนยันรายการ
                 </Button>
@@ -392,7 +402,7 @@ export function JobQueueDetailsView({ jobId }: Props) {
                             bgcolor: 'background.neutral',
                           }}
                         >
-                          <Iconify icon="solar:box-minimalistic-bold" width={25} />
+                          <RiListCheck2 size={25} />
                         </Avatar>
                       </ButtonBase>
                       <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -424,11 +434,7 @@ export function JobQueueDetailsView({ jobId }: Props) {
                   bgcolor: 'background.neutral',
                 }}
               >
-                <Iconify
-                  icon="solar:bill-list-bold-duotone"
-                  width={40}
-                  sx={{ color: 'text.disabled' }}
-                />
+                <Box component={RiFileTextFill} width={40} sx={{ color: 'text.disabled' }} />
                 <Typography variant="subtitle2" sx={{ mt: 1.5 }}>
                   ยังไม่มีรายการจากใบเสนอราคา
                 </Typography>

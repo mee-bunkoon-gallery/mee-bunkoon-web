@@ -4,6 +4,7 @@ import type { ButtonProps } from '@mui/material/Button';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import type { ArrowPlacement } from 'src/components/custom-popover';
 
+import { RiMore2Fill } from '@remixicon/react';
 import { varAlpha } from 'minimal-shared/utils';
 import { useState, Fragment, useCallback } from 'react';
 import { usePopover, usePopoverHover } from 'minimal-shared/hooks';
@@ -15,7 +16,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { Iconify } from 'src/components/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 
 import { ComponentBox, contentStyles, ComponentLayout } from '../../layout';
@@ -130,7 +130,7 @@ export function PopoverView() {
       <Fragment key={placement}>
         {useIconButton ? (
           <IconButton {...buttonProps} sx={{ bgcolor: 'action.hover', ...buttonProps.sx }}>
-            <Iconify icon="eva:more-vertical-fill" />
+            <RiMore2Fill />
           </IconButton>
         ) : (
           <Button {...buttonProps} variant="outlined">

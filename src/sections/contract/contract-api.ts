@@ -72,9 +72,12 @@ export async function saveContractSignature(
   signer: 'issuer' | 'customer',
   signature: string
 ): Promise<string> {
-  const { signatureUrl } = await apiFetch<{ signatureUrl: string }>(`/api/contracts/${id}/signature/`, {
-    method: 'POST',
-    body: JSON.stringify({ signer, signature }),
-  });
+  const { signatureUrl } = await apiFetch<{ signatureUrl: string }>(
+    `/api/contracts/${id}/signature/`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ signer, signature }),
+    }
+  );
   return signatureUrl;
 }

@@ -1,13 +1,13 @@
 import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 
 import { varAlpha } from 'minimal-shared/utils';
+import { RiInformationFill } from '@remixicon/react';
 
+import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
-
-import { Iconify } from '../../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ export function BaseOption({
             title={tooltip}
             slotProps={{ tooltip: { sx: { maxWidth: 240, mr: 0.5 } } }}
           >
-            <Iconify
+            <Box
+              component={RiInformationFill}
               width={16}
-              icon="eva:info-outline"
               sx={{ cursor: 'pointer', color: 'text.disabled' }}
             />
           </Tooltip>

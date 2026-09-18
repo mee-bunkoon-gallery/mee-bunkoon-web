@@ -1,10 +1,10 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
 import { varAlpha } from 'minimal-shared/utils';
+import { RiArrowLeftSFill, RiArrowRightSFill } from '@remixicon/react';
 
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -40,10 +40,11 @@ export function NavToggleButton({ isNavMini, sx, ...other }: NavToggleButtonProp
       ]}
       {...other}
     >
-      <Iconify
-        width={16}
-        icon={isNavMini ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'}
+      <Box
+        component={isNavMini ? RiArrowRightSFill : RiArrowLeftSFill}
         sx={(theme) => ({
+          width: 16,
+          height: 16,
           ...(theme.direction === 'rtl' && { transform: 'scaleX(-1)' }),
         })}
       />

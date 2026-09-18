@@ -2,12 +2,13 @@
 
 import type { LabelProps } from 'src/components/label';
 
+import { RiMailFill } from '@remixicon/react';
+
 import Tooltip from '@mui/material/Tooltip';
 
 import { colorKeys } from 'src/theme/core';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -18,7 +19,7 @@ const COLORS = ['default', ...colorKeys.palette, ...colorKeys.common] as const;
 
 // ----------------------------------------------------------------------
 
-const renderIcon = () => <Iconify icon="solar:letter-bold" />;
+const renderIcon = () => <RiMailFill />;
 
 const DEMO_COMPONENTS = [
   {

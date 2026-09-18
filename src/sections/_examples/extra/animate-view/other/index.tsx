@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { RiStarFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 
-import { Iconify } from 'src/components/iconify';
 import { AnimateCountUp, AnimateLogoZoom, AnimateLogoRotate } from 'src/components/animate';
 
 import { SvgPath } from './svg-path';
@@ -36,7 +36,7 @@ export function AnimateOther() {
         onClick={() => setCount(count + 1)}
         sx={{ position: 'absolute', right: 16, top: 16 }}
       >
-        <Iconify icon="solar:restart-bold" />
+        <RiStarFill />
       </IconButton>
 
       <AnimateCountUp component="h6" variant="h1" to={500} unit="+" />
@@ -65,7 +65,7 @@ export function AnimateOther() {
         onClick={() => setCount(count + 1)}
         sx={{ position: 'absolute', right: 16, top: 16 }}
       >
-        <Iconify icon="solar:restart-bold" />
+        <RiStarFill />
       </IconButton>
 
       <SvgPath key={count} />

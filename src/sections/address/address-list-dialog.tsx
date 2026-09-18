@@ -2,6 +2,7 @@ import type { DialogProps } from '@mui/material/Dialog';
 import type { IAddressItem } from 'src/types/common';
 
 import { useState, useCallback } from 'react';
+import { RiSearchFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -11,7 +12,6 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SearchNotFound } from 'src/components/search-not-found';
 
@@ -125,7 +125,7 @@ export function AddressListDialog({
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                  <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
                 </InputAdornment>
               ),
             },

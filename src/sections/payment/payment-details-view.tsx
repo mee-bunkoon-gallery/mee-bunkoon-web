@@ -3,6 +3,13 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useBoolean } from 'minimal-shared/hooks';
+import {
+  RiEyeFill,
+  RiEditLine,
+  RiCloseLine,
+  RiFileTextFill,
+  RiDownloadCloud2Fill,
+} from '@remixicon/react';
 
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -28,7 +35,6 @@ import { CONFIG } from 'src/global-config';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { usePaymentQuery } from './payment-queries';
@@ -60,11 +66,7 @@ export function PaymentDetailsView({ paymentId }: Props) {
 
   const { data: companyProfile } = useCompanyProfileQuery();
 
-  const {
-    data: payment,
-    isLoading,
-    isError,
-  } = usePaymentQuery(paymentId);
+  const { data: payment, isLoading, isError } = usePaymentQuery(paymentId);
 
   const { data: quotation } = useQuotationQuery(payment?.quotationId ?? '');
 
@@ -104,16 +106,12 @@ export function PaymentDetailsView({ paymentId }: Props) {
             component={RouterLink}
             href={paths.dashboard.payment.edit(payment.id)}
             variant="outlined"
-            startIcon={<Iconify icon="solar:pen-bold" />}
+            startIcon={<RiEditLine />}
           >
             แก้ไข
           </Button>
 
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="solar:eye-bold" />}
-            onClick={previewDialog.onTrue}
-          >
+          <Button variant="contained" startIcon={<RiEyeFill />} onClick={previewDialog.onTrue}>
             พรีวิวใบเสร็จรับเงิน
           </Button>
         </Box>
@@ -197,7 +195,7 @@ export function PaymentDetailsView({ paymentId }: Props) {
                       href={paths.dashboard.quotation.details(payment.quotation.id)}
                       size="small"
                       variant="text"
-                      endIcon={<Iconify icon="solar:eye-bold" />}
+                      endIcon={<RiEyeFill />}
                     >
                       {payment.quotation.quoteNo}
                     </Button>
@@ -273,11 +271,7 @@ export function PaymentDetailsView({ paymentId }: Props) {
 
             {payment.slipUrl && !isSlipImage && (
               <Link href={payment.slipUrl} target="_blank" rel="noopener">
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<Iconify icon="solar:file-bold-duotone" />}
-                >
+                <Button fullWidth variant="outlined" startIcon={<RiFileTextFill />}>
                   เปิดไฟล์หลักฐาน (PDF)
                 </Button>
               </Link>
@@ -298,7 +292,7 @@ export function PaymentDetailsView({ paymentId }: Props) {
         >
           พรีวิวใบเสร็จรับเงิน — {payment.receiptNo}
           <IconButton onClick={previewDialog.onFalse}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </DialogTitle>
 
@@ -333,7 +327,7 @@ export function PaymentDetailsView({ paymentId }: Props) {
             }
             fileName={`${payment.receiptNo}.pdf`}
           >
-            <Button variant="contained" startIcon={<Iconify icon="eva:cloud-download-fill" />}>
+            <Button variant="contained" startIcon={<RiDownloadCloud2Fill />}>
               ดาวน์โหลด PDF
             </Button>
           </PDFDownloadLink>

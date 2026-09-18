@@ -2,6 +2,7 @@ import type { BoxProps } from '@mui/material/Box';
 
 import { m } from 'framer-motion';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiPlayCircleFill } from '@remixicon/react';
 
 import Fab from '@mui/material/Fab';
 import Box from '@mui/material/Box';
@@ -12,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import { CONFIG } from 'src/global-config';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { varFade, MotionViewport } from 'src/components/animate';
 
 // ----------------------------------------------------------------------
@@ -106,7 +106,7 @@ export function AboutVision({ sx, ...other }: BoxProps) {
           {renderLogos()}
 
           <Fab sx={{ position: 'absolute', zIndex: 9 }}>
-            <Iconify icon="solar:play-broken" width={24} />
+            <RiPlayCircleFill size={24} />
           </Fab>
         </Box>
 

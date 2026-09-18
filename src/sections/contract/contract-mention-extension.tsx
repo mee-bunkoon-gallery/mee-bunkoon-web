@@ -1,4 +1,7 @@
-import type { ContractMentionItem, MentionSuggestionListRef } from './contract-mention-suggestion-list';
+import type {
+  ContractMentionItem,
+  MentionSuggestionListRef,
+} from './contract-mention-suggestion-list';
 
 import { ReactRenderer } from '@tiptap/react';
 import Mention from '@tiptap/extension-mention';

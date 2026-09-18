@@ -4,10 +4,9 @@ import type { FabProps } from '@mui/material/Fab';
 
 import { cloneElement } from 'react';
 import { useBackToTop } from 'minimal-shared/hooks';
+import { RiInformationFill } from '@remixicon/react';
 
 import Fab from '@mui/material/Fab';
-
-import { Iconify } from '../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +51,7 @@ export function BackToTopButton({
       ]}
       {...other}
     >
-      <Iconify width={24} icon="solar:double-alt-arrow-up-bold-duotone" />
+      <RiInformationFill size={24} />
     </Fab>
   );
 }

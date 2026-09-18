@@ -7,6 +7,15 @@ import Fade from 'embla-carousel-fade';
 import Autoplay from 'embla-carousel-autoplay';
 import { varAlpha } from 'minimal-shared/utils';
 import { useQuery } from '@tanstack/react-query';
+import {
+  RiCloseLine,
+  RiPhoneFill,
+  RiPaletteFill,
+  RiSparklingFill,
+  RiArrowRightSFill,
+  RiShieldCheckFill,
+  RiCheckboxCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -23,7 +32,6 @@ import { fDate } from 'src/utils/format-time';
 import { fBaht } from 'src/utils/format-number';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { Carousel, useCarousel } from 'src/components/carousel';
 
 const HERO_IMAGES = [
@@ -57,20 +65,29 @@ type PortfolioWork = {
   subtitle: string;
   images: string[];
 };
+type PublicHeroBanner = {
+  id: string;
+  eyebrow: string | null;
+  title: string;
+  subtitle: string | null;
+  imageUrl: string;
+  buttonLabel: string | null;
+  buttonUrl: string | null;
+};
 
 const HIGHLIGHTS = [
   {
-    icon: 'solar:palette-bold-duotone',
+    icon: RiPaletteFill,
     title: 'ออกแบบเฉพาะคุณ',
     body: 'ออกแบบธีม สี และองค์ประกอบให้เข้ากับเรื่องราวและงบประมาณของคุณ',
   },
   {
-    icon: 'solar:stars-bold-duotone',
+    icon: RiSparklingFill,
     title: 'ครบทุกองค์ประกอบ',
     body: 'ดูแลฉาก ดอกไม้ แสง สี เสียง และรายละเอียดสำคัญไว้ในทีมเดียว',
   },
   {
-    icon: 'solar:shield-check-bold-duotone',
+    icon: RiShieldCheckFill,
     title: 'ทีมงานมืออาชีพ',
     body: 'วางแผน ประสานงาน และดูแลหน้างาน เพื่อให้วันสำคัญเป็นไปอย่างราบรื่น',
   },
@@ -102,6 +119,12 @@ async function fetchPublicPromotionPackages(): Promise<IPublicPromotionPackage[]
   return (await response.json())?.packages ?? [];
 }
 
+async function fetchPublicHeroBanners(): Promise<PublicHeroBanner[]> {
+  const response = await fetch('/api/public/hero-banners/', { cache: 'no-store' });
+  if (!response.ok) return [];
+  return (await response.json())?.banners ?? [];
+}
+
 export function HomeView() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const heroCarousel = useCarousel({ loop: true, duration: 80 }, [
@@ -123,6 +146,25 @@ export function HomeView() {
     queryFn: fetchPublicPromotionPackages,
     retry: false,
   });
+  const { data: banners = [] } = useQuery({
+    queryKey: ['public-hero-banners'],
+    queryFn: fetchPublicHeroBanners,
+    retry: false,
+  });
+
+  const heroSlides: PublicHeroBanner[] = banners.length
+    ? banners
+    : HERO_IMAGES.map((imageUrl, index) => ({
+        id: `default-${index}`,
+        eyebrow: company.nameEn,
+        title: 'ให้ทุกช่วงเวลาสำคัญ งดงามในแบบของคุณ',
+        subtitle:
+          'เราดูแลงานแต่ง งานบุญ และทุกโอกาสพิเศษ ตั้งแต่การวางแนวคิด ออกแบบ ไปจนถึงดูแลรายละเอียดในวันจริง',
+        imageUrl,
+        buttonLabel: 'ดูแพ็กเกจและโปรโมชั่น',
+        buttonUrl: paths.promotionPackages.root,
+      }));
+  const activeHero = heroSlides[heroCarousel.dots.selectedIndex] ?? heroSlides[0];
 
   const portfolioWorks: PortfolioWork[] = deliveries
     .filter((delivery) => delivery.imageUrls.length > 0)
@@ -183,10 +225,10 @@ export function HomeView() {
           }}
           slotProps={{ container: { height: 1 }, slide: { height: 1 } }}
         >
-          {HERO_IMAGES.map((src, index) => (
+          {heroSlides.map((banner, index) => (
             <Image
-              key={src}
-              src={src}
+              key={banner.id}
+              src={banner.imageUrl}
               alt={`บรรยากาศผลงาน ${index + 1}`}
               visibleByDefault
               disablePlaceholder
@@ -235,7 +277,7 @@ export function HomeView() {
                 variant="overline"
                 sx={{ color: 'common.white', opacity: 0.8, fontWeight: 800, letterSpacing: 2.6 }}
               >
-                {company.nameEn}
+                {activeHero.eyebrow || company.nameEn}
               </Typography>
             </Stack>
             <Typography
@@ -247,16 +289,7 @@ export function HomeView() {
                 letterSpacing: -1.5,
               }}
             >
-              ให้ทุกช่วงเวลาสำคัญ
-              <Box
-                component="span"
-                sx={{
-                  display: 'block',
-                  color: 'common.white',
-                }}
-              >
-                งดงามในแบบของคุณ
-              </Box>
+              {activeHero.title}
             </Typography>
             <Typography
               sx={{
@@ -267,16 +300,15 @@ export function HomeView() {
                 lineHeight: 1.8,
               }}
             >
-              เราดูแลงานแต่ง งานบุญ และทุกโอกาสพิเศษ ตั้งแต่การวางแนวคิด ออกแบบ
-              ไปจนถึงดูแลรายละเอียดในวันจริง
+              {activeHero.subtitle}
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 4 }}>
               <Button
                 component={RouterLink}
-                href={paths.promotionPackages.root}
+                href={activeHero.buttonUrl || paths.promotionPackages.root}
                 size="large"
                 variant="contained"
-                endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+                endIcon={<RiArrowRightSFill />}
                 sx={{
                   px: 3.5,
                   color: 'primary.main',
@@ -285,7 +317,7 @@ export function HomeView() {
                   '&:hover': { bgcolor: 'grey.200' },
                 }}
               >
-                ดูแพ็กเกจและโปรโมชั่น
+                {activeHero.buttonLabel || 'ดูแพ็กเกจและโปรโมชั่น'}
               </Button>
               <Button
                 component={RouterLink}
@@ -307,9 +339,9 @@ export function HomeView() {
               position: 'absolute',
             }}
           >
-            {HERO_IMAGES.map((_, index) => (
+            {heroSlides.map((banner, index) => (
               <Box
-                key={index}
+                key={banner.id}
                 component="button"
                 type="button"
                 aria-label={`ภาพสไลด์ ${index + 1}`}
@@ -404,7 +436,7 @@ export function HomeView() {
                     borderColor: (theme) => varAlpha(theme.vars.palette.primary.mainChannel, 0.2),
                   }}
                 >
-                  <Iconify icon={item.icon as any} width={26} />
+                  <Box component={item.icon} sx={{ width: 26, height: 26 }} />
                 </Box>
                 <Box sx={{ mt: 'auto !important' }}>
                   <Typography variant="h5" color="secondary.main">
@@ -448,7 +480,7 @@ export function HomeView() {
                   component={RouterLink}
                   href={paths.promotionPackages.root}
                   color="inherit"
-                  endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+                  endIcon={<RiArrowRightSFill />}
                 >
                   ดูทั้งหมด
                 </Button>
@@ -526,7 +558,7 @@ export function HomeView() {
                           color: 'primary.main',
                         }}
                       >
-                        <Iconify icon="eva:arrow-ios-forward-fill" />
+                        <RiArrowRightSFill />
                       </Box>
                     </Stack>
                   </Stack>
@@ -688,7 +720,7 @@ export function HomeView() {
                 'ทีมงานดูแลและประสานงานหน้างาน',
               ].map((text) => (
                 <Stack key={text} direction="row" spacing={1.2} alignItems="center">
-                  <Iconify icon="solar:check-circle-bold" color="success.main" />
+                  <Box component={RiCheckboxCircleFill} color="success.main" />
                   <Typography>{text}</Typography>
                 </Stack>
               ))}
@@ -736,7 +768,7 @@ export function HomeView() {
                 size="large"
                 color="primary"
                 variant="contained"
-                startIcon={<Iconify icon="solar:phone-bold" />}
+                startIcon={<RiPhoneFill />}
               >
                 โทร {company.phone}
               </Button>
@@ -778,7 +810,7 @@ export function HomeView() {
             onClick={() => setSelectedImage(null)}
             sx={{ color: 'inherit' }}
           >
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </Stack>
         <DialogContent sx={{ p: 0 }}>

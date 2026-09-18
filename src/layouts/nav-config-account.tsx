@@ -1,27 +1,33 @@
 import type { AccountDrawerProps } from './components/account-drawer';
 
-import { Iconify } from 'src/components/iconify';
+import {
+  RiHome5Fill,
+  RiUser3Fill,
+  RiFileTextFill,
+  RiSettings3Fill,
+  RiShieldCheckFill,
+} from '@remixicon/react';
 
 // ----------------------------------------------------------------------
 
 export const _account: AccountDrawerProps['data'] = [
-  { label: 'Home', href: '/', icon: <Iconify icon="solar:home-angle-bold-duotone" /> },
+  { label: 'Home', href: '/', icon: <RiHome5Fill /> },
   {
     label: 'Profile',
     href: '#',
-    icon: <Iconify icon="custom:profile-duotone" />,
+    icon: <RiUser3Fill />,
   },
   {
     label: 'Projects',
     href: '#',
-    icon: <Iconify icon="solar:notes-bold-duotone" />,
+    icon: <RiFileTextFill />,
     info: '3',
   },
   {
     label: 'Subscription',
     href: '#',
-    icon: <Iconify icon="custom:invoice-duotone" />,
+    icon: <RiFileTextFill />,
   },
-  { label: 'Security', href: '#', icon: <Iconify icon="solar:shield-keyhole-bold-duotone" /> },
-  { label: 'Account settings', href: '#', icon: <Iconify icon="solar:settings-bold-duotone" /> },
+  { label: 'Security', href: '#', icon: <RiShieldCheckFill /> },
+  { label: 'Account settings', href: '#', icon: <RiSettings3Fill /> },
 ];

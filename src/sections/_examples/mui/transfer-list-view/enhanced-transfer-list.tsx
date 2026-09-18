@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { RiArrowLeftSFill, RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -10,8 +11,6 @@ import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -168,7 +167,7 @@ export function EnhancedTransferList() {
         disabled={isRtl ? rightChecked.length === 0 : leftChecked.length === 0}
         aria-label="move selected right"
       >
-        <Iconify width={18} icon="eva:arrow-ios-forward-fill" />
+        <RiArrowRightSFill size={18} />
       </Button>
 
       <Button
@@ -179,7 +178,7 @@ export function EnhancedTransferList() {
         disabled={isRtl ? leftChecked.length === 0 : rightChecked.length === 0}
         aria-label="move selected left"
       >
-        <Iconify width={18} icon="eva:arrow-ios-back-fill" />
+        <RiArrowLeftSFill size={18} />
       </Button>
     </Box>
   );

@@ -3,6 +3,7 @@
 import type { IPublicPromotionPackage } from 'src/types/promotion-package';
 
 import { useQuery } from '@tanstack/react-query';
+import { RiGiftFill, RiArrowRightSFill, RiCheckboxCircleFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -15,7 +16,6 @@ import { RouterLink } from 'src/routes/components';
 import { fBaht } from 'src/utils/format-number';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 async function fetchPromotionPackages(): Promise<IPublicPromotionPackage[]> {
@@ -139,7 +139,7 @@ export function PromotionPackageListView() {
                         spacing={1}
                         alignItems="center"
                       >
-                        <Iconify icon="solar:check-circle-bold" width={18} color="success.main" />
+                        <Box component={RiCheckboxCircleFill} width={18} color="success.main" />
                         <Typography variant="body2" noWrap>
                           {item.name}
                         </Typography>
@@ -177,7 +177,7 @@ export function PromotionPackageListView() {
                         bgcolor: 'primary.main',
                       }}
                     >
-                      <Iconify icon="eva:arrow-ios-forward-fill" />
+                      <RiArrowRightSFill />
                     </Box>
                   </Stack>
                 </Stack>
@@ -186,7 +186,7 @@ export function PromotionPackageListView() {
           </Box>
         ) : (
           <Card sx={{ p: 6, textAlign: 'center' }}>
-            <Iconify icon={'solar:gift-bold-duotone' as any} width={56} color="text.disabled" />
+            <Box component={RiGiftFill} width={56} color="text.disabled" />
             <Typography variant="h5" sx={{ mt: 2 }}>
               ยังไม่มีโปรโมชั่นในขณะนี้
             </Typography>

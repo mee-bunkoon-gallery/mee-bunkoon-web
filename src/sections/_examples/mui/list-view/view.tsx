@@ -1,6 +1,19 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import {
+  RiMailFill,
+  RiStarLine,
+  RiWifiFill,
+  RiImageFill,
+  RiArchiveFill,
+  RiArrowUpSFill,
+  RiSuitcaseFill,
+  RiBluetoothFill,
+  RiArrowDownSFill,
+  RiSendPlane2Fill,
+  RiInformationFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -16,8 +29,6 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -81,7 +92,7 @@ export function ListView() {
                 <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemIcon>
-                      <Iconify icon="solar:inbox-in-bold" width={24} />
+                      <RiArchiveFill size={24} />
                     </ListItemIcon>
                     <ListItemText primary="Inbox" />
                   </ListItemButton>
@@ -89,7 +100,7 @@ export function ListView() {
                 <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemIcon>
-                      <Iconify icon="solar:letter-bold" width={24} />
+                      <RiMailFill size={24} />
                     </ListItemIcon>
                     <ListItemText primary="Drafts" />
                   </ListItemButton>
@@ -132,28 +143,28 @@ export function ListView() {
           >
             <ListItemButton>
               <ListItemIcon>
-                <Iconify icon="custom:send-fill" width={24} />
+                <RiSendPlane2Fill size={24} />
               </ListItemIcon>
               <ListItemText primary="Sent mail" />
             </ListItemButton>
             <ListItemButton>
               <ListItemIcon>
-                <Iconify icon="solar:letter-bold" width={24} />
+                <RiMailFill size={24} />
               </ListItemIcon>
               <ListItemText primary="Drafts" />
             </ListItemButton>
             <ListItemButton onClick={handleClick}>
               <ListItemIcon>
-                <Iconify icon="solar:inbox-in-bold" width={24} />
+                <RiArchiveFill size={24} />
               </ListItemIcon>
               <ListItemText primary="Inbox" />
-              <Iconify icon={open ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'} />
+              {open ? <RiArrowUpSFill /> : <RiArrowDownSFill />}
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 4 }}>
                   <ListItemIcon>
-                    <Iconify icon="eva:star-outline" width={24} />
+                    <RiStarLine size={24} />
                   </ListItemIcon>
                   <ListItemText primary="Starred" />
                 </ListItemButton>
@@ -171,7 +182,7 @@ export function ListView() {
             <ListItem>
               <ListItemAvatar>
                 <Avatar>
-                  <Iconify icon="solar:gallery-wide-bold" width={24} />
+                  <RiImageFill size={24} />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText primary="Photos" secondary="Jan 9, 2014" />
@@ -179,7 +190,7 @@ export function ListView() {
             <ListItem>
               <ListItemAvatar>
                 <Avatar>
-                  <Iconify icon="solar:suitcase-tag-bold" width={24} />
+                  <RiSuitcaseFill size={24} />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText primary="Work" secondary="Jan 7, 2014" />
@@ -187,7 +198,7 @@ export function ListView() {
             <ListItem>
               <ListItemAvatar>
                 <Avatar>
-                  <Iconify icon="ic:round-beach-access" width={24} />
+                  <RiInformationFill size={24} />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText primary="Vacation" secondary="July 20, 2014" />
@@ -207,7 +218,7 @@ export function ListView() {
                 onClick={(event) => handleListItemClick(event, 0)}
               >
                 <ListItemIcon>
-                  <Iconify icon="solar:inbox-in-bold" width={24} />
+                  <RiArchiveFill size={24} />
                 </ListItemIcon>
                 <ListItemText primary="Inbox" />
               </ListItemButton>
@@ -216,7 +227,7 @@ export function ListView() {
                 onClick={(event) => handleListItemClick(event, 1)}
               >
                 <ListItemIcon>
-                  <Iconify icon="solar:letter-bold" width={24} />
+                  <RiMailFill size={24} />
                 </ListItemIcon>
                 <ListItemText primary="Drafts" />
               </ListItemButton>
@@ -250,7 +261,7 @@ export function ListView() {
                 key={value}
                 secondaryAction={
                   <IconButton edge="end" aria-label="comments">
-                    <Iconify icon="solar:chat-round-dots-bold" width={24} />
+                    <RiInformationFill size={24} />
                   </IconButton>
                 }
                 disablePadding
@@ -303,7 +314,7 @@ export function ListView() {
             >
               <ListItemButton>
                 <ListItemIcon>
-                  <Iconify icon="ic:baseline-wifi" width={24} />
+                  <RiWifiFill size={24} />
                 </ListItemIcon>
                 <ListItemText id="switch-list-label-wifi" primary="Wi-Fi" />
               </ListItemButton>
@@ -327,7 +338,7 @@ export function ListView() {
             >
               <ListItemButton>
                 <ListItemIcon>
-                  <Iconify icon="ic:baseline-bluetooth" width={24} />
+                  <RiBluetoothFill size={24} />
                 </ListItemIcon>
                 <ListItemText id="switch-list-label-bluetooth" primary="Bluetooth" />
               </ListItemButton>

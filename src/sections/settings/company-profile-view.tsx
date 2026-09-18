@@ -5,6 +5,7 @@ import type { ICompanyProfile } from 'src/types/settings';
 import * as z from 'zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { RiDeleteBin6Line } from '@remixicon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -19,7 +20,6 @@ import { fData } from 'src/utils/format-number';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 import { LoadingScreen } from 'src/components/loading-screen';
 
@@ -171,7 +171,7 @@ export function CompanyProfileView() {
                   color="error"
                   size="small"
                   onClick={handleRemoveLogo}
-                  startIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
+                  startIcon={<RiDeleteBin6Line />}
                   sx={{ mt: 2 }}
                 >
                   ลบโลโก้

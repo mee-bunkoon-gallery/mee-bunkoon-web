@@ -3,12 +3,12 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
 import { useCallback } from 'react';
+import { RiCheckboxCircleFill } from '@remixicon/react';
 import { varAlpha, mergeClasses } from 'minimal-shared/utils';
 
 import ButtonBase from '@mui/material/ButtonBase';
 import { styled, alpha as hexAlpha } from '@mui/material/styles';
 
-import { Iconify } from '../iconify';
 import { colorPickerClasses } from './classes';
 
 // ----------------------------------------------------------------------
@@ -99,7 +99,6 @@ export function ColorPicker({
                 <ItemIcon
                   color={color}
                   hasSelected={hasSelected}
-                  icon="eva:checkmark-fill"
                   className={colorPickerClasses.item.icon}
                   {...slotProps?.icon}
                 />
@@ -160,7 +159,7 @@ const ItemContainer = styled('span', {
   ],
 }));
 
-const ItemIcon = styled(Iconify, {
+const ItemIcon = styled(RiCheckboxCircleFill, {
   shouldForwardProp: (prop: string) => !['color', 'hasSelected', 'sx'].includes(prop),
 })<{ color: string; hasSelected: boolean }>(({ color, theme }) => ({
   width: 0,

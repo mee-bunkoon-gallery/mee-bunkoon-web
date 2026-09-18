@@ -30,8 +30,12 @@ export function ContractCreateView() {
   useEffect(() => {
     if (!quotationId && !duplicateId) return;
 
-    const loadSource = quotationId ? getQuotation(quotationId).then(setSourceQuotation) : Promise.resolve();
-    const loadDuplicate = duplicateId ? getContract(duplicateId).then(setDuplicateContract) : Promise.resolve();
+    const loadSource = quotationId
+      ? getQuotation(quotationId).then(setSourceQuotation)
+      : Promise.resolve();
+    const loadDuplicate = duplicateId
+      ? getContract(duplicateId).then(setDuplicateContract)
+      : Promise.resolve();
 
     Promise.all([loadSource, loadDuplicate])
       .catch(() => {})
@@ -48,7 +52,10 @@ export function ContractCreateView() {
         {duplicateContract ? 'ทำสำเนาสัญญาจ้างจัดงาน' : 'สร้างสัญญาจ้างจัดงาน'}
       </Typography>
 
-      <ContractNewEditForm sourceQuotation={sourceQuotation} duplicateContract={duplicateContract} />
+      <ContractNewEditForm
+        sourceQuotation={sourceQuotation}
+        duplicateContract={duplicateContract}
+      />
     </DashboardContent>
   );
 }

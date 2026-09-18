@@ -2,6 +2,7 @@
 
 import type { NavListProps, MegaMenuProps } from '../types';
 
+import { RiMenuFill } from '@remixicon/react';
 import { useBoolean } from 'minimal-shared/hooks';
 import { mergeClasses } from 'minimal-shared/utils';
 import { useState, useEffect, cloneElement } from 'react';
@@ -12,7 +13,6 @@ import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
 import { usePathname } from 'src/routes/hooks';
 
-import { Iconify } from '../../iconify';
 import { Nav, NavUl } from '../components';
 import { Scrollbar } from '../../scrollbar';
 import { NavListDrawer } from './nav-list-drawer';
@@ -60,7 +60,7 @@ export function MegaMenuMobile({
       })
     ) : (
       <IconButton onClick={drawerOpen.onTrue}>
-        <Iconify icon="custom:menu-duotone" width={24} />
+        <RiMenuFill size={24} />
       </IconButton>
     );
 

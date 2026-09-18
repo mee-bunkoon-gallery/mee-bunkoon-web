@@ -2,6 +2,7 @@
 
 import type { IconButtonProps } from '@mui/material/IconButton';
 
+import { RiCloseLine } from '@remixicon/react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -18,7 +19,6 @@ import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { AnimateBorder } from 'src/components/animate';
 
@@ -140,7 +140,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             position: 'absolute',
           }}
         >
-          <Iconify icon="mingcute:close-line" />
+          <RiCloseLine />
         </IconButton>
 
         <Scrollbar>
@@ -194,7 +194,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   }),
                 ]}
               >
-                <Iconify icon="mingcute:add-line" />
+                <RiAddLine   />
               </IconButton>
             </Tooltip>
           </Box> */}

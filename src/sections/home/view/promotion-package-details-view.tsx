@@ -3,6 +3,7 @@
 import type { IPublicPromotionPackage } from 'src/types/promotion-package';
 
 import { useQuery } from '@tanstack/react-query';
+import { RiArrowLeftSFill, RiShieldCheckFill, RiCheckboxCircleFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -15,7 +16,6 @@ import { RouterLink } from 'src/routes/components';
 import { fBaht } from 'src/utils/format-number';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 async function fetchPromotionPackage(id: string): Promise<IPublicPromotionPackage> {
@@ -67,7 +67,7 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
           component={RouterLink}
           href="/"
           color="inherit"
-          startIcon={<Iconify icon="eva:arrow-ios-back-fill" />}
+          startIcon={<RiArrowLeftSFill />}
           size="small"
           sx={{ mb: { xs: 2, sm: 3 } }}
         >
@@ -243,13 +243,13 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
             <Box sx={{ my: 2.5, borderTop: '1px dashed', borderColor: 'divider' }} />
             <Stack spacing={1.25}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Iconify icon="solar:check-circle-bold" color="success.main" />
+                <Box component={RiCheckboxCircleFill} color="success.main" />
                 <Typography variant="body2">
                   รวมบริการ {promotionPackage.items.length} รายการ
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Iconify icon="solar:shield-check-bold" color="success.main" />
+                <Box component={RiShieldCheckFill} color="success.main" />
                 <Typography variant="body2">รายละเอียดครบตามแพ็กเกจ</Typography>
               </Stack>
             </Stack>

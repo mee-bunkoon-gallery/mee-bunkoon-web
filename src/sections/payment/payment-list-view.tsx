@@ -3,6 +3,7 @@
 import type { IPayment } from 'src/types/payment';
 
 import { useState } from 'react';
+import { RiAddLine, RiEyeFill, RiEditLine, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -27,7 +28,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { TableNoData, TablePaginationCustom } from 'src/components/table';
@@ -90,7 +90,7 @@ export function PaymentListView() {
           component={RouterLink}
           href={paths.dashboard.payment.new}
           variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
+          startIcon={<RiAddLine />}
         >
           ออกใบเสร็จรับเงิน
         </Button>
@@ -148,16 +148,16 @@ export function PaymentListView() {
                         component={RouterLink}
                         href={paths.dashboard.payment.details(payment.id)}
                       >
-                        <Iconify icon="solar:eye-bold" />
+                        <RiEyeFill />
                       </IconButton>
                       <IconButton
                         component={RouterLink}
                         href={paths.dashboard.payment.edit(payment.id)}
                       >
-                        <Iconify icon="solar:pen-bold" />
+                        <RiEditLine />
                       </IconButton>
                       <IconButton color="error" onClick={() => setDeleteTarget(payment)}>
-                        <Iconify icon="solar:trash-bin-trash-bold" />
+                        <RiDeleteBin6Fill />
                       </IconButton>
                     </TableCell>
                   </TableRow>

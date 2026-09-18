@@ -1,6 +1,19 @@
 'use client';
 
+import type { RemixiconComponentType } from '@remixicon/react';
+
 import { useMemo } from 'react';
+import {
+  RiAddLine,
+  RiWallet3Fill,
+  RiFileListFill,
+  RiLineChartFill,
+  RiArrowRightSFill,
+  RiArrowRightUpLine,
+  RiCalendarEventFill,
+  RiCalendarCheckFill,
+  RiMoneyDollarCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -24,7 +37,6 @@ import { fBaht } from 'src/utils/format-number';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
-import { Iconify } from 'src/components/iconify';
 import { Chart, useChart } from 'src/components/chart';
 
 import { useAuthContext } from 'src/auth/hooks';
@@ -66,7 +78,7 @@ function MetricCard({
   title: string;
   value: string;
   caption: string;
-  icon: string;
+  icon: RemixiconComponentType;
   color: 'primary' | 'success' | 'warning' | 'info';
   loading: boolean;
 }) {
@@ -107,11 +119,11 @@ function MetricCard({
             bgcolor: hexAlpha(mainColor, 0.1),
           }}
         >
-          <Iconify icon={icon as any} width={23} />
+          <Box component={icon} sx={{ width: 23, height: 23 }} />
         </Box>
       </Stack>
       <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1.5 }}>
-        <Iconify icon={'solar:graph-up-bold' as any} width={15} sx={{ color: mainColor }} />
+        <Box component={RiLineChartFill} width={15} sx={{ color: mainColor }} />
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {caption}
         </Typography>
@@ -193,7 +205,7 @@ export function OverviewView() {
         </Box>
         <Stack direction="row" spacing={1}>
           <Chip
-            icon={<Iconify icon="solar:calendar-date-bold" width={17} />}
+            icon={<RiCalendarEventFill size={17} />}
             label={fDate(today)}
             variant="outlined"
             sx={{ bgcolor: 'background.paper', height: '40px', px: 2 }}
@@ -202,7 +214,7 @@ export function OverviewView() {
             component={RouterLink}
             href={paths.dashboard.quotation.new}
             variant="contained"
-            startIcon={<Iconify icon="mingcute:add-line" />}
+            startIcon={<RiAddLine />}
           >
             สร้างใบเสนอราคา
           </Button>
@@ -215,7 +227,7 @@ export function OverviewView() {
             title="รายรับทั้งหมด"
             value={fBaht(totalPaid)}
             caption="ยอดรับเงินสะสม"
-            icon="solar:wallet-money-bold"
+            icon={RiWallet3Fill}
             color="primary"
             loading={loading}
           />
@@ -225,7 +237,7 @@ export function OverviewView() {
             title="รายรับเดือนนี้"
             value={fBaht(monthPaid)}
             caption={`${monthPayments.length} รายการในเดือนนี้`}
-            icon="solar:wad-of-money-bold"
+            icon={RiMoneyDollarCircleFill}
             color="success"
             loading={loading}
           />
@@ -235,7 +247,7 @@ export function OverviewView() {
             title="ยอดค้างชำระ"
             value={fBaht(outstanding)}
             caption="จากใบเสนอราคาที่อนุมัติ"
-            icon="solar:bill-list-bold"
+            icon={RiFileListFill}
             color="warning"
             loading={loading}
           />
@@ -245,7 +257,7 @@ export function OverviewView() {
             title="คิวงานที่กำลังมาถึง"
             value={`${upcomingJobs.length} งาน`}
             caption={`${pendingContracts} สัญญารอลงนาม`}
-            icon="solar:calendar-mark-bold"
+            icon={RiCalendarCheckFill}
             color="info"
             loading={loading}
           />
@@ -284,14 +296,14 @@ export function OverviewView() {
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="h6">คิวงานเร็ว ๆ นี้</Typography>
               <IconButton component={RouterLink} href={paths.dashboard.jobQueue.root} size="small">
-                <Iconify icon={'solar:arrow-right-up-linear' as any} />
+                <RiArrowRightUpLine />
               </IconButton>
             </Stack>
             <Stack spacing={2.25} sx={{ mt: 2.5 }}>
               {loading && [1, 2, 3, 4].map((item) => <Skeleton key={item} height={52} />)}
               {!loading && upcomingJobs.length === 0 && (
                 <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary' }}>
-                  <Iconify icon={'solar:calendar-minimalistic-bold-duotone' as any} width={48} />
+                  <RiCalendarEventFill size={48} />
                   <Typography variant="body2" sx={{ mt: 1 }}>
                     ยังไม่มีคิวงานที่กำลังมาถึง
                   </Typography>
@@ -309,7 +321,7 @@ export function OverviewView() {
                         height: 46,
                       }}
                     >
-                      <Iconify icon="solar:calendar-date-bold" />
+                      <RiCalendarEventFill />
                     </Avatar>
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="subtitle2" noWrap>
@@ -400,7 +412,7 @@ export function OverviewView() {
                 href={paths.dashboard.payment.root}
                 color="inherit"
                 size="small"
-                endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+                endIcon={<RiArrowRightSFill />}
               >
                 ดูทั้งหมด
               </Button>
@@ -426,7 +438,7 @@ export function OverviewView() {
                         color: 'success.dark',
                       }}
                     >
-                      <Iconify icon={'solar:card-transfer-bold' as any} width={21} />
+                      <RiMoneyDollarCircleFill size={21} />
                     </Avatar>
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="subtitle2" noWrap>

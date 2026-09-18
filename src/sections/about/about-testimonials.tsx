@@ -3,6 +3,7 @@ import type { IDateValue } from 'src/types/common';
 
 import { m } from 'framer-motion';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiDoubleQuotesL, RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -19,14 +20,13 @@ import { fDate } from 'src/utils/format-time';
 import { _testimonials } from 'src/_mock';
 import { CONFIG } from 'src/global-config';
 
-import { Iconify } from 'src/components/iconify';
 import { varFade, MotionViewport } from 'src/components/animate';
 
 // ----------------------------------------------------------------------
 
 export function AboutTestimonials({ sx, ...other }: BoxProps) {
   const renderLink = () => (
-    <Button color="primary" endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}>
+    <Button color="primary" endIcon={<RiArrowRightSFill />}>
       Read more
     </Button>
   );
@@ -162,7 +162,7 @@ function TestimonialItem({ testimonial, sx, ...other }: TestimonialItemProps) {
       ]}
       {...other}
     >
-      <Iconify icon="mingcute:quote-left-fill" width={40} sx={{ opacity: 0.48 }} />
+      <Box component={RiDoubleQuotesL} width={40} sx={{ opacity: 0.48 }} />
 
       <Typography variant="body2">{testimonial.content}</Typography>
 

@@ -1,9 +1,18 @@
 import type { MegaMenuProps } from 'src/components/mega-menu';
 
+import {
+  RiEditLine,
+  RiGiftFill,
+  RiMailFill,
+  RiHome5Fill,
+  RiImageFill,
+  RiSparklingFill,
+  RiInformationFill,
+} from '@remixicon/react';
+
 import { _mock } from 'src/_mock';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -60,7 +69,7 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
   {
     title: 'Item 1',
     path: '#1', // Root-level link (e.g. "/dashboard/user")
-    icon: <Iconify icon="solar:home-2-outline" />,
+    icon: <RiHome5Fill />,
     slides: Array.from({ length: 16 }, (_, index) => ({
       name: _mock.productName(index),
       coverUrl: _mock.image.product(index),
@@ -107,7 +116,7 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
   {
     title: 'Item 2',
     path: '#2',
-    icon: <Iconify icon="solar:atom-outline" />,
+    icon: <RiSparklingFill />,
     children: [
       { subheader: 'Other machinery & parts', items: arr_1 },
       { subheader: 'Plastic & woodworking', items: arr_2 },
@@ -119,14 +128,14 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
   {
     title: 'Item 3',
     path: '#3',
-    icon: <Iconify icon="solar:chart-square-outline" />,
+    icon: <RiInformationFill />,
     info: <Label color="info">+3</Label>,
     children: [{ items: arr_1 }],
   },
   {
     title: 'Item 4',
     path: '#4',
-    icon: <Iconify icon="solar:confetti-minimalistic-outline" />,
+    icon: <RiGiftFill />,
     info: '+72',
     children: [
       {
@@ -141,7 +150,7 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
   {
     title: 'Item 5',
     path: '/components',
-    icon: <Iconify icon="solar:gallery-circle-outline" />,
+    icon: <RiImageFill />,
     children: [
       {
         items: [
@@ -155,7 +164,7 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
   {
     title: 'Item 6',
     path: '#6',
-    icon: <Iconify icon="solar:hanger-2-outline" />,
+    icon: <RiInformationFill />,
     children: [
       {
         items: [
@@ -166,11 +175,11 @@ export const MEGA_MENU_ITEMS: MegaMenuProps['data'] = [
       },
     ],
   },
-  { title: 'Item 7', path: '/components', icon: <Iconify icon="solar:letter-outline" /> },
+  { title: 'Item 7', path: '/components', icon: <RiMailFill /> },
   {
     title: 'Item 8',
     path: 'https://www.google.com/',
-    icon: <Iconify icon="solar:airbuds-case-open-outline" />,
+    icon: <RiEditLine />,
     disabled: true,
   },
 ];

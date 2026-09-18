@@ -1,9 +1,11 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
+import { RiPhoneFill } from '@remixicon/react';
+
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useColorScheme } from '@mui/material/styles';
 
-import { Iconify } from 'src/components/iconify';
 import {
   Map,
   MapPopup,
@@ -67,7 +69,7 @@ export function ContactMap({ contacts, sx }: ContactMapProps) {
             variant="caption"
             sx={{ mt: 1, display: 'flex', alignItems: 'center' }}
           >
-            <Iconify icon="solar:phone-bold" width={14} sx={{ mr: 0.5 }} />
+            <Box component={RiPhoneFill} width={14} sx={{ mr: 0.5 }} />
             {selectedItem.phoneNumber}
           </Typography>
         </MapPopup>

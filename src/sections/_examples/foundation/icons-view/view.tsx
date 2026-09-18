@@ -1,5 +1,15 @@
 'use client';
 
+import {
+  RiLink,
+  RiGithubFill,
+  RiGoogleFill,
+  RiPaletteFill,
+  RiFacebookFill,
+  RiTwitterXFill,
+  RiInstagramFill,
+} from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
@@ -33,7 +43,6 @@ import {
 } from 'src/assets/illustrations';
 
 import { Logo } from 'src/components/logo';
-import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 import { FlagIcon } from 'src/components/flag-icon';
 import { FileThumbnail } from 'src/components/file-thumbnail';
@@ -70,7 +79,7 @@ const DEMO_COMPONENTS = [
     ),
   },
   {
-    name: 'Iconify icons',
+    name: 'RemixIcon icons',
     description: (
       <>
         <Link component={RouterLink} href="/components/foundation/icons/iconify">
@@ -81,17 +90,17 @@ const DEMO_COMPONENTS = [
     ),
     component: (
       <ComponentBox>
-        <Tooltip title="Iconify">
-          <Iconify width={32} icon="solar:palette-bold-duotone" />
+        <Tooltip title="RemixIcon">
+          <RiPaletteFill size={32} />
         </Tooltip>
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'action.active' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'action.disabled' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'primary.main' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'secondary.main' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'info.main' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'success.main' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'warning.main' }} />
-        <Iconify width={32} icon="solar:palette-bold-duotone" sx={{ color: 'error.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'action.active' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'action.disabled' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'primary.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'secondary.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'info.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'success.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'warning.main' }} />
+        <Box component={RiPaletteFill} width={32} sx={{ color: 'error.main' }} />
       </ComponentBox>
     ),
   },
@@ -143,30 +152,30 @@ const DEMO_COMPONENTS = [
       <ComponentBox sx={{ gap: 3, flexDirection: 'column' }}>
         <Box sx={{ gap: 2, display: 'flex', flexWrap: 'wrap' }}>
           <Tooltip title="Google">
-            <Iconify width={24} icon="socials:google" />
+            <RiGoogleFill size={24} />
           </Tooltip>
-          <Iconify width={24} icon="socials:instagram" />
-          <Iconify width={24} icon="socials:facebook" />
-          <Iconify width={24} icon="socials:linkedin" />
-          <Iconify width={24} icon="socials:twitter" />
-          <Iconify width={24} icon="socials:github" />
+          <RiInstagramFill size={24} />
+          <RiFacebookFill size={24} />
+          <RiLink size={24} />
+          <RiTwitterXFill size={24} />
+          <RiGithubFill size={24} />
         </Box>
 
         <Box sx={{ gap: 2, display: 'flex', flexWrap: 'wrap' }}>
-          <Iconify
+          <Box
+            component={RiGoogleFill}
             width={32}
-            icon="socials:google"
             sx={[(theme) => ({ '--color': theme.vars.palette.primary.main })]}
           />
-          <Iconify
+          <Box
+            component={RiInstagramFill}
             width={32}
-            icon="socials:instagram"
             sx={[(theme) => ({ '--color': theme.vars.palette.warning.main })]}
           />
-          <Iconify width={32} icon="socials:facebook" sx={{ color: 'secondary.main' }} />
-          <Iconify width={32} icon="socials:linkedin" sx={{ color: 'info.main' }} />
-          <Iconify width={32} icon="socials:twitter" sx={[{ color: 'success.main' }]} />
-          <Iconify width={32} icon="socials:github" sx={[{ color: 'error.main' }]} />
+          <Box component={RiFacebookFill} width={32} sx={{ color: 'secondary.main' }} />
+          <Box component={RiLink} width={32} sx={{ color: 'info.main' }} />
+          <Box component={RiTwitterXFill} width={32} sx={[{ color: 'success.main' }]} />
+          <Box component={RiGithubFill} width={32} sx={[{ color: 'error.main' }]} />
         </Box>
       </ComponentBox>
     ),

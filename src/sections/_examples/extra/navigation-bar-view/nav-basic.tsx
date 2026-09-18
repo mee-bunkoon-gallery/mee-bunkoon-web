@@ -1,3 +1,4 @@
+import { RiMenuFill } from '@remixicon/react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -6,7 +7,6 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 
 import { Logo } from 'src/components/logo';
-import { Iconify } from 'src/components/iconify';
 import { NavBasicMobile, NavBasicDesktop } from 'src/components/nav-basic';
 
 import { NAV_BASIC_ITEMS } from './data';
@@ -32,7 +32,7 @@ export function NavBasic() {
         }}
       >
         <IconButton onClick={mobileOpen.onTrue}>
-          <Iconify icon="carbon:menu" />
+          <RiMenuFill />
         </IconButton>
 
         <NavBasicDesktop

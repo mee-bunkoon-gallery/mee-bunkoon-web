@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RiEyeFill, RiEyeOffFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -17,7 +18,6 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
-import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { getErrorMessage } from '../../utils';
@@ -112,7 +112,7 @@ export function SupabaseSignUpView() {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={showPassword.onToggle} edge="end">
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                  {showPassword.value ? <RiEyeFill /> : <RiEyeOffFill />}
                 </IconButton>
               </InputAdornment>
             ),

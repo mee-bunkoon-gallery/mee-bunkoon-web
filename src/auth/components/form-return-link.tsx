@@ -1,10 +1,10 @@
 import type { LinkProps } from '@mui/material/Link';
 
+import { RiArrowLeftSFill } from '@remixicon/react';
+
 import Link from '@mui/material/Link';
 
 import { RouterLink } from 'src/routes/components';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ export function FormReturnLink({ sx, href, label, icon, children, ...other }: Fo
       ]}
       {...other}
     >
-      {icon || <Iconify width={16} icon="eva:arrow-ios-back-fill" />}
+      {icon || <RiArrowLeftSFill size={16} />}
       {label || 'Return to sign in'}
       {children}
     </Link>

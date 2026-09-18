@@ -2,10 +2,11 @@
 
 import type { ButtonProps } from '@mui/material/Button';
 
+import { RiNotification3Fill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
-import { Iconify } from 'src/components/iconify';
 import { toast, snackbarClasses } from 'src/components/snackbar';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
@@ -136,7 +137,7 @@ export function SnackbarView() {
             onClick={() =>
               toast(<Box component="span">Event has been created</Box>, {
                 icon: (
-                  <Iconify width={24} icon="solar:bell-bing-bold" sx={{ color: 'info.main' }} />
+                  <Box component={RiNotification3Fill} width={24} sx={{ color: 'info.main' }} />
                 ),
                 description: <Box component="span">Monday, January 3rd at 6:00pm</Box>,
                 classNames: { icon: snackbarClasses.unset },

@@ -81,7 +81,14 @@ export function RHFUpload({ name, multiple, helperText, ...other }: RHFUploadPro
           setValue(name, value, { shouldValidate: true });
         };
 
-        return <Upload {...uploadProps} value={field.value} onDrop={onDrop} {...other} />;
+        return (
+          <Upload
+            {...uploadProps}
+            value={field.value ?? (multiple ? [] : null)}
+            onDrop={onDrop}
+            {...other}
+          />
+        );
       }}
     />
   );

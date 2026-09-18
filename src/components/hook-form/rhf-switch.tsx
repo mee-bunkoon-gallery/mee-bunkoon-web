@@ -43,7 +43,7 @@ export function RHFSwitch({ name, helperText, label, slotProps, sx, ...other }: 
             control={
               <Switch
                 {...field}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...slotProps?.switch}
                 slotProps={{
                   ...slotProps?.switch?.slotProps,

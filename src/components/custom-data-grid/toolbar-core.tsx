@@ -7,6 +7,7 @@ import type { TextFieldProps } from '@mui/material/TextField';
 import type { IconButtonProps } from '@mui/material/IconButton';
 
 import { usePopover } from 'minimal-shared/hooks';
+import { RiCloseLine, RiSearchFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
@@ -30,8 +31,6 @@ import {
 } from '@mui/x-data-grid';
 
 import { ExportIcon, FilterIcon, ViewColumnsIcon } from 'src/theme/core/components/mui-x-data-grid';
-
-import { Iconify } from '../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -213,13 +212,13 @@ export function CustomToolbarQuickFilter({
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Iconify icon="eva:search-fill" />
+                        <RiSearchFill />
                       </InputAdornment>
                     ),
                     endAdornment: state.value ? (
                       <InputAdornment position="end">
                         <QuickFilterClear edge="end" size="small" aria-label="Clear search">
-                          <Iconify icon="mingcute:close-line" width={16} />
+                          <RiCloseLine size={16} />
                         </QuickFilterClear>
                       </InputAdornment>
                     ) : null,

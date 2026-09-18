@@ -2,6 +2,7 @@ import type { ApiResponse } from './pagination-with-api';
 
 import useSWR from 'swr';
 import { useState, useEffect, useCallback } from 'react';
+import { RiMore2Fill, RiSearchFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -17,7 +18,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { fetcher } from 'src/lib/axios';
 
-import { Iconify } from 'src/components/iconify';
 import {
   useTable,
   TableNoData,
@@ -88,7 +88,7 @@ export function TablePaginationWithApi() {
           input: {
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
               </InputAdornment>
             ),
           },
@@ -165,7 +165,7 @@ export function TablePaginationWithApi() {
                     <TableCell>{row.category}</TableCell>
                     <TableCell align="right">
                       <IconButton>
-                        <Iconify icon="eva:more-vertical-fill" />
+                        <RiMore2Fill />
                       </IconButton>
                     </TableCell>
                   </TableRow>

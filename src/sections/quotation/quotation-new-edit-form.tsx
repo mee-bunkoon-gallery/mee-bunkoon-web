@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { useMemo, useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { RiAddLine, RiGiftFill, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -37,7 +38,6 @@ import { useRouter } from 'src/routes/hooks';
 import { fBaht } from 'src/utils/format-number';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
@@ -367,7 +367,7 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                     variant="contained"
                     disabled={!selectedPackage}
                     onClick={handleAddPackage}
-                    startIcon={<Iconify icon="mingcute:add-line" />}
+                    startIcon={<RiAddLine />}
                     sx={{ flexShrink: 0, minHeight: 54 }}
                   >
                     เพิ่มแพ็กเกจ
@@ -441,7 +441,7 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                                   size="small"
                                   color="primary"
                                   variant="soft"
-                                  icon={<Iconify icon={'solar:gift-bold-duotone' as any} />}
+                                  icon={<RiGiftFill />}
                                   label={`แพ็กเกจ: ${promotionPackage?.name ?? 'แพ็กเกจ/โปรโมชั่น'}`}
                                   sx={{ alignSelf: 'flex-start' }}
                                 />
@@ -465,7 +465,7 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                                 color="error"
                                 onClick={() => handleRemovePackage(promotionPackageId)}
                               >
-                                <Iconify icon="solar:trash-bin-trash-bold" />
+                                <RiDeleteBin6Fill />
                               </IconButton>
                             </TableCell>
                           </TableRow>
@@ -541,7 +541,7 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
                               disabled={fields.length === 1}
                               onClick={() => remove(index)}
                             >
-                              <Iconify icon="solar:trash-bin-trash-bold" />
+                              <RiDeleteBin6Fill />
                             </IconButton>
                           </TableCell>
                         </TableRow>
@@ -553,11 +553,7 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
             </TableContainer>
 
             <Box sx={{ p: 3 }}>
-              <Button
-                size="small"
-                startIcon={<Iconify icon="mingcute:add-line" />}
-                onClick={() => append(emptyItem)}
-              >
+              <Button size="small" startIcon={<RiAddLine />} onClick={() => append(emptyItem)}>
                 เพิ่มรายการ
               </Button>
             </Box>

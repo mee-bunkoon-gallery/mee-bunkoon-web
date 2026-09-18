@@ -2,6 +2,7 @@ import type { UploadProps } from '../types';
 
 import { useDropzone } from 'react-dropzone';
 import { mergeClasses } from 'minimal-shared/utils';
+import { RiCloseLine, RiUploadCloud2Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -10,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { UploadIllustration } from 'src/assets/illustrations';
 
-import { Iconify } from '../../iconify';
 import { uploadClasses } from '../classes';
 import { RejectedFiles } from '../components/rejected-files';
 import { MultiFilePreview } from '../components/multi-file-preview';
@@ -98,7 +98,7 @@ export function Upload({
                 size="small"
                 variant="contained"
                 onClick={onUpload}
-                startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+                startIcon={<RiUploadCloud2Fill />}
                 loading={loading && multiple}
                 loadingPosition="start"
               >
@@ -127,7 +127,7 @@ export function Upload({
 
       {isSingleFileSelected && (
         <DeleteButton size="small" onClick={onDelete}>
-          <Iconify icon="mingcute:close-line" width={16} />
+          <RiCloseLine size={16} />
         </DeleteButton>
       )}
 

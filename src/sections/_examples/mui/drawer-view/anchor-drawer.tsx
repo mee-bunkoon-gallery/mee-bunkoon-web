@@ -1,3 +1,4 @@
+import { RiFileTextFill } from '@remixicon/react';
 import { Fragment, useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
@@ -9,8 +10,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -42,7 +41,7 @@ export function AnchorDrawer() {
     <ListItem key={text} disablePadding>
       <ListItemButton>
         <ListItemIcon>
-          <Iconify icon="solar:file-corrupted-bold-duotone" />
+          <RiFileTextFill />
         </ListItemIcon>
         <ListItemText primary={text} />
       </ListItemButton>

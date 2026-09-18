@@ -155,6 +155,11 @@ export const paths = {
       new: `${ROOTS.DASHBOARD}/packages/new`,
       edit: (id: string) => `${ROOTS.DASHBOARD}/packages/${id}/edit`,
     },
+    heroBanner: {
+      root: `${ROOTS.DASHBOARD}/hero-banners`,
+      new: `${ROOTS.DASHBOARD}/hero-banners/new`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/hero-banners/${id}/edit`,
+    },
     colorTheme: {
       root: `${ROOTS.DASHBOARD}/color-themes`,
     },

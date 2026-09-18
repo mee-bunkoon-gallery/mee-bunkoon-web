@@ -2,14 +2,14 @@
 
 import type { Theme, SxProps } from '@mui/material/styles';
 
+import { RiMailFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -26,7 +26,7 @@ const placeholderStyles: SxProps<Theme> = {
 
 // ----------------------------------------------------------------------
 
-const renderIcon = () => <Iconify icon="solar:letter-bold" width={24} />;
+const renderIcon = () => <RiMailFill size={24} />;
 
 const DEMO_COMPONENTS = [
   {

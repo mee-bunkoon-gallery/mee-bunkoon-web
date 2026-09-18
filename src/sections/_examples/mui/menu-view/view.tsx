@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { RiMore2Fill } from '@remixicon/react';
 import { usePopover } from 'minimal-shared/hooks';
 
 import Menu from '@mui/material/Menu';
@@ -9,8 +10,6 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -121,7 +120,7 @@ export function MenuView() {
             onClick={maxHeightMenu.onOpen}
             color={maxHeightMenu.open ? 'inherit' : 'default'}
           >
-            <Iconify icon="eva:more-vertical-fill" />
+            <RiMore2Fill />
           </IconButton>
 
           <Menu

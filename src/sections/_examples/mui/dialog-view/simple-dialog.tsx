@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
+import { RiAddLine, RiUser3Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,8 +10,6 @@ import Typography from '@mui/material/Typography';
 import DialogTitle from '@mui/material/DialogTitle';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +44,7 @@ export function SimpleDialog() {
             <li key={email}>
               <ListItemButton onClick={() => handleClose(email)}>
                 <Avatar sx={{ mr: 2, color: 'info.lighter', bgcolor: 'info.darker' }}>
-                  <Iconify icon="solar:user-rounded-bold" />
+                  <RiUser3Fill />
                 </Avatar>
                 <ListItemText primary={email} />
               </ListItemButton>
@@ -55,7 +54,7 @@ export function SimpleDialog() {
           <li>
             <ListItemButton autoFocus onClick={() => handleClose('addAccount')}>
               <Avatar sx={{ mr: 2 }}>
-                <Iconify icon="mingcute:add-line" />
+                <RiAddLine />
               </Avatar>
               <ListItemText primary="Add account" />
             </ListItemButton>

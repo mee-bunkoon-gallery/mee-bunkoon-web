@@ -2,14 +2,13 @@
 
 import { useState, useCallback } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiVolumeUpFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import Divider from '@mui/material/Divider';
 
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -70,9 +69,9 @@ export function SliderView() {
       name: 'Volume',
       component: (
         <ComponentBox sx={{ flexWrap: 'unset' }}>
-          <Iconify width={24} icon="solar:volume-bold" />
+          <RiVolumeUpFill size={24} />
           <Slider value={value} onChange={handleChangeValue} aria-labelledby="continuous-slider" />
-          <Iconify width={24} icon="solar:volume-loud-bold" />
+          <RiVolumeUpFill size={24} />
         </ComponentBox>
       ),
     },

@@ -1,4 +1,5 @@
 import { Fragment, useCallback } from 'react';
+import { RiDeleteBin6Fill, RiEmotionHappyFill, RiCheckboxCircleFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -6,8 +7,6 @@ import Avatar from '@mui/material/Avatar';
 
 import { _mock } from 'src/_mock';
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, contentStyles } from '../../layout';
 
@@ -55,8 +54,8 @@ export function ChipVariant({ variant }: Props) {
             variant={variant}
             label="Custom icon"
             onDelete={handleDelete}
-            icon={<Iconify width={24} icon="eva:smiling-face-fill" />}
-            deleteIcon={<Iconify icon="eva:checkmark-fill" />}
+            icon={<RiEmotionHappyFill size={24} />}
+            deleteIcon={<RiCheckboxCircleFill />}
           />
 
           <Chip
@@ -65,7 +64,7 @@ export function ChipVariant({ variant }: Props) {
             label="Custom icon"
             onDelete={handleDelete}
             avatar={<Avatar>M</Avatar>}
-            deleteIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
+            deleteIcon={<RiDeleteBin6Fill />}
           />
         </ComponentBox>
 
@@ -75,7 +74,7 @@ export function ChipVariant({ variant }: Props) {
             variant={variant}
             label="Disabled"
             onDelete={handleDelete}
-            icon={<Iconify width={24} icon="eva:smiling-face-fill" />}
+            icon={<RiEmotionHappyFill size={24} />}
           />
           <Chip
             disabled
@@ -109,7 +108,7 @@ export function ChipVariant({ variant }: Props) {
             variant={variant}
             label="Medium"
             onDelete={handleDelete}
-            icon={<Iconify width={24} icon="eva:smiling-face-fill" />}
+            icon={<RiEmotionHappyFill size={24} />}
           />
         </ComponentBox>
       </Box>

@@ -1,4 +1,12 @@
 import { useState, useCallback } from 'react';
+import {
+  RiListCheck2,
+  RiPaletteFill,
+  RiArrowDownSFill,
+  RiLayoutGridFill,
+  RiInformationFill,
+  RiCheckboxCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -6,8 +14,6 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, contentStyles } from '../../layout';
 
@@ -18,44 +24,44 @@ const COLORS = ['standard', ...colorKeys.palette] as const;
 
 const viewContent = () => [
   <ToggleButton key="list" value="list">
-    <Iconify icon="ic:round-view-list" />
+    <RiListCheck2 />
   </ToggleButton>,
   <ToggleButton key="module" value="module">
-    <Iconify icon="ic:round-view-module" />
+    <RiLayoutGridFill />
   </ToggleButton>,
   <ToggleButton key="quilt" value="quilt">
-    <Iconify icon="ic:round-view-quilt" />
+    <RiLayoutGridFill />
   </ToggleButton>,
 ];
 
 const alignContent = () => [
   <ToggleButton key="left" value="left">
-    <Iconify icon="ic:round-format-align-left" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="center" value="center">
-    <Iconify icon="ic:round-format-align-center" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="right" value="right">
-    <Iconify icon="ic:round-format-align-right" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="justify" value="justify" disabled>
-    <Iconify icon="ic:round-format-align-justify" />
+    <RiInformationFill />
   </ToggleButton>,
 ];
 
 const formatContent = () => [
   <ToggleButton key="bold" value="bold">
-    <Iconify icon="ic:round-format-bold" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="italic" value="italic">
-    <Iconify icon="ic:round-format-italic" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="underlined" value="underlined">
-    <Iconify icon="ic:round-format-underlined" />
+    <RiInformationFill />
   </ToggleButton>,
   <ToggleButton key="color" value="color" disabled>
-    <Iconify icon="ic:baseline-format-color-fill" />
-    <Iconify icon="ic:baseline-arrow-drop-down" />
+    <RiPaletteFill />
+    <RiArrowDownSFill />
   </ToggleButton>,
 ];
 
@@ -109,7 +115,7 @@ export function ToggleButtons() {
           <Box sx={contentStyles.row()}>
             {SIZES.map((size, index) => (
               <ToggleButton key={size} size={size} value="check">
-                <Iconify icon="eva:checkmark-fill" width={20 + index * 2} />
+                <RiCheckboxCircleFill size={20 + index * 2} />
               </ToggleButton>
             ))}
           </Box>
@@ -130,10 +136,10 @@ export function ToggleButtons() {
         <ComponentBox title="Disabled">
           <Box sx={contentStyles.row()}>
             <ToggleButton value="check" disabled>
-              <Iconify icon="eva:checkmark-fill" />
+              <RiCheckboxCircleFill />
             </ToggleButton>
             <ToggleButton value="check" disabled selected>
-              <Iconify icon="eva:checkmark-fill" />
+              <RiCheckboxCircleFill />
             </ToggleButton>
           </Box>
 
@@ -171,7 +177,7 @@ export function ToggleButtons() {
               setSelected(!selected);
             }}
           >
-            <Iconify icon="eva:checkmark-fill" />
+            <RiCheckboxCircleFill />
           </ToggleButton>
         ))}
       </ComponentBox>
@@ -187,7 +193,7 @@ export function ToggleButtons() {
         </ToggleButtonGroup>
 
         <ToggleButton value="check" selected={selected} onChange={() => setSelected(!selected)}>
-          <Iconify icon="eva:checkmark-fill" /> Label
+          <RiCheckboxCircleFill /> Label
         </ToggleButton>
       </ComponentBox>
     </>

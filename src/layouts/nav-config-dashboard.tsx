@@ -1,11 +1,12 @@
 import type { NavSectionProps } from 'src/components/nav-section';
 
+import { RiArrowRightUpLine, RiNotification3Fill } from '@remixicon/react';
+
 import { paths } from 'src/routes/paths';
 
 import { CONFIG } from 'src/global-config';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -243,11 +244,7 @@ export const navData: NavSectionProps['data'] = [
         path: '#label',
         icon: ICONS.label,
         info: (
-          <Label
-            color="info"
-            variant="inverted"
-            startIcon={<Iconify icon="solar:bell-bing-bold-duotone" />}
-          >
+          <Label color="info" variant="inverted" startIcon={<RiNotification3Fill />}>
             NEW
           </Label>
         ),
@@ -274,7 +271,7 @@ export const navData: NavSectionProps['data'] = [
         title: 'External link',
         path: 'https://www.google.com/',
         icon: ICONS.external,
-        info: <Iconify width={18} icon="eva:external-link-fill" />,
+        info: <RiArrowRightUpLine size={18} />,
       },
       { title: 'Blank', path: paths.dashboard.blank, icon: ICONS.blank },
     ],

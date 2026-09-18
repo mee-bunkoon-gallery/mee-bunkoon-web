@@ -3,6 +3,7 @@
 import type { TooltipProps } from '@mui/material/Tooltip';
 
 import { m } from 'framer-motion';
+import { RiAddLine, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Fab from '@mui/material/Fab';
 import Zoom from '@mui/material/Zoom';
@@ -12,7 +13,6 @@ import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
-import { Iconify } from 'src/components/iconify';
 import { varTap, varHover, transitionTap } from 'src/components/animate';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
@@ -57,19 +57,19 @@ const DEMO_COMPONENTS = [
       <ComponentBox>
         <Tooltip title="Delete">
           <IconButton>
-            <Iconify width={24} icon="solar:trash-bin-trash-bold" />
+            <RiDeleteBin6Fill size={24} />
           </IconButton>
         </Tooltip>
 
         <Tooltip title="Add">
           <Fab>
-            <Iconify width={24} icon="mingcute:add-line" />
+            <RiAddLine size={24} />
           </Fab>
         </Tooltip>
 
         <Tooltip title="Delete">
           <IconButton color="info">
-            <Iconify width={24} icon="solar:trash-bin-trash-bold" />
+            <RiDeleteBin6Fill size={24} />
           </IconButton>
         </Tooltip>
 
@@ -81,7 +81,7 @@ const DEMO_COMPONENTS = [
             transition={transitionTap()}
             color="info"
           >
-            <Iconify width={24} icon="mingcute:add-line" />
+            <RiAddLine size={24} />
           </Fab>
         </Tooltip>
 
@@ -99,7 +99,7 @@ const DEMO_COMPONENTS = [
       <ComponentBox>
         <Tooltip title="Add" arrow>
           <Fab>
-            <Iconify width={24} icon="mingcute:add-line" />
+            <RiAddLine size={24} />
           </Fab>
         </Tooltip>
       </ComponentBox>

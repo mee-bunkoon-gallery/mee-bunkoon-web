@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { RiStarFill, RiHeartFill } from '@remixicon/react';
 
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
@@ -8,8 +9,6 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -156,8 +155,8 @@ export function CheckboxView() {
               <Checkbox
                 color="info"
                 size="small"
-                icon={<Iconify icon="solar:heart-bold" />}
-                checkedIcon={<Iconify icon="solar:heart-bold" />}
+                icon={<RiHeartFill />}
+                checkedIcon={<RiHeartFill />}
                 slotProps={{
                   input: {
                     id: 'favorite-checkbox',
@@ -173,8 +172,8 @@ export function CheckboxView() {
               <Checkbox
                 color="error"
                 size="small"
-                icon={<Iconify icon="eva:award-fill" />}
-                checkedIcon={<Iconify icon="eva:award-fill" />}
+                icon={<RiStarFill />}
+                checkedIcon={<RiStarFill />}
                 slotProps={{
                   input: {
                     id: 'award-checkbox',

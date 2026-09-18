@@ -2,6 +2,7 @@
 
 import { varAlpha } from 'minimal-shared/utils';
 import { useCountdownDate } from 'minimal-shared/hooks';
+import { RiLink, RiFacebookFill, RiTwitterXFill, RiInstagramFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -15,8 +16,6 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
 import { _socials } from 'src/_mock';
 import { ComingSoonIllustration } from 'src/assets/illustrations';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -78,10 +77,10 @@ export function ComingSoonView() {
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         {_socials.map((social) => (
           <IconButton key={social.label}>
-            {social.value === 'twitter' && <Iconify icon="socials:twitter" />}
-            {social.value === 'facebook' && <Iconify icon="socials:facebook" />}
-            {social.value === 'instagram' && <Iconify icon="socials:instagram" />}
-            {social.value === 'linkedin' && <Iconify icon="socials:linkedin" />}
+            {social.value === 'twitter' && <RiTwitterXFill />}
+            {social.value === 'facebook' && <RiFacebookFill />}
+            {social.value === 'instagram' && <RiInstagramFill />}
+            {social.value === 'linkedin' && <RiLink />}
           </IconButton>
         ))}
       </Box>

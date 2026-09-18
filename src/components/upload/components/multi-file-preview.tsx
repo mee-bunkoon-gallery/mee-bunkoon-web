@@ -1,6 +1,7 @@
 import type { UploadProps, FilesUploadType } from '../types';
 import type { FileThumbnailProps } from '../../file-thumbnail';
 
+import { RiCloseLine } from '@remixicon/react';
 import { varAlpha, mergeClasses } from 'minimal-shared/utils';
 
 import { styled } from '@mui/material/styles';
@@ -9,7 +10,6 @@ import ListItemText from '@mui/material/ListItemText';
 
 import { fData } from 'src/utils/format-number';
 
-import { Iconify } from '../../iconify';
 import { uploadClasses } from '../classes';
 import { getFileMeta, FileThumbnail, useFilesPreview } from '../../file-thumbnail';
 
@@ -88,7 +88,7 @@ export function MultiFilePreview({
 
           {onRemove && (
             <IconButton size="small" onClick={() => onRemove(file)}>
-              <Iconify width={16} icon="mingcute:close-line" />
+              <RiCloseLine size={16} />
             </IconButton>
           )}
         </PreviewItem>

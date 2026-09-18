@@ -3,6 +3,14 @@
 import type { TimelineDotProps } from '@mui/lab/TimelineDot';
 
 import { varAlpha } from 'minimal-shared/utils';
+import {
+  RiImageFill,
+  RiListCheck2,
+  RiPaletteFill,
+  RiFolderAddFill,
+  RiPlayCircleFill,
+  RiInformationFill,
+} from '@remixicon/react';
 
 import Paper from '@mui/material/Paper';
 import Timeline from '@mui/lab/Timeline';
@@ -13,8 +21,6 @@ import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -35,7 +41,7 @@ const TIMELINES: TimelineType[] = [
     title: 'Default',
     des: 'Morbi mattis ullamcorper',
     time: '09:30 am',
-    icon: <Iconify width={24} icon="solar:add-folder-bold" />,
+    icon: <RiFolderAddFill size={24} />,
   },
   {
     key: 2,
@@ -43,7 +49,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '10:00 am',
     color: 'primary',
-    icon: <Iconify width={24} icon="solar:gallery-wide-bold" />,
+    icon: <RiImageFill size={24} />,
   },
   {
     key: 3,
@@ -51,7 +57,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '10:00 am',
     color: 'secondary',
-    icon: <Iconify width={24} icon="solar:palette-bold" />,
+    icon: <RiPaletteFill size={24} />,
   },
   {
     key: 4,
@@ -59,7 +65,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '10:30 am',
     color: 'info',
-    icon: <Iconify width={24} icon="solar:tv-bold" />,
+    icon: <RiInformationFill size={24} />,
   },
   {
     key: 5,
@@ -67,7 +73,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '11:00 am',
     color: 'success',
-    icon: <Iconify width={24} icon="eva:activity-fill" />,
+    icon: <RiInformationFill size={24} />,
   },
   {
     key: 6,
@@ -75,7 +81,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '11:30 am',
     color: 'warning',
-    icon: <Iconify width={24} icon="solar:box-minimalistic-bold" />,
+    icon: <RiListCheck2 size={24} />,
   },
   {
     key: 7,
@@ -83,7 +89,7 @@ const TIMELINES: TimelineType[] = [
     des: 'Morbi mattis ullamcorper',
     time: '12:00 am',
     color: 'error',
-    icon: <Iconify width={24} icon="solar:video-frame-play-horizontal-bold" />,
+    icon: <RiPlayCircleFill size={24} />,
   },
 ];
 

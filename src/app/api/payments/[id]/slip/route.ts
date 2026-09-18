@@ -74,9 +74,7 @@ export async function POST(request: Request, { params }: Params) {
     await supabase.storage.from(BUCKET).remove([current.slip_path]);
   }
 
-  const { data: signed } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(path, SLIP_URL_TTL);
+  const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, SLIP_URL_TTL);
 
   return NextResponse.json({ slipUrl: signed?.signedUrl ?? null });
 }

@@ -1,12 +1,12 @@
 import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 
 import { varAlpha } from 'minimal-shared/utils';
+import { RiStarFill, RiInformationFill } from '@remixicon/react';
 
+import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
-
-import { Iconify } from '../../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -57,15 +57,15 @@ export function LargeBlock({
       <LargeLabel>
         {canReset && (
           <ButtonBase disableRipple onClick={onReset} sx={{ ml: -0.5, mr: 0.5 }}>
-            <Iconify width={14} icon="solar:restart-bold" sx={{ opacity: 0.64 }} />
+            <Box component={RiStarFill} width={14} sx={{ opacity: 0.64 }} />
           </ButtonBase>
         )}
         {title}
         {tooltip && (
           <Tooltip title={tooltip} placement="right" arrow>
-            <Iconify
+            <Box
+              component={RiInformationFill}
               width={14}
-              icon="eva:info-outline"
               sx={{ ml: 0.5, mr: -0.5, opacity: 0.48, cursor: 'pointer' }}
             />
           </Tooltip>
@@ -123,7 +123,7 @@ export function SmallBlock({ label, canReset, onReset, sx, children, ...other }:
   return (
     <SmallBlockRoot sx={sx} {...other}>
       <SmallLabel disableRipple canReset={canReset} onClick={canReset ? onReset : undefined}>
-        {canReset && <Iconify width={14} icon="solar:restart-bold" />}
+        {canReset && <RiStarFill size={14} />}
         {label}
       </SmallLabel>
       {children}

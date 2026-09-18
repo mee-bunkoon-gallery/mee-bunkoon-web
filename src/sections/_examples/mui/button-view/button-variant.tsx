@@ -1,11 +1,10 @@
 import { upperFirst } from 'es-toolkit';
+import { RiMailFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, contentStyles } from '../../layout';
 
@@ -21,7 +20,7 @@ type Props = {
 };
 
 export function ButtonVariant({ variant }: Props) {
-  const renderIcon = () => <Iconify icon="solar:letter-outline" />;
+  const renderIcon = () => <RiMailFill />;
 
   return (
     <>

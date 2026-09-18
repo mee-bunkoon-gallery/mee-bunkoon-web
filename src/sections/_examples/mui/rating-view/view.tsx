@@ -3,12 +3,11 @@
 import type { IconContainerProps } from '@mui/material/Rating';
 
 import { useState } from 'react';
+import { RiTimeFill, RiHeartFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import Tooltip from '@mui/material/Tooltip';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -37,11 +36,11 @@ const CUSTOM_ICONS: {
     label: string;
   };
 } = {
-  1: { icon: <Iconify icon="ic:round-sentiment-very-dissatisfied" />, label: 'Very Dissatisfied' },
-  2: { icon: <Iconify icon="ic:round-sentiment-dissatisfied" />, label: 'Dissatisfied' },
-  3: { icon: <Iconify icon="ic:round-sentiment-neutral" />, label: 'Neutral' },
-  4: { icon: <Iconify icon="ic:round-sentiment-satisfied" />, label: 'Satisfied' },
-  5: { icon: <Iconify icon="ic:round-sentiment-very-satisfied" />, label: 'Very Satisfied' },
+  1: { icon: <RiTimeFill />, label: 'Very Dissatisfied' },
+  2: { icon: <RiTimeFill />, label: 'Dissatisfied' },
+  3: { icon: <RiTimeFill />, label: 'Neutral' },
+  4: { icon: <RiTimeFill />, label: 'Satisfied' },
+  5: { icon: <RiTimeFill />, label: 'Very Satisfied' },
 };
 
 // ----------------------------------------------------------------------
@@ -88,8 +87,8 @@ export function RatingView() {
             defaultValue={2}
             getLabelText={(ratingValue) => `${ratingValue} Heart${ratingValue !== 1 ? 's' : ''}`}
             precision={0.5}
-            icon={<Iconify icon="solar:heart-bold" />}
-            emptyIcon={<Iconify icon="solar:heart-bold" />}
+            icon={<RiHeartFill />}
+            emptyIcon={<RiHeartFill />}
             sx={{ color: 'info.main', '&:hover': { color: 'info.dark' } }}
           />
 

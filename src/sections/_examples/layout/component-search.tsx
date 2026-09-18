@@ -2,6 +2,7 @@ import type { Theme, SxProps } from '@mui/material/styles';
 import type { NavItemData } from './nav-config-components';
 
 import { useState, useCallback } from 'react';
+import { RiSearchFill } from '@remixicon/react';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { isEqualPath } from 'minimal-shared/utils';
@@ -16,7 +17,6 @@ import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
 import { RouterLink } from 'src/routes/components';
 import { useRouter, usePathname } from 'src/routes/hooks';
 
-import { Iconify } from 'src/components/iconify';
 import { SearchNotFound } from 'src/components/search-not-found';
 
 // ----------------------------------------------------------------------
@@ -96,7 +96,7 @@ export function NavSearch({ navData = [], sx }: NavSearchProps) {
               ...params.InputProps,
               startAdornment: (
                 <InputAdornment position="start">
-                  <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                  <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
                 </InputAdornment>
               ),
             },

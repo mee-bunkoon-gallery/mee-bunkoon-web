@@ -67,7 +67,10 @@ export function parseContractClauses(raw: string | null | undefined): IContractC
   try {
     const parsed = JSON.parse(raw);
 
-    if (Array.isArray(parsed) && parsed.every((item) => item && typeof item === 'object' && 'body' in item)) {
+    if (
+      Array.isArray(parsed) &&
+      parsed.every((item) => item && typeof item === 'object' && 'body' in item)
+    ) {
       return parsed.map((item, index) => ({
         id: typeof item.id === 'string' && item.id ? item.id : `clause-${index}`,
         title: typeof item.title === 'string' ? item.title : '',
@@ -135,7 +138,10 @@ const MENTION_TOKEN_REGEX = /\{\{\s*([a-z_]+)\s*\}\}/gi;
  * clause title) — for clause-body/scope HTML, use `resolveContractMentionHtml` instead so
  * the resolved value can be bolded.
  */
-export function resolveContractMentionTokens(text: string, context: ContractMentionContext): string {
+export function resolveContractMentionTokens(
+  text: string,
+  context: ContractMentionContext
+): string {
   if (!text) return text;
 
   return text.replace(MENTION_TOKEN_REGEX, (match, key: string) => context[key] ?? match);

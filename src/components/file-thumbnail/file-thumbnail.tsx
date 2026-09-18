@@ -3,10 +3,10 @@
 import type { FileThumbnailProps } from './types';
 
 import { mergeClasses } from 'minimal-shared/utils';
+import { RiCloseLine, RiDownloadCloud2Fill } from '@remixicon/react';
 
 import Tooltip from '@mui/material/Tooltip';
 
-import { Iconify } from '../iconify';
 import { fileThumbnailClasses } from './classes';
 import { getFileMeta, getFileIcon } from './utils';
 import { useFilePreview } from './use-file-preview';
@@ -63,7 +63,7 @@ export function FileThumbnail({
           className={fileThumbnailClasses.removeBtn}
           {...slotProps?.removeBtn}
         >
-          <Iconify icon="mingcute:close-line" width={12} />
+          <RiCloseLine size={12} />
         </RemoveButton>
       )}
 
@@ -73,7 +73,7 @@ export function FileThumbnail({
           className={fileThumbnailClasses.downloadBtn}
           {...slotProps?.downloadBtn}
         >
-          <Iconify width={24} icon="eva:cloud-download-fill" />
+          <RiDownloadCloud2Fill size={24} />
         </DownloadButton>
       )}
     </>

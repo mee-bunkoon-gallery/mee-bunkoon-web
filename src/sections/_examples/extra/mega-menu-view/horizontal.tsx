@@ -1,9 +1,16 @@
+import {
+  RiGiftFill,
+  RiHome5Fill,
+  RiImageFill,
+  RiSparklingFill,
+  RiInformationFill,
+} from '@remixicon/react';
+
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { MegaMenuHorizontal } from 'src/components/mega-menu';
 
 import { MEGA_MENU_ITEMS_WITH_RENDER } from './data';
@@ -56,11 +63,11 @@ export function DemoMegaMenuHorizontal() {
 // ----------------------------------------------------------------------
 
 const NAV_ICONS = {
-  'icon.item1': <Iconify icon="solar:home-2-outline" />,
-  'icon.item2': <Iconify icon="solar:atom-outline" />,
-  'icon.item3': <Iconify icon="solar:chart-square-outline" />,
-  'icon.item4': <Iconify icon="solar:confetti-minimalistic-outline" />,
-  'icon.item5': <Iconify icon="solar:gallery-circle-outline" />,
+  'icon.item1': <RiHome5Fill />,
+  'icon.item2': <RiSparklingFill />,
+  'icon.item3': <RiInformationFill />,
+  'icon.item4': <RiGiftFill />,
+  'icon.item5': <RiImageFill />,
 };
 
 const NAV_INFO = (val: string) => ({

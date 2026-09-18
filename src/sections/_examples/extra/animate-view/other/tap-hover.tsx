@@ -1,4 +1,5 @@
 import { m } from 'framer-motion';
+import { RiAddLine } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
@@ -7,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 
 import { _mock } from 'src/_mock';
 
-import { Iconify } from 'src/components/iconify';
 import { varTap, varHover, transitionTap, transitionHover } from 'src/components/animate';
 
 import { contentStyles } from '../../../layout';
@@ -38,13 +38,13 @@ export function AnimateTapHover() {
   const renderFabs = () => (
     <Box sx={contentStyles.row()}>
       <Fab {...buttonProps} whileHover={varHover()} whileTap={varTap()} size="small">
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </Fab>
       <Fab {...buttonProps} whileHover={varHover()} whileTap={varTap()} size="medium">
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </Fab>
       <Fab {...buttonProps} whileHover={varHover(1.08)} whileTap={varTap()}>
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </Fab>
     </Box>
   );
@@ -52,13 +52,13 @@ export function AnimateTapHover() {
   const renderIconButtons = () => (
     <Box sx={contentStyles.row()}>
       <IconButton {...buttonProps} whileHover={varHover()} whileTap={varTap()} size="small">
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </IconButton>
       <IconButton {...buttonProps} whileHover={varHover()} whileTap={varTap()}>
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </IconButton>
       <IconButton {...buttonProps} whileHover={varHover()} whileTap={varTap()} size="large">
-        <Iconify width={24} icon="mingcute:add-line" />
+        <RiAddLine size={24} />
       </IconButton>
     </Box>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiArrowDownSFill } from '@remixicon/react';
 
 import Paper from '@mui/material/Paper';
 import Switch from '@mui/material/Switch';
@@ -12,8 +13,6 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Accordion, { accordionClasses } from '@mui/material/Accordion';
 
 import { _mock } from 'src/_mock';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -179,7 +178,7 @@ export function AccordionView() {
               >
                 <AccordionSummary
                   {...getA11yProps('standalone', item.id)}
-                  expandIcon={<Iconify icon="eva:arrow-ios-downward-fill" />}
+                  expandIcon={<RiArrowDownSFill />}
                 >
                   {renderTitle(item.title, item.disabled)}
                 </AccordionSummary>

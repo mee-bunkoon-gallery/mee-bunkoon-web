@@ -1,10 +1,23 @@
 import type { NavSectionProps } from 'src/components/nav-section';
 
+import {
+  RiGiftFill,
+  RiGroupFill,
+  RiHome5Fill,
+  RiImageFill,
+  RiListCheck2,
+  RiArchiveFill,
+  RiPaletteFill,
+  RiFileTextFill,
+  RiPriceTag3Fill,
+  RiSettings3Fill,
+  RiCalendarEventFill,
+  RiMoneyDollarCircleFill,
+} from '@remixicon/react';
+
 import { paths } from 'src/routes/paths';
 
 import { DashboardLayout } from 'src/layouts/dashboard';
-
-import { Iconify } from 'src/components/iconify';
 
 import { AuthGuard } from 'src/auth/guard';
 
@@ -17,7 +30,7 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'ภาพรวม',
         path: paths.dashboard.root,
-        icon: <Iconify icon="solar:home-angle-bold-duotone" />,
+        icon: <RiHome5Fill />,
       },
     ],
   },
@@ -28,7 +41,7 @@ const navData: NavSectionProps['data'] = [
         title: 'ลงคิวงาน',
         path: paths.dashboard.jobQueue.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:calendar-date-bold" />,
+        icon: <RiCalendarEventFill />,
       },
     ],
   },
@@ -39,25 +52,25 @@ const navData: NavSectionProps['data'] = [
         title: 'ใบเสนอราคา',
         path: paths.dashboard.quotation.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:file-text-bold" />,
+        icon: <RiFileTextFill />,
       },
       {
         title: 'สัญญาจ้างจัดงาน',
         path: paths.dashboard.contract.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:file-check-bold-duotone" />,
+        icon: <RiFileTextFill />,
       },
       {
         title: 'ใบเสร็จรับเงิน',
         path: paths.dashboard.payment.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:wad-of-money-bold" />,
+        icon: <RiMoneyDollarCircleFill />,
       },
       {
         title: 'เอกสารส่งมอบงาน',
         path: paths.dashboard.delivery.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:inbox-in-bold-duotone" />,
+        icon: <RiArchiveFill />,
       },
     ],
   },
@@ -68,29 +81,34 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'ลูกค้า',
         path: paths.dashboard.customer.root,
-        icon: <Iconify icon="solar:users-group-rounded-bold-duotone" />,
+        icon: <RiGroupFill />,
       },
       {
         title: 'รายการบริการ',
         path: paths.dashboard.service.root,
         deepMatch: true,
-        icon: <Iconify icon="solar:box-minimalistic-bold" />,
+        icon: <RiListCheck2 />,
       },
       {
         title: 'แพ็กเกจ/โปรโมชั่น',
         path: paths.dashboard.promotionPackage.root,
         deepMatch: true,
-        icon: <Iconify icon={'solar:gift-bold-duotone' as any} />,
+        icon: <RiGiftFill />,
+      },
+      {
+        title: 'แบนเนอร์',
+        path: paths.dashboard.heroBanner.root,
+        icon: <RiImageFill />,
       },
       {
         title: 'โทนสี',
         path: paths.dashboard.colorTheme.root,
-        icon: <Iconify icon="solar:pallete-2-bold-duotone" />,
+        icon: <RiPaletteFill />,
       },
       {
         title: 'ประเภทงาน',
         path: paths.dashboard.eventType.root,
-        icon: <Iconify icon="solar:tag-horizontal-bold-duotone" />,
+        icon: <RiPriceTag3Fill />,
       },
     ],
   },
@@ -100,7 +118,7 @@ const navData: NavSectionProps['data'] = [
       {
         title: 'ข้อมูลผู้เสนอราคา',
         path: paths.dashboard.settings.company,
-        icon: <Iconify icon="solar:settings-bold-duotone" />,
+        icon: <RiSettings3Fill />,
       },
     ],
   },

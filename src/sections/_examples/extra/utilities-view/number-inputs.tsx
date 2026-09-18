@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { RiInformationFill } from '@remixicon/react';
 
-import { Iconify } from 'src/components/iconify';
 import { NumberInput } from 'src/components/number-input';
 
 import { ComponentBox } from '../../layout';
@@ -29,7 +29,7 @@ export function NumberInputs() {
           max={999999}
           captionText={
             <>
-              <Iconify width={16} icon="solar:bed-bold" />
+              <RiInformationFill size={16} />
               Bedrooms
             </>
           }
@@ -47,7 +47,7 @@ export function NumberInputs() {
           hideDivider
           captionText={
             <>
-              <Iconify width={16} icon="solar:bed-bold" />
+              <RiInformationFill size={16} />
               Bedrooms
             </>
           }

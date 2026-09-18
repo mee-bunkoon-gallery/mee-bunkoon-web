@@ -5,6 +5,7 @@ import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 
 import { useState, useCallback } from 'react';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiAddLine, RiArrowDownSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -16,7 +17,6 @@ import ButtonBase from '@mui/material/ButtonBase';
 import Button, { buttonClasses } from '@mui/material/Button';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { CustomPopover } from 'src/components/custom-popover';
 
@@ -106,7 +106,7 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
         {workspace?.plan}
       </Label>
 
-      <Iconify width={16} icon="carbon:chevron-sort" sx={{ color: 'text.disabled' }} />
+      <Box component={RiArrowDownSFill} width={16} sx={{ color: 'text.disabled' }} />
     </ButtonBase>
   );
 
@@ -150,7 +150,7 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
 
       <Button
         fullWidth
-        startIcon={<Iconify width={18} icon="mingcute:add-line" />}
+        startIcon={<RiAddLine size={18} />}
         onClick={() => {
           onClose();
         }}

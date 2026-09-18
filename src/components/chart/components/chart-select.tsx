@@ -5,12 +5,12 @@ import type { CustomPopoverProps } from '../../custom-popover';
 
 import { varAlpha } from 'minimal-shared/utils';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiArrowUpSFill, RiArrowDownSFill } from '@remixicon/react';
 
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ButtonBase from '@mui/material/ButtonBase';
 
-import { Iconify } from '../../iconify';
 import { CustomPopover } from '../../custom-popover';
 
 // ----------------------------------------------------------------------
@@ -68,10 +68,7 @@ export function ChartSelect({ options, value, onChange, slotProps, ...other }: C
       >
         {value}
 
-        <Iconify
-          width={16}
-          icon={open ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
-        />
+        {open ? <RiArrowUpSFill size={16} /> : <RiArrowDownSFill size={16} />}
       </ButtonBase>
 
       {renderMenuActions()}

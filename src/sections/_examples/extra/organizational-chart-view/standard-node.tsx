@@ -1,6 +1,7 @@
 import type { NodeProps } from './data';
 
 import { usePopover } from 'minimal-shared/hooks';
+import { RiEditLine, RiMoreFill, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
@@ -10,7 +11,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
@@ -37,12 +37,12 @@ export function StandardNode({ name, avatarUrl, role, sx }: NodeProps) {
     >
       <MenuList>
         <MenuItem onClick={onDelete} sx={{ color: 'error.main' }}>
-          <Iconify icon="solar:trash-bin-trash-bold" />
+          <RiDeleteBin6Fill />
           Delete
         </MenuItem>
 
         <MenuItem onClick={onEdit}>
-          <Iconify icon="solar:pen-bold" />
+          <RiEditLine />
           Edit
         </MenuItem>
       </MenuList>
@@ -70,7 +70,7 @@ export function StandardNode({ name, avatarUrl, role, sx }: NodeProps) {
           onClick={menuActions.onOpen}
           sx={{ position: 'absolute', top: 8, right: 8 }}
         >
-          <Iconify icon="eva:more-horizontal-fill" />
+          <RiMoreFill />
         </IconButton>
 
         <Avatar

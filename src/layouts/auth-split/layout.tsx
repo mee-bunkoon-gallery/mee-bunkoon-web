@@ -6,6 +6,7 @@ import type { AuthSplitContentProps } from './content';
 import type { MainSectionProps, HeaderSectionProps, LayoutSectionProps } from '../core';
 
 import { merge } from 'es-toolkit';
+import { RiArrowLeftSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -16,7 +17,6 @@ import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/global-config';
 
-import { Iconify } from 'src/components/iconify';
 import { CompanyLogo } from 'src/components/logo';
 
 import { AuthSplitSection } from './section';
@@ -82,7 +82,7 @@ export function AuthSplitLayout({
               '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
             }}
           >
-            <Iconify icon="eva:arrow-ios-back-fill" width={18} />
+            <RiArrowLeftSFill size={18} />
             กลับหน้าหลัก
           </Link>
         </Box>

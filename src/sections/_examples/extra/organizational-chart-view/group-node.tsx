@@ -4,6 +4,7 @@ import type { PaletteColorKey } from 'src/theme/core';
 
 import { varAlpha } from 'minimal-shared/utils';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiEditLine, RiMoreFill, RiDeleteBin6Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -15,7 +16,6 @@ import IconButton from '@mui/material/IconButton';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
@@ -58,12 +58,12 @@ export function GroupNode({ sx, name, role, depth, group, avatarUrl, totalChildr
     >
       <MenuList>
         <MenuItem onClick={onDelete} sx={{ color: 'error.main' }}>
-          <Iconify icon="solar:trash-bin-trash-bold" />
+          <RiDeleteBin6Fill />
           Delete
         </MenuItem>
 
         <MenuItem onClick={onEdit}>
-          <Iconify icon="solar:pen-bold" />
+          <RiEditLine />
           Edit
         </MenuItem>
       </MenuList>
@@ -123,7 +123,7 @@ export function GroupNode({ sx, name, role, depth, group, avatarUrl, totalChildr
               ...(isLabel && { display: 'none' }),
             }}
           >
-            <Iconify icon="eva:more-horizontal-fill" />
+            <RiMoreFill />
           </IconButton>
 
           {depth !== 1 && !isRootGroup && (

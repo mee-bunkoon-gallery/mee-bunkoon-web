@@ -4,11 +4,11 @@ import type { CSSObject } from '@mui/material/styles';
 import type { NavItemProps } from '../types';
 
 import { mergeClasses } from 'minimal-shared/utils';
+import { RiArrowRightSFill } from '@remixicon/react';
 
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
 
-import { Iconify } from '../../iconify';
 import { createNavItem } from '../utils';
 import { navItemStyles, navBasicClasses } from '../styles';
 
@@ -97,12 +97,7 @@ export function NavItem({
       )}
 
       {hasChild && (
-        <ItemArrow
-          {...ownerState}
-          icon={navItem.subItem ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-downward-fill'}
-          className={navBasicClasses.item.arrow}
-          sx={slotProps?.arrow}
-        />
+        <ItemArrow {...ownerState} className={navBasicClasses.item.arrow} sx={slotProps?.arrow} />
       )}
     </ItemRoot>
   );
@@ -209,7 +204,7 @@ const ItemInfo = styled('span', { shouldForwardProp })<StyledState>(() => ({
 /**
  * @slot arrow
  */
-const ItemArrow = styled(Iconify, { shouldForwardProp })<StyledState>(({ theme }) => ({
+const ItemArrow = styled(RiArrowRightSFill, { shouldForwardProp })<StyledState>(({ theme }) => ({
   ...navItemStyles.arrow(theme),
   variants: [{ props: { variant: 'subItem' }, style: { marginRight: theme.spacing(-0.5) } }],
 }));

@@ -7,10 +7,10 @@ import type { FormHelperTextProps } from '@mui/material/FormHelperText';
 
 import { useId, useCallback } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiAddLine, RiCloseLine } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 
-import { Iconify } from '../iconify';
 import {
   HelperText,
   CaptionText,
@@ -123,7 +123,7 @@ export function NumberInput({
             onClick={handleDecrement}
             {...slotProps?.button}
           >
-            <Iconify width={16} icon="mingcute:minimize-line" />
+            <RiCloseLine size={16} />
           </CounterButton>
         )}
 
@@ -145,7 +145,7 @@ export function NumberInput({
             onClick={handleIncrement}
             {...slotProps?.button}
           >
-            <Iconify width={16} icon="mingcute:add-line" />
+            <RiAddLine size={16} />
           </CounterButton>
         )}
       </NumberInputRoot>

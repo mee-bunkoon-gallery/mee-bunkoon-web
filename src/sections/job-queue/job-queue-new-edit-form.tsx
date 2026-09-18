@@ -5,6 +5,7 @@ import type { IJobQueue } from 'src/types/job-queue';
 import * as z from 'zod';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
+import { RiDeleteBin6Fill } from '@remixicon/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -19,7 +20,6 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { useContractsQuery } from 'src/sections/contract/contract-queries';
@@ -351,7 +351,7 @@ export function JobQueueNewEditForm({
             <Button
               color="error"
               onClick={handleDelete}
-              startIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
+              startIcon={<RiDeleteBin6Fill />}
               sx={{ mr: 'auto' }}
             >
               ลบคิวงาน

@@ -5,6 +5,7 @@ import type { ToolbarButtonBaseProps } from './toolbar-core';
 
 import { useState, useCallback } from 'react';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiSettings3Fill } from '@remixicon/react';
 
 import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
@@ -20,7 +21,6 @@ import {
   DensityComfortableIcon,
 } from 'src/theme/core/components/mui-x-data-grid';
 
-import { Iconify } from '../iconify';
 import { ToolbarButtonBase } from './toolbar-core';
 
 // ----------------------------------------------------------------------
@@ -120,7 +120,7 @@ export function CustomToolbarSettingsButton({
           aria-expanded={open ? 'true' : undefined}
           onClick={onOpen}
           label={label}
-          icon={<Iconify icon="solar:settings-bold" />}
+          icon={<RiSettings3Fill />}
           showLabel={showLabel}
         />
       </Tooltip>

@@ -4,6 +4,7 @@ import type { PreviewOrientation } from 'src/components/upload';
 import type { FileThumbnailProps } from 'src/components/file-thumbnail';
 
 import { useState, useCallback } from 'react';
+import { RiUploadCloud2Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -13,7 +14,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { fData } from 'src/utils/format-number';
 
-import { Iconify } from 'src/components/iconify';
 import { Upload, UploadBox, UploadAvatar } from 'src/components/upload';
 
 import { ComponentLayout } from '../../layout';
@@ -156,7 +156,7 @@ export function UploadView() {
           <UploadBox
             placeholder={
               <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
-                <Iconify icon="eva:cloud-upload-fill" width={40} />
+                <RiUploadCloud2Fill size={40} />
                 <Typography variant="body2">Upload file</Typography>
               </Stack>
             }

@@ -1,10 +1,10 @@
 import type { LinkProps } from '@mui/material/Link';
 
+import { RiArrowLeftSFill } from '@remixicon/react';
+
 import Link from '@mui/material/Link';
 
 import { RouterLink } from 'src/routes/components';
-
-import { Iconify, iconifyClasses } from '../iconify';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ export function BackLink({ sx, label, ...other }: BackLinkProps) {
       sx={[
         (theme) => ({
           verticalAlign: 'middle',
-          [`& .${iconifyClasses.root}`]: {
+          '& svg': {
             verticalAlign: 'inherit',
             transform: 'translateY(-2px)',
             ml: {
@@ -34,7 +34,7 @@ export function BackLink({ sx, label, ...other }: BackLinkProps) {
             }),
           },
           '&:hover': {
-            [`& .${iconifyClasses.root}`]: {
+            '& svg': {
               opacity: 0.48,
             },
           },
@@ -43,7 +43,7 @@ export function BackLink({ sx, label, ...other }: BackLinkProps) {
       ]}
       {...other}
     >
-      <Iconify width={18} icon="eva:arrow-ios-back-fill" />
+      <RiArrowLeftSFill size={18} />
       {label}
     </Link>
   );

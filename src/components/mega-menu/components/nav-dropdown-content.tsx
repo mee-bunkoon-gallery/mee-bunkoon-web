@@ -1,5 +1,7 @@
 import type { NavListProps } from '../types';
 
+import { RiArrowRightSFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Masonry from '@mui/lab/Masonry';
@@ -9,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import { RouterLink } from 'src/routes/components';
 
 import { NavUl } from './nav-elements';
-import { Iconify } from '../../iconify';
 import { NavSubList } from './nav-sub-list';
 import { megaMenuClasses } from '../styles';
 import { NavCarousel } from './nav-carousel';
@@ -60,7 +61,7 @@ export function NavDropdownContent({
             ...slotProps?.moreLink,
           }}
         >
-          {data.moreLink.title} <Iconify width={16} icon="eva:arrow-ios-forward-fill" />
+          {data.moreLink.title} <RiArrowRightSFill size={16} />
         </Link>
       )}
 

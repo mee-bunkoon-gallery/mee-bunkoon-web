@@ -2,6 +2,7 @@ import type { TextFieldProps } from '@mui/material/TextField';
 import type { PhoneValue, PhoneCountry, PhoneInputProps } from './types';
 
 import { debounce } from 'es-toolkit';
+import { RiCloseLine } from '@remixicon/react';
 import { useMemo, useState, useCallback } from 'react';
 import PhoneNumberInput, { parsePhoneNumber } from 'react-phone-number-input/input';
 
@@ -14,7 +15,6 @@ import { inputBaseClasses } from '@mui/material/InputBase';
 
 import { countries } from 'src/assets/data/countries';
 
-import { Iconify } from '../iconify';
 import { CountryListPopover } from './list-popover';
 
 // ----------------------------------------------------------------------
@@ -115,7 +115,7 @@ export function PhoneInput({
           endAdornment: normalizedValue && (
             <InputAdornment position="end">
               <IconButton size="small" edge="end" onClick={handleClearInput}>
-                <Iconify width={16} icon="mingcute:close-line" />
+                <RiCloseLine size={16} />
               </IconButton>
             </InputAdornment>
           ),

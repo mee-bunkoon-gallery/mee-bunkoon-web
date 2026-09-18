@@ -1,5 +1,6 @@
 import type { TransitionProps } from '@mui/material/transitions';
 
+import { RiCloseLine } from '@remixicon/react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -13,8 +14,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +44,7 @@ export function FullScreenDialog() {
         <AppBar position="relative" color="default">
           <Toolbar>
             <IconButton color="inherit" edge="start" onClick={openDialog.onFalse}>
-              <Iconify icon="mingcute:close-line" />
+              <RiCloseLine />
             </IconButton>
 
             <Typography variant="h6" sx={{ flex: 1, ml: 2 }}>

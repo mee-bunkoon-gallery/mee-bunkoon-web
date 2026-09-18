@@ -5,6 +5,7 @@ import type { IJobQueue } from 'src/types/job-queue';
 
 import dayjs from 'dayjs';
 import listPlugin from '@fullcalendar/list';
+import { RiAddLine } from '@remixicon/react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -25,7 +26,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 
 import { useJobsQuery } from './job-queue-queries';
 import { JOB_QUEUE_STATUS_META, JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
@@ -102,11 +102,7 @@ export function JobQueueCalendarView() {
           <Button variant="outlined" onClick={() => router.push(paths.dashboard.jobQueue.display)}>
             มุมมองคิวงาน
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={handleNewClick}
-          >
+          <Button variant="contained" startIcon={<RiAddLine />} onClick={handleNewClick}>
             ลงคิวงานใหม่
           </Button>
         </Box>

@@ -3,6 +3,7 @@ import type { FieldsSchemaType } from './schema';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RiEyeFill, RiEyeOffFill, RiInformationFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -14,7 +15,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { today } from 'src/utils/format-time';
 
-import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
 import { FieldsSchema } from './schema';
@@ -136,7 +136,7 @@ export function FieldsDemo({ debug, onCloseDebug }: Props) {
           name="quantity"
           helperText={
             <>
-              <Iconify width={16} icon="solar:info-circle-bold" />
+              <RiInformationFill size={16} />
               Helper text
             </>
           }
@@ -158,9 +158,7 @@ export function FieldsDemo({ debug, onCloseDebug }: Props) {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={showPassword.onToggle} edge="end">
-                    <Iconify
-                      icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
-                    />
+                    {showPassword.value ? <RiEyeFill /> : <RiEyeOffFill />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -179,9 +177,7 @@ export function FieldsDemo({ debug, onCloseDebug }: Props) {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={showPassword.onToggle} edge="end">
-                    <Iconify
-                      icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
-                    />
+                    {showPassword.value ? <RiEyeFill /> : <RiEyeOffFill />}
                   </IconButton>
                 </InputAdornment>
               ),

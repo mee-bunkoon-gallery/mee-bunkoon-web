@@ -3,6 +3,7 @@
 import type { IJobQueue } from 'src/types/job-queue';
 
 import { useEffect } from 'react';
+import { RiEyeFill, RiCalendarEventFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -19,7 +20,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { useJobsQuery } from './job-queue-queries';
@@ -70,7 +70,7 @@ function JobRow({ job }: { job: IJobQueue }) {
           <Label variant="soft" color={statusMeta.color}>
             {statusMeta.label}
           </Label>
-          <Iconify icon="solar:eye-bold" width={18} />
+          <RiEyeFill size={18} />
         </Stack>
       </Box>
     </Card>
@@ -131,7 +131,7 @@ export function JobQueueDisplayView() {
 
         {!upcomingJobs.length && (
           <Card sx={{ py: 7, textAlign: 'center' }}>
-            <Iconify icon="solar:calendar-date-bold" width={44} sx={{ color: 'text.disabled' }} />
+            <Box component={RiCalendarEventFill} width={44} sx={{ color: 'text.disabled' }} />
             <Typography variant="subtitle1" sx={{ mt: 1.5 }}>
               ยังไม่มีคิวงานที่กำลังจะมาถึง
             </Typography>

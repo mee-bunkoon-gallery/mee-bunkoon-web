@@ -1,10 +1,12 @@
 'use client';
 
 import type { BoxProps } from '@mui/material/Box';
-import type { IconifyName } from 'src/components/iconify';
+import type { RemixiconComponentType } from '@remixicon/react';
 
 import { useState, useCallback } from 'react';
+import * as RemixIcons from '@remixicon/react';
 import { useCopyToClipboard } from 'minimal-shared/hooks';
+import { RiCloseLine, RiSearchFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -16,7 +18,6 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify, iconSets } from 'src/components/iconify';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 // ----------------------------------------------------------------------
@@ -25,6 +26,9 @@ export function IconifyView() {
   const { copy } = useCopyToClipboard();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const icons = Object.entries(RemixIcons).filter(
+    ([name, component]) => name.startsWith('Ri') && typeof component === 'function'
+  ) as [string, RemixiconComponentType][];
 
   const handleCopy = useCallback(
     (iconMarkup: string) => {
@@ -47,7 +51,7 @@ export function IconifyView() {
   const renderHeader = () => (
     <Box sx={{ flex: '1 1 auto' }}>
       <Typography variant="h4" sx={{ mb: 1 }}>
-        Iconify
+        RemixIcon
       </Typography>
 
       <CustomBreadcrumbs
@@ -55,12 +59,12 @@ export function IconifyView() {
           { name: 'Home', href: '/' },
           { name: 'Components', href: '/components' },
           { name: 'Icons', href: '/components/foundation/icons' },
-          { name: 'Iconify' },
+          { name: 'RemixIcon' },
         ]}
       />
 
       <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
-        Iconify icons used in this template.
+        RemixIcon icons used in this template.
       </Typography>
     </Box>
   );
@@ -75,13 +79,13 @@ export function IconifyView() {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+              <Box component={RiSearchFill} sx={{ color: 'text.disabled' }} />
             </InputAdornment>
           ),
           endAdornment: !!searchQuery && (
             <InputAdornment position="end">
               <IconButton edge="end" size="small" onClick={handleClearSearch}>
-                <Iconify icon="mingcute:close-line" />
+                <RiCloseLine />
               </IconButton>
             </InputAdornment>
           ),
@@ -107,59 +111,14 @@ export function IconifyView() {
         {renderSearch()}
       </Box>
 
-      <Grid container spacing={3}>
-        {iconSets.map((iconSet) => {
-          const hasLink = !['payments', 'socials', 'custom'].includes(iconSet.prefix);
-
-          return (
-            <Grid
-              key={iconSet.prefix}
-              size={{ xs: 12, sm: 6 }}
-              sx={{
-                p: 3,
-                borderRadius: 2,
-                bgcolor: 'background.neutral',
-              }}
-            >
-              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                  {iconSet.prefix}
-                </Typography>
-
-                {hasLink && (
-                  <IconButton
-                    href={`https://icon-sets.iconify.design/${iconSet.prefix}/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Iconify width={18} icon="eva:external-link-fill" />
-                  </IconButton>
-                )}
-              </Box>
-
-              <Box sx={{ gap: 1, display: 'flex', flexWrap: 'wrap' }}>
-                {Object.keys(iconSet.icons).map((icon) => {
-                  const iconNameWithPrefix = `${iconSet.prefix}:${icon}` as IconifyName;
-                  const isMatch = searchQuery && iconNameWithPrefix.includes(searchQuery);
-
-                  return (
-                    <IconBox
-                      key={iconNameWithPrefix}
-                      iconName={iconNameWithPrefix}
-                      onClick={() => handleCopy(iconNameWithPrefix)}
-                      sx={{
-                        ...(isMatch && {
-                          color: 'primary.darker',
-                          bgcolor: 'primary.lighter',
-                        }),
-                      }}
-                    />
-                  );
-                })}
-              </Box>
+      <Grid container spacing={1}>
+        {icons
+          .filter(([name]) => name.toLowerCase().includes(searchQuery))
+          .map(([name, Icon]) => (
+            <Grid key={name} size="auto">
+              <IconBox iconName={name} icon={Icon} onClick={() => handleCopy(name)} />
             </Grid>
-          );
-        })}
+          ))}
       </Grid>
     </Container>
   );
@@ -168,10 +127,11 @@ export function IconifyView() {
 // ----------------------------------------------------------------------
 
 type IconBoxProps = BoxProps & {
-  iconName: IconifyName;
+  iconName: string;
+  icon: RemixiconComponentType;
 };
 
-function IconBox({ iconName, sx, ...other }: IconBoxProps) {
+function IconBox({ iconName, icon, sx, ...other }: IconBoxProps) {
   return (
     <Tooltip title={iconName}>
       <Box
@@ -195,7 +155,7 @@ function IconBox({ iconName, sx, ...other }: IconBoxProps) {
         ]}
         {...other}
       >
-        <Iconify icon={iconName} width={24} />
+        <Box component={icon} sx={{ width: 24, height: 24 }} />
       </Box>
     </Tooltip>
   );

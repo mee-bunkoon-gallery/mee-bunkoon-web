@@ -3,6 +3,15 @@
 import type { IPromotionPackage } from 'src/types/promotion-package';
 
 import { useState, useEffect, useCallback } from 'react';
+import {
+  RiAddLine,
+  RiEditLine,
+  RiGiftFill,
+  RiImageFill,
+  RiSearchLine,
+  RiDeleteBin6Line,
+  RiCalendarEventFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -26,7 +35,6 @@ import { fBaht } from 'src/utils/format-number';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 
 import { getPromotionPackages, deletePromotionPackage } from './promotion-package-api';
@@ -84,7 +92,7 @@ export function PromotionPackageView() {
           component={RouterLink}
           href={paths.dashboard.promotionPackage.new}
           variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
+          startIcon={<RiAddLine />}
         >
           สร้างแพ็กเกจ
         </Button>
@@ -98,7 +106,7 @@ export function PromotionPackageView() {
           input: {
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                <RiSearchLine />
               </InputAdornment>
             ),
           },
@@ -146,9 +154,7 @@ export function PromotionPackageView() {
                       ...(item.imageUrl && { backgroundImage: `url(${item.imageUrl})` }),
                     }}
                   >
-                    {!item.imageUrl && (
-                      <Iconify icon={'solar:gallery-wide-bold-duotone' as any} width={56} />
-                    )}
+                    {!item.imageUrl && <RiImageFill size={56} />}
                   </Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box sx={{ minWidth: 0 }}>
@@ -167,10 +173,10 @@ export function PromotionPackageView() {
                         component={RouterLink}
                         href={paths.dashboard.promotionPackage.edit(item.id)}
                       >
-                        <Iconify icon="solar:pen-bold" />
+                        <RiEditLine />
                       </IconButton>
                       <IconButton color="error" onClick={() => setDeleteTarget(item)}>
-                        <Iconify icon="solar:trash-bin-trash-bold" />
+                        <RiDeleteBin6Line />
                       </IconButton>
                     </Box>
                   </Stack>
@@ -225,8 +231,8 @@ export function PromotionPackageView() {
                       variant="caption"
                       sx={{ display: 'block', mt: 2, color: 'text.secondary' }}
                     >
-                      <Iconify
-                        icon="solar:calendar-date-bold"
+                      <Box
+                        component={RiCalendarEventFill}
                         width={14}
                         sx={{ mr: 0.5, verticalAlign: 'middle' }}
                       />
@@ -241,7 +247,7 @@ export function PromotionPackageView() {
       </Grid>
       {!loading && !packages.length && (
         <Box sx={{ py: 12, textAlign: 'center', color: 'text.secondary' }}>
-          <Iconify icon={'solar:gift-bold-duotone' as any} width={72} />
+          <RiGiftFill size={72} />
           <Typography variant="h6" sx={{ mt: 2 }}>
             ยังไม่มีแพ็กเกจ/โปรโมชั่น
           </Typography>

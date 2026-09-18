@@ -41,7 +41,10 @@ export async function POST(request: Request, { params }: Params) {
   const files = formData.getAll('files').filter((file): file is File => file instanceof File);
 
   if (keepUrls.length + files.length < MIN_IMAGES) {
-    return NextResponse.json({ message: `กรุณาแนบภาพอย่างน้อย ${MIN_IMAGES} ภาพ` }, { status: 400 });
+    return NextResponse.json(
+      { message: `กรุณาแนบภาพอย่างน้อย ${MIN_IMAGES} ภาพ` },
+      { status: 400 }
+    );
   }
   if (keepUrls.length + files.length > MAX_IMAGES) {
     return NextResponse.json({ message: `แนบภาพได้ไม่เกิน ${MAX_IMAGES} ภาพ` }, { status: 400 });

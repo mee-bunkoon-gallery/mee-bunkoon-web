@@ -1,9 +1,10 @@
 import type { GridColDef } from '@mui/x-data-grid';
 import type { IDateValue } from 'src/types/common';
 
+import { RiEyeFill, RiEditLine, RiDeleteBin6Fill } from '@remixicon/react';
+
 import { DataGrid } from '@mui/x-data-grid';
 
-import { Iconify } from 'src/components/iconify';
 import { CustomGridActionsCellItem } from 'src/components/custom-data-grid';
 
 // ----------------------------------------------------------------------
@@ -51,17 +52,17 @@ const columns: GridColDef[] = [
     getActions: (params) => [
       <CustomGridActionsCellItem
         label="View"
-        icon={<Iconify icon="solar:eye-bold" />}
+        icon={<RiEyeFill />}
         onClick={() => console.info('VIEW', params.row.id)}
       />,
       <CustomGridActionsCellItem
         label="Edit"
-        icon={<Iconify icon="solar:pen-bold" />}
+        icon={<RiEditLine />}
         onClick={() => console.info('EDIT', params.row.id)}
       />,
       <CustomGridActionsCellItem
         label="Delete"
-        icon={<Iconify icon="solar:trash-bin-trash-bold" />}
+        icon={<RiDeleteBin6Fill />}
         onClick={() => console.info('DELETE', params.row.id)}
         style={{ color: 'var(--palette-error-main)' }}
       />,

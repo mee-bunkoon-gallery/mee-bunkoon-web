@@ -3,6 +3,13 @@
 import type { IServiceItem } from 'src/types/quotation';
 
 import { useState, useEffect } from 'react';
+import {
+  RiAddLine,
+  RiEditLine,
+  RiListCheck2,
+  RiSearchLine,
+  RiDeleteBin6Line,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -29,7 +36,6 @@ import { fBaht } from 'src/utils/format-number';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { TableNoData, TablePaginationCustom } from 'src/components/table';
@@ -106,7 +112,7 @@ export function ServiceListView() {
           component={RouterLink}
           href={paths.dashboard.service.new}
           variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
+          startIcon={<RiAddLine />}
         >
           เพิ่มรายการบริการ
         </Button>
@@ -124,7 +130,7 @@ export function ServiceListView() {
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                    <RiSearchLine />
                   </InputAdornment>
                 ),
               },
@@ -159,7 +165,7 @@ export function ServiceListView() {
                         src={item.imageUrl ?? undefined}
                         sx={{ width: 48, height: 48 }}
                       >
-                        <Iconify icon="solar:box-minimalistic-bold" />
+                        <RiListCheck2 />
                       </Avatar>
                     </TableCell>
                     <TableCell>
@@ -201,10 +207,10 @@ export function ServiceListView() {
                         component={RouterLink}
                         href={paths.dashboard.service.edit(item.id)}
                       >
-                        <Iconify icon="solar:pen-bold" />
+                        <RiEditLine />
                       </IconButton>
                       <IconButton color="error" onClick={() => setDeleteTarget(item)}>
-                        <Iconify icon="solar:trash-bin-trash-bold" />
+                        <RiDeleteBin6Line />
                       </IconButton>
                     </TableCell>
                   </TableRow>

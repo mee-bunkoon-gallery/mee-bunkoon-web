@@ -1,5 +1,7 @@
 'use client';
 
+import { RiFolderAddFill } from '@remixicon/react';
+
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
@@ -7,8 +9,6 @@ import AvatarGroup, { avatarGroupClasses } from '@mui/material/AvatarGroup';
 
 import { _mock } from 'src/_mock';
 import { colorKeys } from 'src/theme/core';
-
-import { Iconify } from 'src/components/iconify';
 
 import { ComponentBox, ComponentLayout } from '../../layout';
 
@@ -39,7 +39,7 @@ const DEMO_COMPONENTS = [
       <ComponentBox>
         {COLORS.map((color) => (
           <Avatar key={color} color={color}>
-            <Iconify icon="solar:add-folder-outline" />
+            <RiFolderAddFill />
           </Avatar>
         ))}
       </ComponentBox>
@@ -67,7 +67,7 @@ const DEMO_COMPONENTS = [
             variant={variant}
             sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}
           >
-            <Iconify icon="solar:add-folder-outline" />
+            <RiFolderAddFill />
           </Avatar>
         ))}
       </ComponentBox>

@@ -3,6 +3,7 @@ import type { TableHeadCellProps } from 'src/components/table';
 
 import useSWR from 'swr';
 import { useState } from 'react';
+import { RiMore2Fill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -15,7 +16,6 @@ import Pagination from '@mui/material/Pagination';
 
 import { fetcher } from 'src/lib/axios';
 
-import { Iconify } from 'src/components/iconify';
 import { TableSkeleton, TableHeadCustom } from 'src/components/table';
 
 // ----------------------------------------------------------------------
@@ -74,7 +74,7 @@ export function PaginationWithApi() {
                 <TableCell>{row.category}</TableCell>
                 <TableCell align="right">
                   <IconButton>
-                    <Iconify icon="eva:more-vertical-fill" />
+                    <RiMore2Fill />
                   </IconButton>
                 </TableCell>
               </TableRow>

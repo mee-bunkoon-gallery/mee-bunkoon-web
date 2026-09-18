@@ -1,9 +1,10 @@
+import { RiArrowRightSFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 
-import { Iconify } from 'src/components/iconify';
 import {
   Carousel,
   useCarousel,
@@ -115,7 +116,7 @@ function CarouselItem({ item, index }: CarouselItemProps) {
           })}
         >
           Learn more
-          <Iconify width={16} icon="eva:arrow-forward-fill" />
+          <RiArrowRightSFill size={16} />
         </Link>
       </CardContent>
     </Box>

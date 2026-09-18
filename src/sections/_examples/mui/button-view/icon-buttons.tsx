@@ -1,11 +1,11 @@
 import { m } from 'framer-motion';
+import { RiMailFill } from '@remixicon/react';
 
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 
 import { colorKeys } from 'src/theme/core';
 
-import { Iconify } from 'src/components/iconify';
 import { varTap, varHover, transitionTap } from 'src/components/animate';
 
 import { ComponentBox } from '../../layout';
@@ -19,10 +19,7 @@ const COLORS = ['inherit', 'default', ...colorKeys.palette] as const;
 
 export function IconButtons() {
   const renderIcon = (size: (typeof SIZES)[number] = 'medium') => (
-    <Iconify
-      icon="solar:letter-outline"
-      width={(size === 'small' && 18) || (size === 'medium' && 20) || 24}
-    />
+    <RiMailFill size={(size === 'small' && 18) || (size === 'medium' && 20) || 24} />
   );
 
   return (

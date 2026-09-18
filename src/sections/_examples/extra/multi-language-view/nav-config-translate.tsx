@@ -1,11 +1,12 @@
 import type { TFunction } from 'i18next';
 
+import { RiNotification3Fill } from '@remixicon/react';
+
 import { paths } from 'src/routes/paths';
 
 import { CONFIG } from 'src/global-config';
 
 import { Label } from 'src/components/label';
-import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -30,11 +31,7 @@ export function navData(t: TFunction<any, any>) {
           path: '#label',
           icon: <SvgColor src={`${CONFIG.assetsDir}/assets/icons/navbar/ic-job.svg`} />,
           info: (
-            <Label
-              color="info"
-              variant="inverted"
-              startIcon={<Iconify icon="solar:bell-bing-bold-duotone" />}
-            >
+            <Label color="info" variant="inverted" startIcon={<RiNotification3Fill />}>
               NEW
             </Label>
           ),

@@ -2,9 +2,9 @@ import type { UploadProps } from '../types';
 
 import { useDropzone } from 'react-dropzone';
 import { mergeClasses } from 'minimal-shared/utils';
+import { RiUploadCloud2Fill } from '@remixicon/react';
 
 import { UploadArea } from './styles';
-import { Iconify } from '../../iconify';
 import { uploadClasses } from '../classes';
 
 // ----------------------------------------------------------------------
@@ -35,7 +35,7 @@ export function UploadBox({
       sx={sx}
     >
       <input {...getInputProps()} />
-      {placeholder ?? <Iconify icon="eva:cloud-upload-fill" width={28} />}
+      {placeholder ?? <RiUploadCloud2Fill size={28} />}
     </UploadArea>
   );
 }

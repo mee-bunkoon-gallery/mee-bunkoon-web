@@ -1,11 +1,12 @@
 import type { MegaMenuMobileProps } from 'src/components/mega-menu';
 
+import { RiMenuFill } from '@remixicon/react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
 import { Logo } from 'src/components/logo';
-import { Iconify } from 'src/components/iconify';
 import { MegaMenuMobile } from 'src/components/mega-menu';
 
 import { MEGA_MENU_ITEMS } from './data';
@@ -23,7 +24,7 @@ export function DemoMegaMenuMobile({ submenuMode }: Pick<MegaMenuMobileProps, 's
           <Button
             variant="contained"
             color={submenuMode === 'drawer' ? 'inherit' : 'primary'}
-            startIcon={<Iconify icon="carbon:menu" />}
+            startIcon={<RiMenuFill />}
           >
             Mobile menu ({submenuMode})
           </Button>

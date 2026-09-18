@@ -4,6 +4,16 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  RiEyeFill,
+  RiEditLine,
+  RiCloseLine,
+  RiArchiveFill,
+  RiFileTextFill,
+  RiCalendarEventFill,
+  RiDownloadCloud2Fill,
+  RiMoneyDollarCircleFill,
+} from '@remixicon/react';
 
 import Card from '@mui/material/Card';
 import Link from '@mui/material/Link';
@@ -36,7 +46,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { LoadingScreen } from 'src/components/loading-screen';
 
@@ -76,11 +85,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
   const { data: paymentsData } = usePaymentsQuery({ quotationId });
   const payments = paymentsData ?? [];
 
-  const {
-    data: quotation,
-    isLoading,
-    isError,
-  } = useQuotationQuery(quotationId);
+  const { data: quotation, isLoading, isError } = useQuotationQuery(quotationId);
 
   useEffect(() => {
     if (isError) {
@@ -133,7 +138,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
               component={RouterLink}
               href={paths.dashboard.quotation.edit(quotation.id)}
               variant="outlined"
-              startIcon={<Iconify icon="solar:pen-bold" />}
+              startIcon={<RiEditLine />}
             >
               แก้ไข
             </Button>
@@ -142,7 +147,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
               component={RouterLink}
               href={`${paths.dashboard.contract.new}?quotationId=${quotation.id}`}
               variant="outlined"
-              startIcon={<Iconify icon="solar:file-check-bold-duotone" />}
+              startIcon={<RiFileTextFill />}
             >
               สร้างสัญญา
             </Button>
@@ -151,7 +156,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
               component={RouterLink}
               href={`${paths.dashboard.payment.new}?quotationId=${quotation.id}`}
               variant="outlined"
-              startIcon={<Iconify icon="solar:wad-of-money-bold" />}
+              startIcon={<RiMoneyDollarCircleFill />}
             >
               ออกใบเสร็จรับเงิน
             </Button>
@@ -160,7 +165,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
               component={RouterLink}
               href={`${paths.dashboard.delivery.new}?quotationId=${quotation.id}`}
               variant="outlined"
-              startIcon={<Iconify icon="solar:inbox-in-bold-duotone" />}
+              startIcon={<RiArchiveFill />}
             >
               ส่งมอบงาน
             </Button>
@@ -169,16 +174,12 @@ export function QuotationDetailsView({ quotationId }: Props) {
               component={RouterLink}
               href={`${paths.dashboard.jobQueue.new}?quotationId=${quotation.id}`}
               variant="outlined"
-              startIcon={<Iconify icon="solar:calendar-date-bold" />}
+              startIcon={<RiCalendarEventFill />}
             >
               ลงคิวงาน
             </Button>
 
-            <Button
-              variant="contained"
-              startIcon={<Iconify icon="solar:eye-bold" />}
-              onClick={previewDialog.onTrue}
-            >
+            <Button variant="contained" startIcon={<RiEyeFill />} onClick={previewDialog.onTrue}>
               พรีวิว PDF
             </Button>
           </Box>
@@ -603,7 +604,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
         >
           พรีวิว PDF — {quotation.quoteNo}
           <IconButton onClick={previewDialog.onFalse}>
-            <Iconify icon="mingcute:close-line" />
+            <RiCloseLine />
           </IconButton>
         </DialogTitle>
 
@@ -636,7 +637,7 @@ export function QuotationDetailsView({ quotationId }: Props) {
             }
             fileName={`${quotation.quoteNo}.pdf`}
           >
-            <Button variant="contained" startIcon={<Iconify icon="eva:cloud-download-fill" />}>
+            <Button variant="contained" startIcon={<RiDownloadCloud2Fill />}>
               ดาวน์โหลด PDF
             </Button>
           </PDFDownloadLink>
@@ -649,20 +650,23 @@ export function QuotationDetailsView({ quotationId }: Props) {
         signer={signatureSigner}
         onClose={() => setSignatureSigner(null)}
         onSigned={(signatureUrl) =>
-          queryClient.setQueryData(quotationKeys.detail(quotationId), (current: typeof quotation) => {
-            if (!current) return current;
-            return signatureSigner === 'issuer'
-              ? {
-                  ...current,
-                  issuerSignatureUrl: signatureUrl,
-                  issuerSignedAt: new Date().toISOString(),
-                }
-              : {
-                  ...current,
-                  customerSignatureUrl: signatureUrl,
-                  customerSignedAt: new Date().toISOString(),
-                };
-          })
+          queryClient.setQueryData(
+            quotationKeys.detail(quotationId),
+            (current: typeof quotation) => {
+              if (!current) return current;
+              return signatureSigner === 'issuer'
+                ? {
+                    ...current,
+                    issuerSignatureUrl: signatureUrl,
+                    issuerSignedAt: new Date().toISOString(),
+                  }
+                : {
+                    ...current,
+                    customerSignatureUrl: signatureUrl,
+                    customerSignedAt: new Date().toISOString(),
+                  };
+            }
+          )
         }
       />
     </DashboardContent>

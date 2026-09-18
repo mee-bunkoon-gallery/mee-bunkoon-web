@@ -3,6 +3,7 @@
 import type { IColorTheme } from 'src/types/color-theme';
 
 import { useState } from 'react';
+import { RiAddLine, RiEditLine, RiDeleteBin6Line } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -25,7 +26,6 @@ import TableContainer from '@mui/material/TableContainer';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { ColorPicker } from 'src/components/color-utils';
 import { TablePaginationCustom } from 'src/components/table';
@@ -135,11 +135,7 @@ export function ColorThemeListView() {
     <DashboardContent maxWidth="xl">
       <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h4">โทนสี</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={openCreateDialog}
-        >
+        <Button variant="contained" startIcon={<RiAddLine />} onClick={openCreateDialog}>
           เพิ่มโทนสี
         </Button>
       </Box>
@@ -174,7 +170,7 @@ export function ColorThemeListView() {
                     </TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => openEditDialog(item)}>
-                        <Iconify icon="solar:pen-bold" />
+                        <RiEditLine />
                       </IconButton>
                       <Tooltip title={item.inUse ? 'ไม่สามารถลบโทนสีที่มีการใช้งานอยู่' : ''}>
                         <span>
@@ -183,7 +179,7 @@ export function ColorThemeListView() {
                             disabled={item.inUse}
                             onClick={() => handleDelete(item.id)}
                           >
-                            <Iconify icon="solar:trash-bin-trash-bold" />
+                            <RiDeleteBin6Line />
                           </IconButton>
                         </span>
                       </Tooltip>

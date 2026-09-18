@@ -2,6 +2,7 @@ import type { BoxProps } from '@mui/material/Box';
 
 import { m } from 'framer-motion';
 import { varAlpha } from 'minimal-shared/utils';
+import { RiArrowRightSFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -15,7 +16,6 @@ import { fPercent } from 'src/utils/format-number';
 import { CONFIG } from 'src/global-config';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { varFade, MotionViewport } from 'src/components/animate';
 
 // ----------------------------------------------------------------------
@@ -135,7 +135,7 @@ export function AboutWhat({ sx, ...other }: BoxProps) {
               variant="outlined"
               color="inherit"
               size="large"
-              endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+              endIcon={<RiArrowRightSFill />}
             >
               Our work
             </Button>

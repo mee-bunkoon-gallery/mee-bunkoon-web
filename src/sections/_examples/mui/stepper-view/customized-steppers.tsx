@@ -3,6 +3,12 @@ import type { StepIconProps } from '@mui/material/StepIcon';
 
 import { useState, useCallback } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
+import {
+  RiUserAddFill,
+  RiSettings3Fill,
+  RiInformationFill,
+  RiCheckboxCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Step from '@mui/material/Step';
@@ -12,8 +18,6 @@ import Stepper from '@mui/material/Stepper';
 import { styled } from '@mui/material/styles';
 import StepLabel from '@mui/material/StepLabel';
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
-
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -107,7 +111,7 @@ function QontoStepIcon({ active, completed, className }: StepIconProps) {
   return (
     <QontoStepIconRoot ownerState={{ active }} className={className}>
       {completed ? (
-        <Iconify width={24} icon="eva:checkmark-fill" className="QontoStepIcon-completedIcon" />
+        <RiCheckboxCircleFill size={24} className="QontoStepIcon-completedIcon" />
       ) : (
         <div className="QontoStepIcon-circle" />
       )}
@@ -119,9 +123,9 @@ function ColorlibStepIcon({ active, completed, className, icon }: StepIconProps)
   const icons: {
     [index: string]: React.ReactElement;
   } = {
-    1: <Iconify icon="solar:settings-bold" width={24} />,
-    2: <Iconify icon="solar:user-plus-bold" width={24} />,
-    3: <Iconify icon="solar:monitor-bold" width={24} />,
+    1: <RiSettings3Fill size={24} />,
+    2: <RiUserAddFill size={24} />,
+    3: <RiInformationFill size={24} />,
   };
 
   return (

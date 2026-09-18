@@ -3,6 +3,7 @@
 import type { Breakpoint } from '@mui/material/styles';
 
 import { useState, useEffect } from 'react';
+import { RiLink, RiTiktokFill, RiFacebookFill, RiInstagramFill } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -18,7 +19,6 @@ import { RouterLink } from 'src/routes/components';
 
 import { _socials } from 'src/_mock';
 
-import { Iconify } from 'src/components/iconify';
 import { CompanyLogo } from 'src/components/logo';
 
 // ----------------------------------------------------------------------
@@ -74,9 +74,9 @@ const getLinks = (companyName: string) => [
 ];
 
 const SOCIAL_ICONS = {
-  facebook: 'socials:facebook',
-  instagram: 'socials:instagram',
-  tiktok: 'logos:tiktok-icon',
+  facebook: RiFacebookFill,
+  instagram: RiInstagramFill,
+  tiktok: RiTiktokFill,
 } as const;
 
 // ----------------------------------------------------------------------
@@ -172,7 +172,9 @@ export function Footer({
                     '&:hover': { bgcolor: 'primary.main', color: 'common.white' },
                   }}
                 >
-                  <Iconify icon={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] as any} />
+                  <Box
+                    component={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] ?? RiLink}
+                  />
                 </IconButton>
               ))}
             </Box>
@@ -268,7 +270,7 @@ export function HomeFooter({ sx, ...other }: FooterProps) {
               rel="noopener noreferrer"
               aria-label={social.label}
             >
-              <Iconify icon={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] as any} />
+              <Box component={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] ?? RiLink} />
             </IconButton>
           ))}
         </Box>

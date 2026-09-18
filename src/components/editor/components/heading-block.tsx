@@ -4,12 +4,12 @@ import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 import { useMemo, useCallback } from 'react';
 import { varAlpha } from 'minimal-shared/utils';
 import { usePopover } from 'minimal-shared/hooks';
+import { RiArrowUpSFill, RiArrowDownSFill } from '@remixicon/react';
 
 import Menu from '@mui/material/Menu';
 import { listClasses } from '@mui/material/List';
 import ButtonBase, { buttonBaseClasses } from '@mui/material/ButtonBase';
 
-import { Iconify } from '../../iconify';
 import { ToolbarItem } from './toolbar-item';
 
 // ----------------------------------------------------------------------
@@ -79,10 +79,7 @@ export function HeadingBlock({ editor, isActive }: HeadingBlock) {
         })}
       >
         {selectedOption?.label ?? 'Paragraph'}
-        <Iconify
-          width={16}
-          icon={open ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
-        />
+        {open ? <RiArrowUpSFill size={16} /> : <RiArrowDownSFill size={16} />}
       </ButtonBase>
 
       <Menu
