@@ -16,11 +16,11 @@ import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/global-config';
 
-import { Logo } from 'src/components/logo';
+import { Iconify } from 'src/components/iconify';
+import { CompanyLogo } from 'src/components/logo';
 
 import { AuthSplitSection } from './section';
 import { AuthSplitContent } from './content';
-import { SettingsButton } from '../components/settings-button';
 import { MainSection, LayoutSection, HeaderSection } from '../core';
 
 // ----------------------------------------------------------------------
@@ -55,26 +55,24 @@ export function AuthSplitLayout({
           This is an info Alert.
         </Alert>
       ),
-      leftArea: (
-        <>
-          {/** @slot Logo */}
-          <Logo />
-        </>
-      ),
+      leftArea: <CompanyLogo />,
       rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
-          {/** @slot Help link */}
           <Link
-            href={paths.faqs}
+            href="/"
             component={RouterLink}
             color="inherit"
-            sx={{ typography: 'subtitle2' }}
+            underline="none"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.75,
+              typography: 'subtitle2',
+            }}
           >
-            Need help?
+            <Iconify icon="eva:arrow-ios-back-fill" width={18} />
+            กลับหน้าหลัก
           </Link>
-
-          {/** @slot Settings button */}
-          <SettingsButton />
         </Box>
       ),
     };
@@ -155,7 +153,7 @@ export function AuthSplitLayout({
       /** **************************************
        * @Styles
        *************************************** */
-      cssVars={{ '--layout-auth-content-width': '420px', ...cssVars }}
+      cssVars={{ '--layout-auth-content-width': '460px', ...cssVars }}
       sx={sx}
     >
       {renderMain()}

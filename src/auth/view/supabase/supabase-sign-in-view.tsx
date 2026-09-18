@@ -7,10 +7,12 @@ import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { paths } from 'src/routes/paths';
@@ -22,7 +24,6 @@ import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { useAuthContext } from '../../hooks';
 import { getErrorMessage } from '../../utils';
-import { FormHead } from '../../components/form-head';
 import { signInWithPassword } from '../../context/supabase';
 
 // ----------------------------------------------------------------------
@@ -33,8 +34,8 @@ export const SignInSchema = z.object({
   email: schemaUtils.email(),
   password: z
     .string()
-    .min(1, { error: 'Password is required!' })
-    .min(6, { error: 'Password must be at least 6 characters!' }),
+    .min(1, { error: 'กรุณากรอกรหัสผ่าน' })
+    .min(6, { error: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร' }),
 });
 
 // ----------------------------------------------------------------------
@@ -88,13 +89,13 @@ export function SupabaseSignInView() {
           color="inherit"
           sx={{ alignSelf: 'flex-end' }}
         >
-          Forgot password?
+          ลืมรหัสผ่าน?
         </Link>
 
         <Field.Text
           name="password"
           label="รหัสผ่าน"
-          placeholder="6+ characters"
+          placeholder="กรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร"
           type={showPassword.value ? 'text' : 'password'}
           slotProps={{
             inputLabel: { shrink: true },
@@ -128,8 +129,27 @@ export function SupabaseSignInView() {
   );
 
   return (
-    <>
-      <FormHead title="ลงชื่อเข้าใช้งาน" sx={{ textAlign: { xs: 'center', md: 'left' } }} />
+    <Card
+      sx={{ p: { xs: 3, sm: 4.5 }, border: '1px solid', borderColor: 'divider', boxShadow: 12 }}
+    >
+      <Box
+        sx={{
+          width: 52,
+          height: 52,
+          mb: 3,
+          display: 'grid',
+          borderRadius: 1.5,
+          placeItems: 'center',
+          color: 'primary.main',
+          bgcolor: 'primary.lighter',
+        }}
+      >
+        <Iconify icon="solar:lock-password-outline" width={28} />
+      </Box>
+      <Typography variant="h3">เข้าสู่ระบบหลังบ้าน</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 4 }}>
+        กรอกอีเมลและรหัสผ่านเพื่อจัดการข้อมูลของร้าน
+      </Typography>
 
       {!!errorMessage && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -140,6 +160,6 @@ export function SupabaseSignInView() {
       <Form methods={methods} onSubmit={onSubmit}>
         {renderForm()}
       </Form>
-    </>
+    </Card>
   );
 }

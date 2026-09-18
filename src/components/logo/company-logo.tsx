@@ -16,9 +16,10 @@ import { Logo } from './logo';
 
 type CompanyLogoProps = {
   sx?: SxProps<Theme>;
+  isRow?: boolean;
 };
 
-export function CompanyLogo({ sx }: CompanyLogoProps) {
+export function CompanyLogo({ sx, isRow }: CompanyLogoProps) {
   const [companyName, setCompanyName] = useState('มีบุญคุณ แกลเลอรี่');
   const [companyNameEn, setCompanyNameEn] = useState('MEE BUNKOON GALLERY');
 
@@ -44,7 +45,12 @@ export function CompanyLogo({ sx }: CompanyLogoProps) {
   }, []);
 
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center">
+    <Stack
+      direction={isRow ? 'row' : 'column'}
+      spacing={1.5}
+      alignItems="center"
+      justifyContent="center"
+    >
       <Logo sx={sx} />
       <Box
         component={RouterLink}

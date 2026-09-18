@@ -59,88 +59,66 @@ export function PublicJobQueueView() {
 
   if (isLoading) return <LoadingScreen />;
 
-  const companyName = data?.company?.name || 'มีบุญคุณ แกลเลอรี่';
   const jobCount = data?.jobs.length ?? 0;
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        px: { xs: 2.5, md: 8 },
-        pt: { xs: 14, md: 12 },
+        px: { xs: 2, sm: 3, md: 8 },
+        pt: { xs: 11, sm: 13, md: 14 },
         pb: { xs: 8, md: 12 },
-        bgcolor: 'background.neutral',
+        bgcolor: 'background.default',
       }}
     >
       <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
         <Box
           sx={{
-            px: { xs: 2.5, sm: 5 },
-            py: { xs: 3.5, sm: 5 },
+            px: { xs: 3, md: 6 },
+            py: { xs: 5, md: 6 },
             mb: { xs: 2.5, sm: 4 },
             color: 'common.white',
             overflow: 'hidden',
             position: 'relative',
             borderRadius: { xs: 2.5, sm: 3 },
-            boxShadow: '0 24px 54px rgba(5, 37, 24, 0.2)',
+            boxShadow: '0 24px 54px rgba(255, 255, 255, 0.93)',
             backgroundImage:
-              'linear-gradient(105deg, rgba(5, 37, 24, 0.98), rgba(9, 65, 44, 0.82)), url(/assets/background/hero-2.jpg)',
+              'linear-gradient(105deg, rgba(249, 245, 239, 0.98), rgba(255, 253, 247, 0.78)), url(/assets/background/hero-3.jpg)',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
-            '&::after': {
-              top: -120,
-              right: -90,
-              width: 300,
-              height: 300,
-              content: '""',
-              opacity: 0.18,
-              borderRadius: '50%',
-              position: 'absolute',
-              border: '56px solid currentColor',
-            },
           }}
         >
+          <Box
+            sx={{
+              width: 240,
+              height: 240,
+              right: -80,
+              bottom: -150,
+              position: 'absolute',
+              borderRadius: '50%',
+              border: '38px solid rgba(255,255,255,0.07)',
+            }}
+          />
           <Box
             sx={{
               gap: 2,
               zIndex: 1,
               display: 'flex',
               position: 'relative',
-              alignItems: 'center',
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              flexDirection: { xs: 'column', sm: 'row' },
               justifyContent: 'space-between',
             }}
           >
             <Box sx={{ gap: { xs: 1.5, sm: 2 }, display: 'flex', alignItems: 'center' }}>
-              {!!data?.company?.logoUrl && (
-                <Box
-                  sx={{
-                    p: 0.75,
-                    display: 'flex',
-                    borderRadius: 1.5,
-                    bgcolor: 'common.white',
-                    boxShadow: '0 10px 24px rgba(0, 0, 0, 0.18)',
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={data.company.logoUrl}
-                    alt={`โลโก้ ${companyName}`}
-                    sx={{
-                      width: { xs: 44, sm: 56 },
-                      height: { xs: 44, sm: 56 },
-                      objectFit: 'contain',
-                    }}
-                  />
-                </Box>
-              )}
-              <Box>
-                <Typography variant="overline" sx={{ color: 'secondary.light', letterSpacing: 2 }}>
+              <Box sx={{ zIndex: 1, maxWidth: 760, position: 'relative' }}>
+                <Typography variant="overline" color="secondary" sx={{ letterSpacing: 2 }}>
                   UPCOMING EVENTS
                 </Typography>
-                <Typography variant="h3" sx={{ mt: 0.25, fontSize: { xs: 32, sm: 42 } }}>
+                <Typography variant="h2" color="primary" sx={{ mt: 1 }}>
                   คิวงานที่กำลังจะมาถึง
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 0.75, opacity: 0.78 }}>
+                <Typography color="primary" sx={{ mt: 1.5, lineHeight: 1.8 }}>
                   ติดตามกำหนดการและสถานะงานได้ที่นี่
                 </Typography>
               </Box>
@@ -155,7 +133,8 @@ export function PublicJobQueueView() {
                 borderRadius: 1.5,
                 textAlign: 'center',
                 alignItems: 'center',
-                flexDirection: 'column',
+                flexDirection: { xs: 'row', sm: 'column' },
+                gap: { xs: 1, sm: 0 },
                 bgcolor: 'rgba(255, 255, 255, 0.14)',
                 border: '1px solid rgba(255, 255, 255, 0.22)',
               }}
@@ -163,19 +142,22 @@ export function PublicJobQueueView() {
               <Typography sx={{ fontSize: { xs: 24, sm: 30 }, fontWeight: 800, lineHeight: 1 }}>
                 {jobCount}
               </Typography>
-              <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.78, whiteSpace: 'nowrap' }}>
-                รายการ
+              <Typography
+                variant="caption"
+                sx={{ mt: { sm: 0.5 }, opacity: 0.78, whiteSpace: 'nowrap' }}
+              >
+                คิวงานทั้งหมด
               </Typography>
             </Box>
           </Box>
         </Box>
 
-        <Box
-          sx={{ mb: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          <Typography variant="h5">ตารางคิวงาน</Typography>
+        <Box sx={{ mb: 2.5 }}>
+          <Typography variant="h4" sx={{ fontSize: { xs: 24, sm: 28 } }}>
+            ตารางคิวงาน
+          </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            อัปเดตล่าสุด
+            กำหนดการเรียงตามวันที่เพื่อให้ตรวจสอบคิวได้สะดวก
           </Typography>
         </Box>
 
@@ -193,6 +175,7 @@ export function PublicJobQueueView() {
                   overflow: 'hidden',
                   border: '1px solid',
                   borderColor: 'divider',
+                  borderLeft: { sm: `4px solid ${statusMeta.hex}` },
                   boxShadow: '0 10px 28px rgba(13, 32, 61, 0.06)',
                   transition: 'transform 180ms ease, box-shadow 180ms ease',
                   '&:hover': {
@@ -205,16 +188,16 @@ export function PublicJobQueueView() {
                   sx={{
                     minHeight: { sm: 126 },
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', sm: '156px minmax(0, 1fr) auto' },
+                    gridTemplateColumns: { xs: '1fr', sm: '180px minmax(0, 1fr) auto' },
                   }}
                 >
                   <Box
                     sx={{
                       p: { xs: 1.5, sm: 2.5 },
-                      color: 'common.white',
+                      color: { xs: 'common.white', sm: statusMeta.hex },
                       display: 'flex',
                       alignItems: 'center',
-                      bgcolor: statusMeta.hex,
+                      bgcolor: { xs: statusMeta.hex, sm: 'transparent' },
                       justifyContent: { xs: 'flex-start', sm: 'center' },
                     }}
                   >
@@ -237,7 +220,7 @@ export function PublicJobQueueView() {
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                       {job.jobNo}
                     </Typography>
-                    <Typography variant="h6" sx={{ mt: 0.25 }}>
+                    <Typography variant="h6" sx={{ mt: 0.25, overflowWrap: 'anywhere' }}>
                       {job.title}
                     </Typography>
                     <Box

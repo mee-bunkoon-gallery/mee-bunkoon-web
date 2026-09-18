@@ -42,7 +42,7 @@ export function PromotionPackageListView() {
         px: { xs: 2.5, md: 8 },
         pt: { xs: 14, md: 12 },
         pb: { xs: 8, md: 12 },
-        bgcolor: 'background.neutral',
+        bgcolor: 'background.default',
       }}
     >
       <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
@@ -50,42 +50,29 @@ export function PromotionPackageListView() {
           sx={{
             mb: { xs: 4, md: 6 },
             px: { xs: 3, md: 6 },
-            py: { xs: 5, md: 7 },
+            py: { xs: 5, md: 6 },
             overflow: 'hidden',
             color: 'common.white',
             borderRadius: 2.5,
             position: 'relative',
             backgroundImage:
-              'linear-gradient(105deg, rgba(5,37,24,0.98), rgba(9,65,44,0.78)), url(/assets/background/hero-3.jpg)',
+              'linear-gradient(105deg, rgba(249, 245, 239, 0.98), rgba(255, 253, 247, 0.78)), url(/assets/background/hero-3.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            boxShadow: '0 24px 54px rgba(5,37,24,0.2)',
+            boxShadow: '0 24px 54px rgba(248, 250, 249, 0.2)',
           }}
         >
           <Box sx={{ zIndex: 1, maxWidth: 760, position: 'relative' }}>
-            <Typography variant="overline" sx={{ color: 'secondary.light', letterSpacing: 2 }}>
+            <Typography variant="overline" color="secondary" sx={{ letterSpacing: 2 }}>
               PACKAGES & PROMOTIONS
             </Typography>
-            <Typography component="h1" variant="h2" sx={{ mt: 1 }}>
+            <Typography variant="h2" color="primary" sx={{ mt: 1 }}>
               แพ็กเกจสำหรับทุกช่วงเวลาสำคัญ
             </Typography>
-            <Typography sx={{ mt: 1.5, color: 'rgba(255,255,255,0.72)', lineHeight: 1.8 }}>
+            <Typography color="primary" sx={{ mt: 1.5, lineHeight: 1.8 }}>
               เลือกแพ็กเกจที่เหมาะกับรูปแบบงานและงบประมาณของคุณ พร้อมดูรายละเอียดบริการทั้งหมด
             </Typography>
           </Box>
-          <Box
-            sx={{
-              width: 260,
-              height: 260,
-              right: -70,
-              bottom: -130,
-              opacity: 0.12,
-              borderRadius: '50%',
-              position: 'absolute',
-              border: '52px solid',
-              borderColor: 'secondary.light',
-            }}
-          />
         </Box>
 
         {promotionPackages.length ? (

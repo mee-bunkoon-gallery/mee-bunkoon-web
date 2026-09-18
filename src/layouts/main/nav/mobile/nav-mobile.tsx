@@ -3,10 +3,8 @@ import type { NavMainProps } from '../types';
 import { useEffect } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 
-import { paths } from 'src/routes/paths';
 import { usePathname } from 'src/routes/hooks';
 
 import { Logo } from 'src/components/logo';
@@ -14,7 +12,6 @@ import { Scrollbar } from 'src/components/scrollbar';
 
 import { Nav, NavUl } from '../components';
 import { NavList } from './nav-mobile-list';
-import { SignInButton } from '../../../components/sign-in-button';
 
 // ----------------------------------------------------------------------
 
@@ -93,7 +90,7 @@ export function NavMobile({ data, open, onClose, slots, sx }: NavMobileProps) {
             display: 'flex',
           }}
         >
-          <SignInButton fullWidth />
+          {/* <SignInButton fullWidth />
 
           <Button
             fullWidth
@@ -103,7 +100,7 @@ export function NavMobile({ data, open, onClose, slots, sx }: NavMobileProps) {
             href={paths.minimalStore}
           >
             Purchase
-          </Button>
+          </Button> */}
         </Box>
       )}
     </Drawer>

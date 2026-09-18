@@ -168,7 +168,7 @@ export function HomeView() {
         <Box
           sx={{
             mx: 'auto',
-            px: { xs: 2.5, sm: 4, md: 8 },
+            px: { xs: 2.5, sm: 0 },
             pt: { xs: 18, md: 21 },
             pb: 9,
             maxWidth: 1280,
@@ -290,7 +290,6 @@ export function HomeView() {
               spacing={2}
               sx={{
                 p: { xs: 3, md: 4 },
-                borderBottom: { xs: index < 2 ? '1px solid' : 0, md: 0 },
               }}
             >
               <Box
@@ -553,7 +552,7 @@ export function HomeView() {
         </Box>
       </Box>
 
-      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 8, md: 12 } }}>
+      <Box component="section" sx={{ px: { xs: 2.5, md: 8 }, pb: { xs: 8 } }}>
         <Box
           sx={{
             mx: 'auto',
@@ -599,19 +598,6 @@ export function HomeView() {
               </Button>
             </Stack>
           </Box>
-          <Box
-            sx={{
-              width: 360,
-              height: 360,
-              right: -80,
-              bottom: -180,
-              opacity: 0.12,
-              borderRadius: '50%',
-              position: 'absolute',
-              border: '70px solid',
-              borderColor: 'secondary.light',
-            }}
-          />
         </Box>
       </Box>
 

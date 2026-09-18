@@ -57,6 +57,7 @@ const getLinks = (companyName: string) => [
     children: [
       { name: 'หน้าแรก', href: '/' },
       { name: 'คิวงาน', href: paths.jobQueue },
+      { name: 'โปรโมชั่น', href: paths.promotionPackages.root },
     ],
   },
   {
@@ -82,7 +83,9 @@ const SOCIAL_ICONS = {
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   position: 'relative',
-  backgroundColor: theme.palette.common.white,
+  overflow: 'hidden',
+  color: theme.palette.text.primary,
+  backgroundColor: '#ffffff',
 }));
 
 export type FooterProps = React.ComponentProps<typeof FooterRoot>;
@@ -104,30 +107,40 @@ export function Footer({
           width: { xs: 'calc(100% - 40px)', md: 'calc(100% - 128px)' },
           maxWidth: '1280px !important',
           px: '0 !important',
-          pb: 5,
-          pt: 10,
+          pb: { xs: 3, md: 4 },
+          pt: { xs: 5, sm: 7, md: 4 },
           textAlign: 'center',
           [theme.breakpoints.up(layoutQuery)]: { textAlign: 'unset' },
         })}
       >
-        <CompanyLogo />
-
         <Grid
           container
           sx={[
             (theme) => ({
-              mt: 3,
+              rowGap: { xs: 4, md: 0 },
               justifyContent: 'center',
               [theme.breakpoints.up(layoutQuery)]: { justifyContent: 'space-between' },
             }),
           ]}
         >
-          <Grid size={{ xs: 12, [layoutQuery]: 3 }}>
+          <Grid size={{ xs: 12, [layoutQuery]: 4 }}>
+            <Box
+              sx={(theme) => ({
+                display: 'flex',
+                justifyContent: 'center',
+                [theme.breakpoints.up(layoutQuery)]: { justifyContent: 'flex-start' },
+              })}
+            >
+              <CompanyLogo sx={{ width: 100, height: 100 }} />
+            </Box>
             <Typography
               variant="body2"
               sx={(theme) => ({
+                mt: 2,
                 mx: 'auto',
-                maxWidth: 280,
+                maxWidth: 340,
+                opacity: 0.72,
+                lineHeight: 1.8,
                 [theme.breakpoints.up(layoutQuery)]: { mx: 'unset' },
               })}
             >
@@ -136,11 +149,11 @@ export function Footer({
 
             <Box
               sx={(theme) => ({
-                mt: 3,
-                mb: 5,
+                gap: 0.75,
+                mt: 2,
                 display: 'flex',
                 justifyContent: 'center',
-                [theme.breakpoints.up(layoutQuery)]: { mb: 0, justifyContent: 'flex-start' },
+                [theme.breakpoints.up(layoutQuery)]: { justifyContent: 'flex-start' },
               })}
             >
               {_socials.map((social) => (
@@ -151,6 +164,13 @@ export function Footer({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
+                  sx={{
+                    color: 'primary.main',
+                    bgcolor: 'common.white',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'primary.main', color: 'common.white' },
+                  }}
                 >
                   <Iconify icon={SOCIAL_ICONS[social.value as keyof typeof SOCIAL_ICONS] as any} />
                 </IconButton>
@@ -161,25 +181,27 @@ export function Footer({
           <Grid size={{ xs: 12, [layoutQuery]: 6 }}>
             <Box
               sx={(theme) => ({
-                gap: 5,
-                display: 'flex',
-                flexDirection: 'column',
-                [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row' },
+                gap: { xs: 3, sm: 4 },
+                display: 'grid',
+                gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(3, 1fr)' },
               })}
             >
-              {links.map((list) => (
+              {links.map((list, index) => (
                 <Box
                   key={list.headline}
                   sx={(theme) => ({
-                    gap: 2,
+                    gap: 1.25,
                     width: 1,
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'column',
+                    ...(index === links.length - 1 && {
+                      gridColumn: { xs: '1 / -1', sm: 'auto' },
+                    }),
                     [theme.breakpoints.up(layoutQuery)]: { alignItems: 'flex-start' },
                   })}
                 >
-                  <Typography component="div" variant="overline">
+                  <Typography component="div" variant="overline" sx={{ color: 'primary.main' }}>
                     {list.headline}
                   </Typography>
 
@@ -188,8 +210,10 @@ export function Footer({
                       key={link.name}
                       component={RouterLink}
                       href={link.href}
-                      color="inherit"
+                      color="text.secondary"
                       variant="body2"
+                      underline="none"
+                      sx={{ '&:hover': { color: 'primary.main' } }}
                     >
                       {link.name}
                     </Link>
@@ -200,9 +224,11 @@ export function Footer({
           </Grid>
         </Grid>
 
-        <Typography variant="body2" sx={{ mt: 10 }}>
-          © {new Date().getFullYear()} {company.name} สงวนลิขสิทธิ์
-        </Typography>
+        <Box sx={{ mt: { xs: 4, md: 6 }, pt: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            © {new Date().getFullYear()} {company.name} สงวนลิขสิทธิ์
+          </Typography>
+        </Box>
       </Container>
     </FooterRoot>
   );
@@ -246,7 +272,7 @@ export function HomeFooter({ sx, ...other }: FooterProps) {
             </IconButton>
           ))}
         </Box>
-        <Box sx={{ mt: 1, typography: 'caption', color: theme.palette.secondary.main }}>
+        <Box sx={{ mt: 1, typography: 'caption', color: theme.palette.primary.main }}>
           © {company.nameEn}
         </Box>
       </Container>

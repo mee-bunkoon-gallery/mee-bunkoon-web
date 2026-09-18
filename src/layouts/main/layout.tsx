@@ -73,7 +73,7 @@ export function MainLayout({
           <NavMobile data={navData} open={open} onClose={onClose} />
 
           {/** @slot Logo */}
-          <CompanyLogo />
+          <CompanyLogo isRow />
         </>
       ),
       rightArea: (

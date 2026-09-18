@@ -56,41 +56,60 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
       component="main"
       sx={{
         minHeight: '100vh',
-        px: { xs: 2.5, md: 8 },
-        pt: { xs: 13, md: 16 },
+        px: { xs: 2, sm: 3, md: 8 },
+        pt: { xs: 11, sm: 13, md: 16 },
         pb: { xs: 8, md: 12 },
-        bgcolor: 'background.neutral',
+        bgcolor: 'background.default',
       }}
     >
-      <Box sx={{ mx: 'auto', maxWidth: 1180 }}>
+      <Box sx={{ mx: 'auto', maxWidth: 1280 }}>
         <Button
           component={RouterLink}
           href="/"
           color="inherit"
           startIcon={<Iconify icon="eva:arrow-ios-back-fill" />}
-          sx={{ mb: 3 }}
+          size="small"
+          sx={{ mb: { xs: 2, sm: 3 } }}
         >
           กลับหน้าหลัก
         </Button>
 
-        <Card sx={{ mb: 3, overflow: 'hidden', position: 'relative' }}>
+        <Card sx={{ mb: { xs: 2, sm: 3 }, overflow: 'hidden', position: 'relative' }}>
           <Image
             alt={promotionPackage.name}
             src={promotionPackage.imageUrl || '/assets/background/hero-1.jpg'}
-            sx={{ width: 1, height: { xs: 280, sm: 380, md: 460 } }}
+            sx={{ width: 1, height: { xs: 230, sm: 380, md: 460 } }}
           />
           <Box
             sx={{
               inset: 0,
               position: 'absolute',
-              background: 'linear-gradient(180deg, transparent 45%, rgba(5,37,24,0.82) 100%)',
+              background: 'linear-gradient(180deg, rgba(5,37,24,0.04) 20%, rgba(5,37,24,0.9) 100%)',
             }}
           />
-          <Box sx={{ left: 0, right: 0, bottom: 0, p: { xs: 3, md: 5 }, position: 'absolute' }}>
+          <Box
+            sx={{
+              left: 0,
+              right: 0,
+              bottom: 0,
+              minWidth: 0,
+              p: { xs: 2.25, sm: 3, md: 5 },
+              position: 'absolute',
+            }}
+          >
             <Typography variant="overline" sx={{ color: 'secondary.light' }}>
               แพ็กเกจและโปรโมชั่น
             </Typography>
-            <Typography component="h1" variant="h2" sx={{ color: 'common.white' }}>
+            <Typography
+              component="h1"
+              variant="h2"
+              sx={{
+                color: 'common.white',
+                fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
+                lineHeight: 1.25,
+                overflowWrap: 'anywhere',
+              }}
+            >
               {promotionPackage.name}
             </Typography>
           </Box>
@@ -98,13 +117,13 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
 
         <Box
           sx={{
-            gap: 3,
+            gap: { xs: 2, md: 3 },
             display: 'grid',
             alignItems: 'start',
             gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) 320px' },
           }}
         >
-          <Card sx={{ p: { xs: 2.5, sm: 3.5, md: 4 } }}>
+          <Card sx={{ p: { xs: 2, sm: 3.5, md: 4 }, minWidth: 0 }}>
             {promotionPackage.description && (
               <Box sx={{ mb: 4 }}>
                 <Typography variant="h5" sx={{ mb: 1.5 }}>
@@ -118,7 +137,13 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
               </Box>
             )}
 
-            <Stack direction="row" alignItems="baseline" justifyContent="space-between" mb={2.5}>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              alignItems={{ xs: 'flex-start', sm: 'baseline' }}
+              justifyContent="space-between"
+              spacing={0.5}
+              mb={2.5}
+            >
               <Typography variant="h5">รายการภายในแพ็กเกจ</Typography>
               <Typography variant="body2" color="text.secondary">
                 {promotionPackage.items.length} รายการ
@@ -137,15 +162,15 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
                     borderRadius: 1.5,
                     border: '1px solid',
                     borderColor: 'divider',
-                    gridTemplateColumns: { xs: '76px minmax(0, 1fr)', sm: '112px minmax(0, 1fr)' },
+                    gridTemplateColumns: { xs: '1fr', sm: '112px minmax(0, 1fr)' },
                   }}
                 >
                   <Image
                     alt={item.name}
                     src={item.imageUrl || '/assets/background/hero-1.jpg'}
                     sx={{
-                      width: { xs: 76, sm: 112 },
-                      height: { xs: 76, sm: 112 },
+                      width: 1,
+                      height: { xs: 180, sm: 112 },
                       borderRadius: 1,
                     }}
                   />
@@ -160,7 +185,10 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
                         <Typography variant="caption" color="text.disabled">
                           รายการที่ {index + 1}
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ lineHeight: 1.4 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ lineHeight: 1.4, overflowWrap: 'anywhere' }}
+                        >
                           {item.name}
                         </Typography>
                       </Box>
@@ -195,11 +223,21 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
             </Stack>
           </Card>
 
-          <Card sx={{ p: 3 }}>
+          <Card
+            sx={{
+              p: { xs: 2.5, sm: 3 },
+              minWidth: 0,
+              gridRow: { xs: 1, md: 'auto' },
+            }}
+          >
             <Typography variant="body2" color="text.secondary">
               ราคาแพ็กเกจ
             </Typography>
-            <Typography variant="h2" color="primary.main" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="h2"
+              color="primary.main"
+              sx={{ mt: 0.5, fontSize: { xs: '2rem', sm: '2.5rem' }, overflowWrap: 'anywhere' }}
+            >
               {fBaht(promotionPackage.promotionPrice)}
             </Typography>
             <Box sx={{ my: 2.5, borderTop: '1px dashed', borderColor: 'divider' }} />
