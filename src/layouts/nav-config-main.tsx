@@ -15,11 +15,13 @@ export const navData: NavMainProps['data'] = [
   {
     title: 'คิวงาน',
     path: paths.jobQueue,
+    deepMatch: true,
     icon: <Iconify width={22} icon="solar:atom-bold-duotone" />,
   },
   {
     title: 'โปรโมชั่น',
     path: paths.promotionPackages.root,
+    deepMatch: true,
     icon: <Iconify width={22} icon={'solar:gift-bold-duotone' as any} />,
   },
   // {
