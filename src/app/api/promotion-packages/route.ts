@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 function mapPackage(row: any) {
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
+  const body = await readJson(request);
   if (!body.name?.trim() || !body.items?.length) {
     return NextResponse.json({ message: 'กรุณากรอกชื่อและเลือกรายการบริการ' }, { status: 400 });
   }

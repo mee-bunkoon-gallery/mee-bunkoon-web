@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { extensionFromMime } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 const BUCKET = 'quotation-attachments';
@@ -61,7 +62,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const uploadedUrls: string[] = [];
   for (const [index, file] of files.entries()) {
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const extension = extensionFromMime(file.type, 'jpg');
     const path = `${id}/${crypto.randomUUID()}-${index}.${extension}`;
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)

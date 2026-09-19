@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
-import { mapContract } from '../map-contract';
+import { mapContract, withIdCardUrls } from '../map-contract';
 
 // ----------------------------------------------------------------------
 
@@ -36,7 +37,7 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ message: error.message }, { status: 404 });
   }
 
-  return NextResponse.json({ contract: mapContract(data) });
+  return NextResponse.json({ contract: mapContract((await withIdCardUrls(supabase, [data]))[0]) });
 }
 
 export async function PUT(request: Request, { params }: Params) {
@@ -49,7 +50,7 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await readJson(request);
 
   if (!body.customerId) {
     return NextResponse.json({ message: 'Customer is required' }, { status: 400 });
@@ -84,7 +85,7 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ contract: mapContract(data) });
+  return NextResponse.json({ contract: mapContract((await withIdCardUrls(supabase, [data]))[0]) });
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
@@ -97,10 +98,21 @@ export async function DELETE(_request: Request, { params }: Params) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
+  const { data: current } = await supabase
+    .from('contracts')
+    .select('id_card_front_path')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error } = await supabase.from('contracts').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+
+  // Don't leave the customer's ID card orphaned in storage.
+  if (current?.id_card_front_path) {
+    await supabase.storage.from('contract-id-cards').remove([current.id_card_front_path]);
   }
 
   return NextResponse.json({ success: true });

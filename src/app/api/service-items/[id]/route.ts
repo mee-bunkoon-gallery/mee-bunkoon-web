@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
@@ -82,7 +83,7 @@ export async function PUT(request: Request, { params }: Params) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await readJson(request);
 
   if (!body.name) {
     return NextResponse.json({ message: 'Name is required' }, { status: 400 });

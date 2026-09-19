@@ -2,12 +2,21 @@ import { NextResponse } from 'next/server';
 
 import { paths } from 'src/routes/paths';
 
+import { readJson, rateLimit, getSiteUrl } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
 
 export async function POST(request: Request) {
-  const { email, password, firstName, lastName } = await request.json();
+  // Internal back-office app: public registration is off unless explicitly enabled.
+  if (process.env.ALLOW_SIGN_UP !== 'true') {
+    return NextResponse.json({ message: 'Sign-up is disabled' }, { status: 403 });
+  }
+
+  const limited = rateLimit(request, 'sign-up', 5);
+  if (limited) return limited;
+
+  const { email, password, firstName, lastName } = await readJson(request);
 
   if (!email || !password || !firstName || !lastName) {
     return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
@@ -19,7 +28,7 @@ export async function POST(request: Request) {
     email,
     password,
     options: {
-      emailRedirectTo: `${new URL(request.url).origin}${paths.dashboard.root}`,
+      emailRedirectTo: `${getSiteUrl(request)}${paths.dashboard.root}`,
       data: { display_name: `${firstName} ${lastName}` },
     },
   });

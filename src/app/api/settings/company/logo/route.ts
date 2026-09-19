@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { extensionFromMime } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
     .eq('id', 'default')
     .maybeSingle();
 
-  const extension = file.name.split('.').pop() || 'png';
+  const extension = extensionFromMime(file.type, 'png');
   const path = `default-${Date.now()}.${extension}`;
 
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {

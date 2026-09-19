@@ -2,12 +2,16 @@ import { NextResponse } from 'next/server';
 
 import { paths } from 'src/routes/paths';
 
+import { readJson, rateLimit, getSiteUrl } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
 
 export async function POST(request: Request) {
-  const { email } = await request.json();
+  const limited = rateLimit(request, 'reset-password', 3);
+  if (limited) return limited;
+
+  const { email } = await readJson(request);
 
   if (!email) {
     return NextResponse.json({ message: 'Email is required' }, { status: 400 });
@@ -16,11 +20,12 @@ export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${new URL(request.url).origin}${paths.auth.supabase.updatePassword}`,
+    redirectTo: `${getSiteUrl(request)}${paths.auth.supabase.updatePassword}`,
   });
 
-  if (error) {
-    return NextResponse.json({ message: error.message }, { status: error.status ?? 400 });
+  // Same response whether or not the address exists, so accounts can't be enumerated.
+  if (error && error.status === 429) {
+    return NextResponse.json({ message: 'Too many attempts, try again later' }, { status: 429 });
   }
 
   return NextResponse.json({ success: true });

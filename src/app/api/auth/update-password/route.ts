@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
 
 export async function POST(request: Request) {
-  const { password, accessToken, refreshToken } = await request.json();
+  const { password, accessToken, refreshToken } = await readJson(request);
 
   if (!password) {
     return NextResponse.json({ message: 'Password is required' }, { status: 400 });

@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
@@ -114,7 +115,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await readJson(request);
 
   if (!body.customerId) {
     return NextResponse.json({ message: 'Customer is required' }, { status: 400 });
@@ -148,7 +149,9 @@ export async function POST(request: Request) {
   }
 
   if (body.status !== 'draft') {
-    const { error: completeError } = await supabase.rpc('complete_payment', { payment_id: data.id });
+    const { error: completeError } = await supabase.rpc('complete_payment', {
+      payment_id: data.id,
+    });
     if (completeError) {
       await supabase.from('payments').delete().eq('id', data.id);
       return NextResponse.json({ message: completeError.message }, { status: 400 });

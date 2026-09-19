@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { publicJson } from 'src/lib/api/utils';
 import { createSupabaseAdminClient } from 'src/lib/supabase/admin';
 
 export async function GET() {
@@ -12,8 +13,8 @@ export async function GET() {
     .order('display_order')
     .order('created_at');
 
-  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
-  return NextResponse.json({
+  if (error) return NextResponse.json({ message: 'Failed to load data' }, { status: 400 });
+  return publicJson({
     banners: data.map((row) => ({
       id: row.id,
       eyebrow: row.eyebrow,

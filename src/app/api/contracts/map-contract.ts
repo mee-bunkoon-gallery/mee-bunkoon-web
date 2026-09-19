@@ -1,3 +1,34 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+const ID_CARD_BUCKET = 'contract-id-cards';
+const ID_CARD_URL_TTL = 60 * 60; // 1 hour
+
+/** Replaces each row's stored `id_card_front_path` with a short-lived signed URL (one batched call). */
+export async function withIdCardUrls<T extends { id_card_front_path?: string | null }>(
+  supabase: SupabaseClient,
+  rows: T[]
+): Promise<(T & { id_card_front_url: string | null })[]> {
+  const paths = rows.map((row) => row.id_card_front_path).filter((path): path is string => !!path);
+  const urlByPath = new Map<string, string>();
+
+  if (paths.length) {
+    const { data } = await supabase.storage
+      .from(ID_CARD_BUCKET)
+      .createSignedUrls(paths, ID_CARD_URL_TTL);
+
+    data?.forEach((item) => {
+      if (item.path && item.signedUrl) urlByPath.set(item.path, item.signedUrl);
+    });
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    id_card_front_url: row.id_card_front_path
+      ? (urlByPath.get(row.id_card_front_path) ?? null)
+      : null,
+  }));
+}
+
 export function mapContract(row: any) {
   return {
     id: row.id,

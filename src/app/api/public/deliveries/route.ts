@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { publicJson } from 'src/lib/api/utils';
 import { createSupabaseAdminClient } from 'src/lib/supabase/admin';
 
 // ----------------------------------------------------------------------
@@ -15,7 +16,7 @@ export async function GET() {
     .limit(100);
 
   if (jobsError) {
-    return NextResponse.json({ message: jobsError.message }, { status: 400 });
+    return NextResponse.json({ message: 'Failed to load data' }, { status: 400 });
   }
 
   const { data: deliveries, error } = await supabase
@@ -28,7 +29,7 @@ export async function GET() {
     .limit(100);
 
   if (error) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: 'Failed to load data' }, { status: 400 });
   }
 
   const completedDeliveries = (deliveries ?? [])
@@ -54,5 +55,5 @@ export async function GET() {
     .filter((delivery) => delivery !== null)
     .slice(0, 12);
 
-  return NextResponse.json({ deliveries: completedDeliveries });
+  return publicJson({ deliveries: completedDeliveries });
 }

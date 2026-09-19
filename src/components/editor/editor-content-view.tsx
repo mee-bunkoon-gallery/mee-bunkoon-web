@@ -5,6 +5,8 @@ import { varAlpha } from 'minimal-shared/utils';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 
+import { sanitizeRichText } from 'src/utils/sanitize-html';
+
 import { editorClasses } from './classes';
 
 // ----------------------------------------------------------------------
@@ -22,7 +24,7 @@ export function EditorContentView({ content, className, ...other }: EditorConten
   return (
     <StyledContent
       className={[editorClasses.content.root, className].filter(Boolean).join(' ')}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: sanitizeRichText(content) }}
       {...other}
     />
   );

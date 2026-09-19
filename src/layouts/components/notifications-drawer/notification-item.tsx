@@ -7,6 +7,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
 
 import { fToNow } from 'src/utils/format-time';
+import { sanitizeRichText } from 'src/utils/sanitize-html';
 
 import { Label } from 'src/components/label';
 import { FileThumbnail } from 'src/components/file-thumbnail';
@@ -29,7 +30,7 @@ export type NotificationItemProps = {
 
 const readerContent = (data: string) => (
   <Box
-    dangerouslySetInnerHTML={{ __html: data }}
+    dangerouslySetInnerHTML={{ __html: sanitizeRichText(data) }}
     sx={{
       '& p': { m: 0, typography: 'body2' },
       '& a': { color: 'inherit', textDecoration: 'none' },

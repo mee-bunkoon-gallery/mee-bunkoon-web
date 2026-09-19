@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { useId, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { mergeClasses, isExternalLink } from 'minimal-shared/utils';
 
 import Link from '@mui/material/Link';
@@ -65,6 +66,17 @@ export function Markdown({
  *************************************** */
 const defaultRehypePlugins: NonNullable<Options['rehypePlugins']> = [
   rehypeRaw,
+  // Raw HTML inside markdown is untrusted: sanitize before highlighting (keep `className` for code blocks).
+  [
+    rehypeSanitize,
+    {
+      ...defaultSchema,
+      attributes: {
+        ...defaultSchema.attributes,
+        '*': [...(defaultSchema.attributes?.['*'] ?? []), 'className'],
+      },
+    },
+  ],
   rehypeHighlight,
   [remarkGfm, { singleTilde: false }],
 ];

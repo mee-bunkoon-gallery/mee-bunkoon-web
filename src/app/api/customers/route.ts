@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { readJson, sanitizeSearchTerm } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 // ----------------------------------------------------------------------
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
   }
 
   const searchParams = new URL(request.url).searchParams;
-  const q = searchParams.get('q');
+  const q = sanitizeSearchTerm(searchParams.get('q') ?? '');
   const rowsPerPageParam = searchParams.get('rowsPerPage');
 
   let query = supabase
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await readJson(request);
 
   if (!body.name) {
     return NextResponse.json({ message: 'Name is required' }, { status: 400 });

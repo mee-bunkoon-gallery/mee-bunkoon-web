@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { extensionFromMime } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 const BUCKET = 'hero-banner-images';
@@ -14,7 +15,7 @@ export async function POST(request: Request, { params }: Params) {
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const file = (await request.formData()).get('file');
-  if (!(file instanceof File) || !file.type.startsWith('image/')) {
+  if (!(file instanceof File) || !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
     return NextResponse.json({ message: 'กรุณาเลือกไฟล์รูปภาพ' }, { status: 400 });
   }
   if (file.size > 8 * 1024 * 1024) {
@@ -26,7 +27,7 @@ export async function POST(request: Request, { params }: Params) {
     .select('image_path')
     .eq('id', id)
     .single();
-  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const extension = extensionFromMime(file.type, 'jpg');
   const path = `${id}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)

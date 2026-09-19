@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { extensionFromMime } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 const BUCKET = 'delivery-images';
@@ -68,7 +69,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const uploadedUrls: string[] = [];
   for (const [index, file] of files.entries()) {
-    const extension = file.name.split('.').pop() || 'jpg';
+    const extension = extensionFromMime(file.type, 'jpg');
     const path = `${id}/${Date.now()}-${index}.${extension}`;
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)

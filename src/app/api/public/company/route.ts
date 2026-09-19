@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { publicJson } from 'src/lib/api/utils';
 import { createSupabaseAdminClient } from 'src/lib/supabase/admin';
 
 // ----------------------------------------------------------------------
@@ -14,10 +15,10 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: 'Failed to load data' }, { status: 400 });
   }
 
-  return NextResponse.json({
+  return publicJson({
     company: company
       ? {
           name: company.store_name_th || company.name,

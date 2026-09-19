@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { publicJson } from 'src/lib/api/utils';
 import { createSupabaseAdminClient } from 'src/lib/supabase/admin';
 
 type Params = { params: Promise<{ id: string }> };
@@ -25,7 +26,7 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ message: 'ไม่พบแพ็กเกจนี้' }, { status: 404 });
   }
 
-  return NextResponse.json({
+  return publicJson({
     package: {
       id: data.id,
       name: data.name,

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
 const mapBanner = (row: any) => ({
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
+  const body = await readJson(request);
   if (!body.title?.trim()) {
     return NextResponse.json({ message: 'กรุณากรอกหัวข้อ Banner' }, { status: 400 });
   }

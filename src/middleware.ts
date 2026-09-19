@@ -37,6 +37,8 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// Only routes that read the session need the refresh (a network round-trip to Supabase).
+// Public marketing pages and `/api/public/*` skip it entirely.
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: ['/dashboard/:path*', '/auth/:path*', '/api/((?!public/).*)'],
 };

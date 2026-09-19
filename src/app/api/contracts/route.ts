@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 
+import { readJson } from 'src/lib/api/utils';
 import { createSupabaseServerClient } from 'src/lib/supabase/server';
 
-import { mapContract } from './map-contract';
+import { mapContract, withIdCardUrls } from './map-contract';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +46,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ contracts: data.map(mapContract), total: count ?? data.length });
+  return NextResponse.json({
+    contracts: (await withIdCardUrls(supabase, data)).map(mapContract),
+    total: count ?? data.length,
+  });
 }
 
 export async function POST(request: Request) {
@@ -59,7 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await readJson(request);
 
   if (!body.customerId) {
     return NextResponse.json({ message: 'Customer is required' }, { status: 400 });
@@ -94,5 +98,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ contract: mapContract(data) });
+  return NextResponse.json({ contract: mapContract((await withIdCardUrls(supabase, [data]))[0]) });
 }
