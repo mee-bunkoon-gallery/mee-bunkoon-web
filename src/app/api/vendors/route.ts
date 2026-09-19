@@ -7,6 +7,7 @@ function mapVendor(row: any) {
   return {
     id: row.id,
     name: row.name,
+    imageUrl: row.image_url,
     category: row.category,
     contactPerson: row.contact_person,
     phone: row.phone,
@@ -17,6 +18,7 @@ function mapVendor(row: any) {
     province: row.province,
     paymentTerms: row.payment_terms,
     note: row.note,
+    documentUrls: row.document_urls ?? [],
     isActive: row.is_active,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

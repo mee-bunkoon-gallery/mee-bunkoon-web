@@ -8,6 +8,8 @@ import { RiAddLine, RiEditLine, RiSearchLine, RiDeleteBin6Line } from '@remixico
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
+import Stack from '@mui/material/Stack';
+import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
@@ -91,7 +93,12 @@ export function VendorListView() {
               <TableBody>
                 {vendors.map((vendor) => (
                   <TableRow key={vendor.id} hover>
-                    <TableCell><Typography variant="subtitle2">{vendor.name}</Typography><Typography variant="caption" sx={{ color: 'text.secondary' }}>{vendor.phone || vendor.email || '-'}</Typography></TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Avatar src={vendor.imageUrl ?? undefined} alt={vendor.name}>{vendor.name.charAt(0)}</Avatar>
+                        <Box><Typography variant="subtitle2">{vendor.name}</Typography><Typography variant="caption" sx={{ color: 'text.secondary' }}>{vendor.phone || vendor.email || '-'}</Typography></Box>
+                      </Stack>
+                    </TableCell>
                     <TableCell>{vendor.category || '-'}</TableCell>
                     <TableCell>{vendor.contactPerson || '-'}</TableCell>
                     <TableCell>{vendor.province || '-'}</TableCell>
