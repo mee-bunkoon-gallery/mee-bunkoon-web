@@ -7,7 +7,6 @@ import {
   RiAddLine,
   RiEditLine,
   RiGiftFill,
-  RiImageFill,
   RiSearchLine,
   RiDeleteBin6Line,
   RiCalendarEventFill,
@@ -151,11 +150,9 @@ export function PromotionPackageView() {
                       borderBottomRightRadius: 0,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      ...(item.imageUrl && { backgroundImage: `url(${item.imageUrl})` }),
+                      backgroundImage: `url(${item.imageUrl || '/assets/images/empty/default.png'})`,
                     }}
-                  >
-                    {!item.imageUrl && <RiImageFill size={56} />}
-                  </Box>
+                   />
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Box sx={{ minWidth: 0 }}>
                       <Chip

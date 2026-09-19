@@ -162,7 +162,7 @@ export function ServiceListView() {
                     <TableCell>
                       <Avatar
                         variant="rounded"
-                        src={item.imageUrl ?? undefined}
+                        src={item.imageUrl || '/assets/images/empty/default.png'}
                         sx={{ width: 48, height: 48 }}
                       >
                         <RiListCheck2 />

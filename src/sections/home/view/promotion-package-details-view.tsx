@@ -77,14 +77,15 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
         <Card sx={{ mb: { xs: 2, sm: 3 }, overflow: 'hidden', position: 'relative' }}>
           <Image
             alt={promotionPackage.name}
-            src={promotionPackage.imageUrl || '/assets/background/hero-1.jpg'}
+            src={promotionPackage.imageUrl || '/assets/images/empty/default.png'}
             sx={{ width: 1, height: { xs: 230, sm: 380, md: 460 } }}
           />
           <Box
             sx={{
               inset: 0,
               position: 'absolute',
-              background: 'linear-gradient(180deg, rgba(5,37,24,0.04) 20%, rgba(5,37,24,0.9) 100%)',
+              background:
+                'linear-gradient(180deg, rgba(5, 15, 37, 0.04) 20%, rgba(11, 37, 84, 0.92) 100%)',
             }}
           />
           <Box
@@ -167,7 +168,7 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
                 >
                   <Image
                     alt={item.name}
-                    src={item.imageUrl || '/assets/background/hero-1.jpg'}
+                    src={item.imageUrl || '/assets/images/empty/default.png'}
                     sx={{
                       width: 1,
                       height: { xs: 180, sm: 112 },
@@ -217,6 +218,56 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
                     >
                       {item.description || 'ไม่มีรายละเอียดเพิ่มเติม'}
                     </Typography>
+                    <Box sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        โทนสี
+                      </Typography>
+                      {item.colorThemes?.length ? (
+                        <Stack
+                          direction="row"
+                          useFlexGap
+                          flexWrap="wrap"
+                          spacing={1}
+                          sx={{ mt: 0.75 }}
+                        >
+                          {item.colorThemes.map((theme) => (
+                            <Stack
+                              key={theme.id}
+                              direction="row"
+                              spacing={0.75}
+                              alignItems="center"
+                              sx={{
+                                px: 1.25,
+                                py: 0.5,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 10,
+                                bgcolor: 'background.paper',
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 14,
+                                  height: 14,
+                                  flexShrink: 0,
+                                  borderRadius: '50%',
+                                  bgcolor: theme.hexCode || 'grey.300',
+                                  border: '1px solid',
+                                  borderColor: 'divider',
+                                }}
+                              />
+                              <Typography variant="caption" sx={{ color: 'text.primary' }}>
+                                {theme.name}
+                              </Typography>
+                            </Stack>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Typography variant="body2" sx={{ mt: 0.5, color: 'text.disabled' }}>
+                          ยังไม่ได้กำหนดโทนสี
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               ))}
@@ -231,7 +282,7 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              ราคาแพ็กเกจ
+              ราคาแพ็กเกจเริ่มต้นที่
             </Typography>
             <Typography
               variant="h2"

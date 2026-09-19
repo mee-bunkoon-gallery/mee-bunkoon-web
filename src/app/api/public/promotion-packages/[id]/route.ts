@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: Params) {
   const { data, error } = await supabase
     .from('promotion_packages')
     .select(
-      'id, name, description, image_url, promotion_price, start_date, end_date, active, items:promotion_package_items(quantity, position, service_item:service_items(name, description, image_url, unit))'
+      'id, name, description, image_url, promotion_price, start_date, end_date, active, items:promotion_package_items(quantity, position, service_item:service_items(name, description, image_url, unit, color_themes:service_item_color_themes(color_theme:color_themes(id, name, hex_code))))'
     )
     .eq('id', id)
     .single();
@@ -40,6 +40,14 @@ export async function GET(_request: Request, { params }: Params) {
           imageUrl: item.service_item.image_url,
           quantity: Number(item.quantity),
           unit: item.service_item.unit,
+          colorThemes: (item.service_item.color_themes ?? [])
+            .map((relation: any) => relation.color_theme)
+            .filter(Boolean)
+            .map((theme: any) => ({
+              id: theme.id,
+              name: theme.name,
+              hexCode: theme.hex_code,
+            })),
         })),
     },
   });

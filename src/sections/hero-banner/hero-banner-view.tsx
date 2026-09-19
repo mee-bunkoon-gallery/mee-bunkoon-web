@@ -90,7 +90,7 @@ export function HeroBannerView() {
                   <TableRow key={banner.id} hover>
                     <TableCell>
                       <Image
-                        src={banner.imageUrl || '/assets/background/hero-1.jpg'}
+                        src={banner.imageUrl || '/assets/images/empty/default.png'}
                         alt={banner.title}
                         sx={{ width: 120, height: 68, borderRadius: 1 }}
                       />

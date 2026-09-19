@@ -49,5 +49,10 @@ export type IPublicPromotionPackage = {
     imageUrl: string | null;
     quantity: number;
     unit: string;
+    colorThemes: {
+      id: string;
+      name: string;
+      hexCode: string | null;
+    }[];
   }[];
 };

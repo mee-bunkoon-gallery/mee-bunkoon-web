@@ -394,7 +394,7 @@ export function JobQueueDetailsView({ jobId }: Props) {
                       >
                         <Avatar
                           variant="rounded"
-                          src={item.imageUrl || undefined}
+                          src={item.imageUrl || '/assets/images/empty/default.png'}
                           alt={item.label}
                           sx={{
                             width: { xs: 58, sm: 76 },

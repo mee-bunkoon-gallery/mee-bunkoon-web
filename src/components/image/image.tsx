@@ -45,6 +45,7 @@ export type ImageProps = React.ComponentProps<typeof ImageRoot> &
   };
 
 const DEFAULT_DELAY = 0;
+const DEFAULT_IMAGE = '/assets/images/empty/default.png';
 const DEFAULT_EFFECT: EffectsType = {
   style: 'blur',
   duration: 300,
@@ -105,7 +106,7 @@ export function Image({
       ),
     image: () => (
       <ImageImg
-        src={src}
+        src={src || DEFAULT_IMAGE}
         alt={alt}
         onLoad={handleImageLoad}
         className={imageClasses.img}

@@ -87,7 +87,7 @@ export function PromotionPackageListView() {
               },
             }}
           >
-            {promotionPackages.map((promotionPackage, index) => (
+            {promotionPackages.map((promotionPackage) => (
               <Card
                 key={promotionPackage.id}
                 component={RouterLink}
@@ -107,9 +107,7 @@ export function PromotionPackageListView() {
               >
                 <Image
                   alt={promotionPackage.name}
-                  src={
-                    promotionPackage.imageUrl || `/assets/background/hero-${(index % 3) + 1}.jpg`
-                  }
+                  src={promotionPackage.imageUrl || '/assets/images/empty/default.png'}
                   sx={{ width: 1, height: 260 }}
                 />
                 <Stack spacing={2} sx={{ p: 3 }}>

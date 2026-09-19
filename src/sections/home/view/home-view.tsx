@@ -34,11 +34,8 @@ import { fBaht } from 'src/utils/format-number';
 import { Image } from 'src/components/image';
 import { Carousel, useCarousel } from 'src/components/carousel';
 
-const HERO_IMAGES = [
-  '/assets/background/hero-1.jpg',
-  '/assets/background/hero-2.jpg',
-  '/assets/background/hero-3.jpg',
-];
+const DEFAULT_IMAGE = '/assets/images/empty/default.png';
+const HERO_IMAGES = [DEFAULT_IMAGE];
 
 const DEFAULT_COMPANY = {
   name: 'มีบุญคุณ แกลเลอรี่',
@@ -506,7 +503,7 @@ export function HomeView() {
                 gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
               }}
             >
-              {promotionPackages.map((item, index) => (
+              {promotionPackages.map((item) => (
                 <Box
                   key={item.id}
                   component={RouterLink}
@@ -528,7 +525,7 @@ export function HomeView() {
                 >
                   <Image
                     alt={item.name}
-                    src={item.imageUrl || HERO_IMAGES[index % HERO_IMAGES.length]}
+                    src={item.imageUrl || DEFAULT_IMAGE}
                     sx={{
                       inset: 0,
                       width: 1,
@@ -542,7 +539,7 @@ export function HomeView() {
                       inset: 0,
                       position: 'absolute',
                       background:
-                        'linear-gradient(180deg, transparent 25%, rgba(4,28,19,0.92) 100%)',
+                        'linear-gradient(180deg, transparent 25%, rgba(11, 37, 84, 0.92) 100%)',
                     }}
                   />
                   <Stack sx={{ inset: 0, p: 3, position: 'absolute', justifyContent: 'flex-end' }}>
@@ -676,7 +673,7 @@ export function HomeView() {
         >
           <Box sx={{ position: 'relative' }}>
             <Image
-              src="/assets/mee-bunkoon/bg-1.jpg"
+              src="/assets/mee-bunkoon/logo-bg.png"
               alt="ทีมงานมีบุญคุณ แกลเลอรี่"
               ratio="4/3"
               sx={{
