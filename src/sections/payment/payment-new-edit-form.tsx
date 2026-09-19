@@ -5,34 +5,55 @@ import type { ICustomer } from 'src/types/quotation';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useBoolean } from 'minimal-shared/hooks';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RiEyeLine, RiCloseLine, RiSave3Line } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import DialogTitle from '@mui/material/DialogTitle';
 import Autocomplete from '@mui/material/Autocomplete';
+import DialogContent from '@mui/material/DialogContent';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
+import { CONFIG } from 'src/global-config';
+
 import { toast } from 'src/components/snackbar';
+import { LoadingScreen } from 'src/components/loading-screen';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { useCustomersQuery } from 'src/sections/customer/customer-queries';
+import { useCompanyProfileQuery } from 'src/sections/settings/settings-queries';
 import { useQuotationQuery, useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
 
-import { uploadPaymentSlip } from './payment-api';
+import { PaymentPdfDocument } from './payment-pdf-document';
+import { getPayment, getNextReceiptNo, uploadPaymentSlip } from './payment-api';
 import { PAYMENT_METHOD_OPTIONS, PAYMENT_PURPOSE_OPTIONS } from './payment-method';
 import {
   usePaymentsQuery,
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
 } from './payment-queries';
+
+// ----------------------------------------------------------------------
+
+const PDFViewer = dynamic(() => import('@react-pdf/renderer').then((mod) => mod.PDFViewer), {
+  ssr: false,
+  loading: () => <LoadingScreen />,
+});
 
 // ----------------------------------------------------------------------
 
@@ -105,9 +126,18 @@ export function PaymentNewEditForm({
   prefillQuotation,
 }: Props) {
   const router = useRouter();
+  const previewDialog = useBoolean();
 
-  const [selectedQuotationId, setSelectedQuotationId] = useState<string | null>(null);
+  const [savedPayment, setSavedPayment] = useState<IPayment | null>(null);
+  const [selectedQuotationId, setSelectedQuotationId] = useState<string | null>(
+    currentPayment?.quotationId ?? prefillQuotation?.id ?? quotationId ?? null
+  );
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+  const { data: nextReceiptNo = 'กำลังสร้างเลข...' } = useQuery({
+    queryKey: ['payments', 'next-receipt-no'],
+    queryFn: getNextReceiptNo,
+  });
   const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
   const { data: quotations = [], isError: isQuotationsError } = useQuotationsQuery();
 
@@ -146,6 +176,7 @@ export function PaymentNewEditForm({
 
   const {
     reset,
+    watch,
     control,
     setValue,
     handleSubmit,
@@ -153,6 +184,10 @@ export function PaymentNewEditForm({
   } = methods;
 
   useEffect(() => {
+    setSavedPayment(null);
+    setSelectedQuotationId(
+      currentPayment?.quotationId ?? prefillQuotation?.id ?? quotationId ?? null
+    );
     reset(
       toDefaultValues(currentPayment, {
         customer: prefillCustomer,
@@ -160,14 +195,14 @@ export function PaymentNewEditForm({
         quotation: prefillQuotation,
       })
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayment, reset]);
+  }, [currentPayment, prefillAmount, prefillCustomer, prefillQuotation, quotationId, reset]);
 
   useEffect(() => {
     if (!selectedQuotationId || !selectedQuotationDetail) return;
 
+    const activePaymentId = savedPayment?.id ?? currentPayment?.id;
     const paid = (selectedQuotationPayments ?? []).reduce(
-      (sum, payment) => sum + payment.amount,
+      (sum, payment) => sum + (payment.id === activePaymentId ? 0 : payment.amount),
       0
     );
 
@@ -178,37 +213,82 @@ export function PaymentNewEditForm({
         : null
     );
     setValue('amount', Math.max(selectedQuotationDetail.total - paid, 0));
-  }, [selectedQuotationId, selectedQuotationDetail, selectedQuotationPayments, setValue]);
+  }, [
+    currentPayment?.id,
+    savedPayment?.id,
+    selectedQuotationId,
+    selectedQuotationDetail,
+    selectedQuotationPayments,
+    setValue,
+  ]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const values = watch() as PaymentFormSchemaType;
+  const activePayment = savedPayment ?? currentPayment;
+  const previewPayment: IPayment = {
+    id: activePayment?.id ?? 'preview',
+    receiptNo:
+      activePayment?.status === 'completed' ? activePayment.receiptNo : nextReceiptNo,
+    quotationId: values.quotation?.id ?? quotationId ?? null,
+    quotation: values.quotation ?? null,
+    contractId: contractId ?? activePayment?.contractId ?? null,
+    customerId: values.customer?.id ?? '',
+    customer: customers.find((customer) => customer.id === values.customer?.id) ?? null,
+    paymentDate: values.paymentDate
+      ? dayjs(values.paymentDate).format('YYYY-MM-DD')
+      : dayjs().format('YYYY-MM-DD'),
+    amount: Number(values.amount) || 0,
+    paymentMethod: values.paymentMethod,
+    paymentPurpose: values.paymentPurpose,
+    status: activePayment?.status ?? 'draft',
+    referenceNo: values.referenceNo ?? null,
+    slipUrl: typeof values.slip === 'string' ? values.slip : null,
+    note: values.note ?? null,
+    createdAt: activePayment?.createdAt ?? new Date().toISOString(),
+    updatedAt: activePayment?.updatedAt ?? new Date().toISOString(),
+  };
+
+  const savePayment = async (data: PaymentFormSchemaType, stayOnPage: boolean) => {
     try {
       const payload = {
-        quotationId: data.quotation?.id ?? (!currentPayment ? quotationId : null) ?? null,
-        contractId: contractId ?? currentPayment?.contractId ?? null,
+        quotationId: data.quotation?.id ?? (!activePayment ? quotationId : null) ?? null,
+        contractId: contractId ?? activePayment?.contractId ?? null,
         customerId: data.customer!.id,
         paymentDate: dayjs(data.paymentDate).format('YYYY-MM-DD'),
         amount: data.amount,
         paymentMethod: data.paymentMethod,
         paymentPurpose: data.paymentPurpose,
+        status: stayOnPage ? ('draft' as const) : ('completed' as const),
         referenceNo: data.referenceNo,
         note: data.note,
       };
 
-      const payment = currentPayment
-        ? await updateMutation.mutateAsync({ id: currentPayment.id, input: payload })
+      const payment = activePayment
+        ? await updateMutation.mutateAsync({ id: activePayment.id, input: payload })
         : await createMutation.mutateAsync(payload);
 
       if (data.slip instanceof File) {
         await uploadPaymentSlip(payment.id, data.slip);
       }
 
-      toast.success(currentPayment ? 'แก้ไขใบเสร็จรับเงินแล้ว' : 'ออกใบเสร็จรับเงินแล้ว');
+      if (stayOnPage) {
+        const refreshedPayment = await getPayment(payment.id);
+        setSavedPayment(refreshedPayment);
+        reset(toDefaultValues(refreshedPayment));
+        setSelectedQuotationId(refreshedPayment.quotationId);
+        toast.success('บันทึกแบบร่างแล้ว');
+        return;
+      }
+
+      toast.success(activePayment ? 'แก้ไขใบเสร็จรับเงินแล้ว' : 'ออกใบเสร็จรับเงินแล้ว');
       router.push(paths.dashboard.payment.details(payment.id));
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาด');
     }
-  });
+  };
+
+  const onSubmit = handleSubmit((data) => savePayment(data, false));
+  const onSaveDraft = handleSubmit((data) => savePayment(data, true));
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
@@ -310,6 +390,24 @@ export function PaymentNewEditForm({
 
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ p: 3 }}>
+            <Box
+              sx={{
+                p: 2,
+                mb: 3,
+                borderRadius: 1.5,
+                bgcolor: 'background.neutral',
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                เลขที่ใบเสร็จรับเงิน
+              </Typography>
+              <Typography variant="h6" sx={{ mt: 0.25, color: 'primary.main' }}>
+                {activePayment?.status === 'completed' ? activePayment.receiptNo : nextReceiptNo}
+              </Typography>
+            </Box>
+
             <Box sx={{ mb: 2 }}>หลักฐานการโอนเงิน / สลิป</Box>
 
             <Field.Upload
@@ -320,17 +418,71 @@ export function PaymentNewEditForm({
 
             <Button
               fullWidth
+              type="button"
+              variant="outlined"
+              size="large"
+              startIcon={<RiEyeLine />}
+              onClick={previewDialog.onTrue}
+              sx={{ mt: 3 }}
+            >
+              ดูตัวอย่าง PDF
+            </Button>
+
+            <Button
+              fullWidth
+              type="button"
+              variant="soft"
+              size="large"
+              loading={isSubmitting}
+              startIcon={<RiSave3Line />}
+              onClick={onSaveDraft}
+              sx={{ mt: 1.5 }}
+            >
+              บันทึกแบบร่าง
+            </Button>
+
+            <Button
+              fullWidth
               type="submit"
               variant="contained"
               size="large"
               loading={isSubmitting}
-              sx={{ mt: 3 }}
+              sx={{ mt: 1.5 }}
             >
-              {currentPayment ? 'บันทึกการแก้ไข' : 'ออกใบเสร็จรับเงิน'}
+              {activePayment ? 'บันทึกและดูใบเสร็จ' : 'ออกและดูใบเสร็จรับเงิน'}
             </Button>
           </Card>
         </Grid>
       </Grid>
+
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={previewDialog.value}
+        onClose={previewDialog.onFalse}
+        slotProps={{ paper: { sx: { height: '90vh' } } }}
+      >
+        <DialogTitle
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 2 }}
+        >
+          พรีวิวใบเสร็จรับเงิน — {previewPayment.receiptNo}
+          <IconButton type="button" onClick={previewDialog.onFalse} aria-label="ปิดพรีวิว PDF">
+            <RiCloseLine />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
+          {previewDialog.value && (
+            <PDFViewer style={{ width: '100%', height: '100%', border: 'none' }}>
+              <PaymentPdfDocument
+                payment={previewPayment}
+                quotation={selectedQuotationDetail}
+                companyProfile={companyProfile}
+                companyName={CONFIG.appName}
+              />
+            </PDFViewer>
+          )}
+        </DialogContent>
+      </Dialog>
     </Form>
   );
 }

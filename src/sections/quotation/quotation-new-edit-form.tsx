@@ -5,10 +5,20 @@ import type { IPromotionPackage } from 'src/types/promotion-package';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
+import dynamic from 'next/dynamic';
+import { useQuery } from '@tanstack/react-query';
+import { useBoolean } from 'minimal-shared/hooks';
 import { useMemo, useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { RiAddLine, RiGiftFill, RiDeleteBin6Fill } from '@remixicon/react';
+import { useForm, useWatch, Controller, useFieldArray } from 'react-hook-form';
+import {
+  RiEyeLine,
+  RiAddLine,
+  RiGiftFill,
+  RiCloseLine,
+  RiSave3Line,
+  RiDeleteBin6Fill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -18,6 +28,7 @@ import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
@@ -28,7 +39,9 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
+import DialogTitle from '@mui/material/DialogTitle';
 import Autocomplete from '@mui/material/Autocomplete';
+import DialogContent from '@mui/material/DialogContent';
 import TableContainer from '@mui/material/TableContainer';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
@@ -37,14 +50,21 @@ import { useRouter } from 'src/routes/hooks';
 
 import { fBaht } from 'src/utils/format-number';
 
+import { CONFIG } from 'src/global-config';
+
+import { Upload } from 'src/components/upload';
 import { toast } from 'src/components/snackbar';
 import { Scrollbar } from 'src/components/scrollbar';
+import { LoadingScreen } from 'src/components/loading-screen';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
 import { useCustomersQuery } from 'src/sections/customer/customer-queries';
 import { useServiceItemsQuery } from 'src/sections/service/service-queries';
+import { useCompanyProfileQuery } from 'src/sections/settings/settings-queries';
 import { usePromotionPackagesQuery } from 'src/sections/promotion-package/promotion-package-queries';
 
+import { QuotationPdfDocument } from './quotation-pdf-document';
+import { getQuotation, getNextQuotationNo, saveQuotationAttachments } from './quotation-api';
 import { useCreateQuotationMutation, useUpdateQuotationMutation } from './quotation-queries';
 
 // ----------------------------------------------------------------------
@@ -55,6 +75,11 @@ const STATUS_OPTIONS: { value: IQuotation['status']; label: string }[] = [
   { value: 'accepted', label: 'ลูกค้ายอมรับ' },
   { value: 'rejected', label: 'ลูกค้าปฏิเสธ' },
 ];
+
+const PDFViewer = dynamic(() => import('@react-pdf/renderer').then((mod) => mod.PDFViewer), {
+  ssr: false,
+  loading: () => <LoadingScreen />,
+});
 
 const QuotationItemSchema = z.object({
   serviceItemId: z.string().nullable().optional(),
@@ -80,6 +105,9 @@ export const QuotationFormSchema = z.object({
   discount: z.coerce.number().min(0, { error: 'ส่วนลดต้องไม่ติดลบ' }),
   note: z.string().optional(),
   paymentTerms: z.string().optional(),
+  attachments: z
+    .array(z.union([z.instanceof(File), z.string()]))
+    .max(10, { error: 'แนบภาพได้ไม่เกิน 10 ภาพ' }),
   items: z.array(QuotationItemSchema).min(1, { error: 'กรุณาเพิ่มอย่างน้อย 1 รายการ' }),
 });
 
@@ -100,11 +128,12 @@ function toDefaultValues(quotation?: IQuotation | null): QuotationFormSchemaType
       issueDate: dayjs().format(),
       validUntil: null,
       status: 'draft',
-      includeVat: true,
+      includeVat: false,
       vatRate: 7,
       discount: 0,
       note: '',
       paymentTerms: '',
+      attachments: [],
       items: [emptyItem],
     };
   }
@@ -121,6 +150,7 @@ function toDefaultValues(quotation?: IQuotation | null): QuotationFormSchemaType
     discount: quotation.discount,
     note: quotation.note ?? '',
     paymentTerms: quotation.paymentTerms ?? '',
+    attachments: quotation.attachmentImageUrls ?? [],
     items: quotation.items.length
       ? quotation.items.map((item) => ({
           serviceItemId: item.serviceItemId,
@@ -141,8 +171,15 @@ type Props = {
 
 export function QuotationNewEditForm({ currentQuotation }: Props) {
   const router = useRouter();
+  const previewDialog = useBoolean();
   const [selectedPackage, setSelectedPackage] = useState<IPromotionPackage | null>(null);
+  const [savedQuotation, setSavedQuotation] = useState<IQuotation | null>(null);
 
+  const { data: companyProfile } = useCompanyProfileQuery();
+  const { data: nextQuotationNo = 'กำลังสร้างเลข...' } = useQuery({
+    queryKey: ['quotations', 'next-quotation-no'],
+    queryFn: getNextQuotationNo,
+  });
   const { data: customers = [], isError: isCustomersError } = useCustomersQuery();
   const { data: serviceItems = [], isError: isServiceItemsError } = useServiceItemsQuery();
   const { data: promotionPackages = [], isError: isPackagesError } = usePromotionPackagesQuery();
@@ -168,19 +205,19 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
 
   const {
     reset,
-    watch,
     control,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
 
   useEffect(() => {
+    setSavedQuotation(null);
     reset(toDefaultValues(currentQuotation));
   }, [currentQuotation, reset]);
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
 
-  const values = watch() as QuotationFormSchemaType;
+  const values = useWatch({ control }) as QuotationFormSchemaType;
 
   const totals = useMemo(() => {
     const subtotal = values.items.reduce(
@@ -194,13 +231,69 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
     return { subtotal, vatAmount, total };
   }, [values.items, values.discount, values.includeVat, values.vatRate]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const activeQuotation = savedQuotation ?? currentQuotation;
+  const previewAttachmentUrls = useMemo(
+    () =>
+      values.attachments.map((attachment) =>
+        typeof attachment === 'string' ? attachment : URL.createObjectURL(attachment)
+      ),
+    [values.attachments]
+  );
+
+  useEffect(
+    () => () => {
+      previewAttachmentUrls.forEach((url) => {
+        if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+      });
+    },
+    [previewAttachmentUrls]
+  );
+
+  const previewQuotation: IQuotation = {
+    id: activeQuotation?.id ?? 'preview',
+    quoteNo: activeQuotation?.quoteNo ?? nextQuotationNo,
+    customerId: values.customer?.id ?? '',
+    customer: customers.find((customer) => customer.id === values.customer?.id) ?? null,
+    issueDate: values.issueDate
+      ? dayjs(values.issueDate).format('YYYY-MM-DD')
+      : dayjs().format('YYYY-MM-DD'),
+    validUntil: values.validUntil ? dayjs(values.validUntil).format('YYYY-MM-DD') : null,
+    status: values.status,
+    includeVat: values.includeVat,
+    vatRate: Number(values.vatRate) || 0,
+    discount: Number(values.discount) || 0,
+    subtotal: totals.subtotal,
+    vatAmount: totals.vatAmount,
+    total: totals.total,
+    note: values.note ?? null,
+    paymentTerms: values.paymentTerms ?? null,
+    issuerSignatureUrl: activeQuotation?.issuerSignatureUrl ?? null,
+    customerSignatureUrl: activeQuotation?.customerSignatureUrl ?? null,
+    issuerSignedAt: activeQuotation?.issuerSignedAt ?? null,
+    customerSignedAt: activeQuotation?.customerSignedAt ?? null,
+    attachmentImageUrls: previewAttachmentUrls,
+    items: values.items.map((item, index) => ({
+      id: activeQuotation?.items[index]?.id,
+      serviceItemId: item.serviceItemId ?? null,
+      promotionPackageId: item.promotionPackageId ?? null,
+      promotionPackageDiscount: Number(item.promotionPackageDiscount) || 0,
+      description: item.description || '-',
+      unit: item.unit || null,
+      quantity: Number(item.quantity) || 0,
+      unitPrice: Number(item.unitPrice) || 0,
+      amount: (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
+    })),
+    createdAt: activeQuotation?.createdAt ?? new Date().toISOString(),
+    updatedAt: activeQuotation?.updatedAt ?? new Date().toISOString(),
+  };
+
+  const saveQuotation = async (data: QuotationFormSchemaType, stayOnPage: boolean) => {
     try {
       const payload = {
         customerId: data.customer!.id,
         issueDate: dayjs(data.issueDate).format('YYYY-MM-DD'),
         validUntil: data.validUntil ? dayjs(data.validUntil).format('YYYY-MM-DD') : null,
-        status: data.status,
+        status: stayOnPage ? ('draft' as const) : data.status,
         includeVat: data.includeVat,
         vatRate: data.vatRate,
         discount: data.discount,
@@ -217,17 +310,30 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
         })),
       };
 
-      const quotation = currentQuotation
-        ? await updateMutation.mutateAsync({ id: currentQuotation.id, input: payload })
+      const quotation = activeQuotation
+        ? await updateMutation.mutateAsync({ id: activeQuotation.id, input: payload })
         : await createMutation.mutateAsync(payload);
 
-      toast.success(currentQuotation ? 'แก้ไขใบเสนอราคาแล้ว' : 'สร้างใบเสนอราคาแล้ว');
+      await saveQuotationAttachments(quotation.id, data.attachments);
+
+      if (stayOnPage) {
+        const refreshedQuotation = await getQuotation(quotation.id);
+        setSavedQuotation(refreshedQuotation);
+        reset(toDefaultValues(refreshedQuotation));
+        toast.success('บันทึกแบบร่างแล้ว');
+        return;
+      }
+
+      toast.success(activeQuotation ? 'แก้ไขใบเสนอราคาแล้ว' : 'สร้างใบเสนอราคาแล้ว');
       router.push(paths.dashboard.quotation.details(quotation.id));
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'เกิดข้อผิดพลาด');
     }
-  });
+  };
+
+  const onSubmit = handleSubmit((data) => saveQuotation(data, false));
+  const onSaveDraft = handleSubmit((data) => saveQuotation(data, true));
 
   const handlePickServiceItem = (index: number, serviceItem: IServiceItem) => {
     methods.setValue(`items.${index}.description`, serviceItem.name);
@@ -559,6 +665,37 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
             </Box>
           </Card>
 
+          <Card sx={{ mt: 3, p: 3 }}>
+            <Typography variant="h6" sx={{ mb: 0.5 }}>
+              เอกสารเพิ่มเติม
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              แนบภาพประกอบได้หลายภาพ โดยแต่ละภาพจะแสดงเป็นหน้าใหม่ในไฟล์ PDF
+            </Typography>
+            <Controller
+              name="attachments"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <Upload
+                  multiple
+                  value={field.value}
+                  accept={{ 'image/png': [], 'image/jpeg': [] }}
+                  error={!!error}
+                  helperText={
+                    error?.message ?? 'รองรับ PNG และ JPG สูงสุด 10 ภาพ ภาพละไม่เกิน 10MB'
+                  }
+                  onDrop={(acceptedFiles) =>
+                    field.onChange([...field.value, ...acceptedFiles].slice(0, 10))
+                  }
+                  onRemove={(file) =>
+                    field.onChange(field.value.filter((item: File | string) => item !== file))
+                  }
+                  onRemoveAll={() => field.onChange([])}
+                />
+              )}
+            />
+          </Card>
+
           <Card sx={{ mt: 3, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <Field.Text
               name="paymentTerms"
@@ -574,6 +711,24 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
 
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ p: 3, position: 'sticky', top: 96 }}>
+            <Box
+              sx={{
+                p: 2,
+                mb: 3,
+                borderRadius: 1.5,
+                bgcolor: 'background.neutral',
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                เลขที่ใบเสนอราคา
+              </Typography>
+              <Typography variant="h6" sx={{ mt: 0.25, color: 'primary.main' }}>
+                {activeQuotation?.quoteNo ?? nextQuotationNo}
+              </Typography>
+            </Box>
+
             <Typography variant="h6" sx={{ mb: 2.5 }}>
               สรุปยอด
             </Typography>
@@ -638,17 +793,70 @@ export function QuotationNewEditForm({ currentQuotation }: Props) {
 
             <Button
               fullWidth
+              type="button"
+              variant="outlined"
+              size="large"
+              startIcon={<RiEyeLine />}
+              onClick={previewDialog.onTrue}
+              sx={{ mt: 3 }}
+            >
+              ดูตัวอย่าง PDF
+            </Button>
+
+            <Button
+              fullWidth
+              type="button"
+              variant="soft"
+              size="large"
+              loading={isSubmitting}
+              startIcon={<RiSave3Line />}
+              onClick={onSaveDraft}
+              sx={{ mt: 1.5 }}
+            >
+              บันทึกแบบร่าง
+            </Button>
+
+            <Button
+              fullWidth
               type="submit"
               variant="contained"
               size="large"
               loading={isSubmitting}
-              sx={{ mt: 3 }}
+              sx={{ mt: 1.5 }}
             >
-              {currentQuotation ? 'บันทึกการแก้ไข' : 'สร้างใบเสนอราคา'}
+              {activeQuotation ? 'บันทึกและดูใบเสนอราคา' : 'สร้างและดูใบเสนอราคา'}
             </Button>
           </Card>
         </Grid>
       </Grid>
+
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={previewDialog.value}
+        onClose={previewDialog.onFalse}
+        slotProps={{ paper: { sx: { height: '90vh' } } }}
+      >
+        <DialogTitle
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 2 }}
+        >
+          พรีวิว PDF — {previewQuotation.quoteNo}
+          <IconButton type="button" onClick={previewDialog.onFalse} aria-label="ปิดพรีวิว PDF">
+            <RiCloseLine />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
+          {previewDialog.value && (
+            <PDFViewer style={{ width: '100%', height: '100%', border: 'none' }}>
+              <QuotationPdfDocument
+                quotation={previewQuotation}
+                companyProfile={companyProfile}
+                companyName={CONFIG.appName}
+              />
+            </PDFViewer>
+          )}
+        </DialogContent>
+      </Dialog>
     </Form>
   );
 }

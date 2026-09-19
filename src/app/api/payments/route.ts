@@ -21,7 +21,7 @@ async function mapPayment(supabase: SupabaseClient, row: any) {
 
   return {
     id: row.id,
-    receiptNo: row.receipt_no,
+    receiptNo: row.receipt_no ?? 'แบบร่าง',
     quotationId: row.quotation_id,
     quotation: row.quotation ? { id: row.quotation.id, quoteNo: row.quotation.quote_no } : null,
     contractId: row.contract_id,
@@ -44,6 +44,7 @@ async function mapPayment(supabase: SupabaseClient, row: any) {
     amount: Number(row.amount),
     paymentMethod: row.payment_method,
     paymentPurpose: row.payment_purpose,
+    status: row.status ?? 'completed',
     referenceNo: row.reference_no,
     slipUrl,
     note: row.note,
@@ -66,6 +67,7 @@ export async function GET(request: Request) {
   const searchParams = new URL(request.url).searchParams;
   const quotationId = searchParams.get('quotationId');
   const contractId = searchParams.get('contractId');
+  const status = searchParams.get('status');
   const rowsPerPageParam = searchParams.get('rowsPerPage');
 
   let query = supabase
@@ -78,6 +80,9 @@ export async function GET(request: Request) {
   }
   if (contractId) {
     query = query.eq('contract_id', contractId);
+  }
+  if (status === 'draft' || status === 'completed') {
+    query = query.eq('status', status);
   }
 
   if (rowsPerPageParam) {
@@ -122,6 +127,7 @@ export async function POST(request: Request) {
   const { data, error } = await supabase
     .from('payments')
     .insert({
+      receipt_no: null,
       quotation_id: body.quotationId || null,
       contract_id: body.contractId || null,
       customer_id: body.customerId,
@@ -129,6 +135,7 @@ export async function POST(request: Request) {
       amount: body.amount,
       payment_method: body.paymentMethod || 'transfer',
       payment_purpose: body.paymentPurpose || 'partial',
+      status: body.status === 'draft' ? 'draft' : 'completed',
       reference_no: body.referenceNo || null,
       note: body.note || null,
       created_by: user.id,
@@ -140,5 +147,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ payment: await mapPayment(supabase, data) });
+  if (body.status !== 'draft') {
+    const { error: completeError } = await supabase.rpc('complete_payment', { payment_id: data.id });
+    if (completeError) {
+      await supabase.from('payments').delete().eq('id', data.id);
+      return NextResponse.json({ message: completeError.message }, { status: 400 });
+    }
+  }
+
+  const { data: savedPayment, error: savedError } = await supabase
+    .from('payments')
+    .select('*, customer:customers(*), quotation:quotations(id, quote_no)')
+    .eq('id', data.id)
+    .single();
+
+  if (savedError) return NextResponse.json({ message: savedError.message }, { status: 400 });
+
+  return NextResponse.json({ payment: await mapPayment(supabase, savedPayment) });
 }

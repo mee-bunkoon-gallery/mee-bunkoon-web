@@ -24,9 +24,10 @@ export const paymentKeys = {
 
 /** Filtered list — used by document detail pages (payments for a quotation/contract). */
 export function usePaymentsQuery(filter: { quotationId?: string; contractId?: string }) {
+  const completedFilter = { ...filter, status: 'completed' as const };
   return useQuery({
-    queryKey: paymentKeys.list(filter),
-    queryFn: () => getPayments(filter),
+    queryKey: paymentKeys.list(completedFilter),
+    queryFn: () => getPayments(completedFilter),
     enabled: !!(filter.quotationId || filter.contractId),
   });
 }
@@ -34,8 +35,8 @@ export function usePaymentsQuery(filter: { quotationId?: string; contractId?: st
 /** Full unfiltered list — used by the dashboard for aggregate totals. */
 export function useAllPaymentsQuery() {
   return useQuery({
-    queryKey: paymentKeys.list({}),
-    queryFn: () => getPayments(),
+    queryKey: paymentKeys.list({ status: 'completed' }),
+    queryFn: () => getPayments({ status: 'completed' }),
   });
 }
 

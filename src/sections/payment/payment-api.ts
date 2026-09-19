@@ -1,4 +1,4 @@
-import type { IPayment, PaymentMethod, PaymentPurpose } from 'src/types/payment';
+import type { IPayment, PaymentMethod, PaymentStatus, PaymentPurpose } from 'src/types/payment';
 
 import { apiFetch } from 'src/lib/api-fetch';
 
@@ -12,17 +12,25 @@ export type PaymentInput = {
   amount: number;
   paymentMethod: PaymentMethod;
   paymentPurpose: PaymentPurpose;
+  status?: PaymentStatus;
   referenceNo?: string;
   note?: string;
 };
 
+export async function getNextReceiptNo(): Promise<string> {
+  const { receiptNo } = await apiFetch<{ receiptNo: string }>('/api/payments/next-receipt-no/');
+  return receiptNo;
+}
+
 export async function getPayments(filter?: {
   quotationId?: string;
   contractId?: string;
+  status?: PaymentStatus;
 }): Promise<IPayment[]> {
   const params = new URLSearchParams();
   if (filter?.quotationId) params.set('quotationId', filter.quotationId);
   if (filter?.contractId) params.set('contractId', filter.contractId);
+  if (filter?.status) params.set('status', filter.status);
   const qs = params.toString() ? `?${params.toString()}` : '';
 
   const { payments } = await apiFetch<{ payments: IPayment[] }>(`/api/payments/${qs}`);

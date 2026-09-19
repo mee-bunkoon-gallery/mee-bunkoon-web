@@ -38,6 +38,7 @@ function mapQuotation(row: any) {
     customerSignatureUrl: row.customer_signature_url,
     issuerSignedAt: row.issuer_signed_at,
     customerSignedAt: row.customer_signed_at,
+    attachmentImageUrls: row.attachment_image_urls ?? [],
     items: (row.items ?? [])
       .sort((a: any, b: any) => a.position - b.position)
       .map((item: any) => ({
@@ -207,11 +208,30 @@ export async function DELETE(_request: Request, { params }: Params) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
+  const { data: quotation } = await supabase
+    .from('quotations')
+    .select('attachment_image_urls')
+    .eq('id', id)
+    .single();
+
   const { error } = await supabase.from('quotations').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 
+  const attachmentPaths = (quotation?.attachment_image_urls ?? [])
+    .map((url: string) => storagePathFromPublicUrl(url))
+    .filter((path: string | null): path is string => Boolean(path));
+  if (attachmentPaths.length) {
+    await supabase.storage.from('quotation-attachments').remove(attachmentPaths);
+  }
+
   return NextResponse.json({ success: true });
+}
+
+function storagePathFromPublicUrl(url: string) {
+  const marker = '/storage/v1/object/public/quotation-attachments/';
+  const index = url.indexOf(marker);
+  return index === -1 ? null : url.slice(index + marker.length);
 }

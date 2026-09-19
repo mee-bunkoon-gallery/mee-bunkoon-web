@@ -17,6 +17,13 @@ Font.register({
   ],
 });
 
+const thaiWordSegmenter = new Intl.Segmenter('th', { granularity: 'word' });
+const glyphEndGuard = '\u200A';
+
+Font.registerHyphenationCallback((word) =>
+  Array.from(thaiWordSegmenter.segment(word), ({ segment }) => `${segment}${glyphEndGuard}`)
+);
+
 const styles = StyleSheet.create({
   page: {
     padding: 32,

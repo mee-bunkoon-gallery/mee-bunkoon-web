@@ -62,6 +62,7 @@ export type IQuotation = {
   customerSignatureUrl: string | null;
   issuerSignedAt: string | null;
   customerSignedAt: string | null;
+  attachmentImageUrls: string[];
   items: IQuotationItem[];
   createdAt: string;
   updatedAt: string;

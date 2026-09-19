@@ -4,6 +4,7 @@ import type { ICompanyProfile } from 'src/types/settings';
 import { Font, Page, View, Text, Image, Document, StyleSheet } from '@react-pdf/renderer';
 
 import { fBaht } from 'src/utils/format-number';
+import { fThaiBahtText } from 'src/utils/format-thai-baht-text';
 
 import { renderClauseBodyPdf } from './contract-pdf-rich-text';
 import {
@@ -24,6 +25,13 @@ Font.register({
   ],
 });
 
+const thaiWordSegmenter = new Intl.Segmenter('th', { granularity: 'word' });
+const glyphEndGuard = '\u200A';
+
+Font.registerHyphenationCallback((word) =>
+  Array.from(thaiWordSegmenter.segment(word), ({ segment }) => `${segment}${glyphEndGuard}`)
+);
+
 const styles = StyleSheet.create({
   page: {
     padding: 32,
@@ -42,6 +50,15 @@ const styles = StyleSheet.create({
   mb24: { marginBottom: 24 },
   tableHeadText: { fontSize: 9, fontWeight: 'bold' },
   totalsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  amountWordsRow: {
+    marginTop: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+    backgroundColor: '#F2F3F5',
+    fontSize: 9,
+    fontWeight: 'bold',
+    lineHeight: 1.5,
+  },
   section: { marginTop: 16 },
   bodyText: { fontSize: 10, lineHeight: 1.5 },
   signatureBox: { width: '45%', alignItems: 'center' },
@@ -123,7 +140,7 @@ export function ContractPdfDocument({
           </View>
         )}
 
-        {/* <View style={styles.section}>
+        <View style={styles.section} wrap={false}>
           <View style={styles.totalsRow}>
             <Text style={styles.h4}>มูลค่าสัญญา</Text>
             <Text style={styles.h4}>{fBaht(contract.totalAmount)}</Text>
@@ -134,7 +151,10 @@ export function ContractPdfDocument({
               <Text>{fBaht(contract.depositAmount)}</Text>
             </View>
           )}
-        </View> */}
+          <View style={styles.amountWordsRow}>
+            <Text>จำนวนเงิน (Amount) {fThaiBahtText(contract.totalAmount)}</Text>
+          </View>
+        </View>
 
         {!!paymentLines.length && (
           <View style={styles.section}>

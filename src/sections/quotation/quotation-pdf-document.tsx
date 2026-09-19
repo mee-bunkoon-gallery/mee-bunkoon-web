@@ -5,6 +5,7 @@ import { Font, Page, View, Text, Image, Document, StyleSheet } from '@react-pdf/
 
 import { fDate } from 'src/utils/format-time';
 import { fBaht } from 'src/utils/format-number';
+import { fThaiBahtText } from 'src/utils/format-thai-baht-text';
 
 // ----------------------------------------------------------------------
 
@@ -15,6 +16,16 @@ Font.register({
     { src: '/fonts/LINESeedSansTH-Bold.ttf', fontWeight: 'bold' },
   ],
 });
+
+// Thai is commonly written without spaces. Break at language-aware word boundaries
+// instead of Unicode characters so combining vowels and tone marks stay with their glyph.
+const thaiWordSegmenter = new Intl.Segmenter('th', { granularity: 'word' });
+const textEndGuard = '\u00A0';
+const glyphEndGuard = '\u200A';
+
+Font.registerHyphenationCallback((word) =>
+  Array.from(thaiWordSegmenter.segment(word), ({ segment }) => `${segment}${glyphEndGuard}`)
+);
 
 const styles = StyleSheet.create({
   page: {
@@ -32,7 +43,7 @@ const styles = StyleSheet.create({
   mb8: { marginBottom: 8 },
   mb24: { marginBottom: 24 },
   divider: { borderBottomWidth: 1, borderBottomColor: '#E7EBF0', marginVertical: 16 },
-  table: { display: 'flex', width: '100%' },
+  table: { display: 'flex', width: '98%', alignSelf: 'center' },
   tableHeadRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -47,21 +58,45 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   // Keep numeric headers wide enough for Thai labels; the columns add up to 100%.
-  colDescription: { width: '42%' },
-  colUnit: { width: '10%' },
-  colQty: { width: '10%', textAlign: 'right' },
-  colPrice: { width: '18%', textAlign: 'right' },
-  colAmount: { width: '20%', textAlign: 'right' },
-  tableHeadText: { fontSize: 9, fontWeight: 'bold' },
-  totalsBox: { width: '40%', marginLeft: 'auto', marginTop: 12 },
-  totalsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  colDescription: { width: '42%', paddingHorizontal: 2, lineHeight: 1.45 },
+  colUnit: { width: '10%', paddingHorizontal: 2, lineHeight: 1.45 },
+  colQty: { width: '10%', paddingHorizontal: 2, lineHeight: 1.45, textAlign: 'right' },
+  colPrice: { width: '18%', paddingHorizontal: 2, lineHeight: 1.45, textAlign: 'right' },
+  colAmount: {
+    width: '20%',
+    paddingLeft: 2,
+    paddingRight: 6,
+    lineHeight: 1.45,
+    textAlign: 'right',
+  },
+  tableHeadText: { fontSize: 9, fontWeight: 'bold', lineHeight: 1.5 },
+  totalsBox: { width: '41%', marginLeft: 'auto', marginTop: 12, paddingHorizontal: 4 },
+  totalsRow: {
+    minHeight: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  totalsLabel: { lineHeight: 1.5, paddingLeft: 2, paddingRight: 6 },
+  totalsValue: { lineHeight: 1.5, paddingHorizontal: 2 },
   grandTotalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 1,
     borderTopColor: '#212B36',
     paddingTop: 6,
+    paddingHorizontal: 2,
     marginTop: 4,
+  },
+  amountWordsRow: {
+    marginTop: 10,
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+    backgroundColor: '#F2F3F5',
+    fontSize: 9,
+    fontWeight: 'bold',
+    lineHeight: 1.5,
   },
   signatureSection: { marginTop: 40, flexDirection: 'row', justifyContent: 'space-between' },
   signatureBox: { width: '42%', alignItems: 'center' },
@@ -74,6 +109,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   signatureText: { fontSize: 9, textAlign: 'center' },
+  attachmentPage: {
+    padding: 24,
+    fontSize: 10,
+    fontFamily: 'LINE Seed Sans TH',
+    color: '#212B36',
+  },
+  attachmentImage: { width: '100%', height: '100%', objectFit: 'contain' },
 });
 
 type Props = {
@@ -173,48 +215,60 @@ export function QuotationPdfDocument({
 
         <View style={styles.table}>
           <View style={styles.tableHeadRow}>
-            <Text style={[styles.colDescription, styles.tableHeadText]}>รายละเอียด</Text>
-            <Text style={[styles.colUnit, styles.tableHeadText]}>หน่วย</Text>
-            <Text style={[styles.colQty, styles.tableHeadText]}>จำนวน</Text>
-            <Text style={[styles.colPrice, styles.tableHeadText]}>ราคาต่อหน่วย</Text>
-            <Text style={[styles.colAmount, styles.tableHeadText]}>จำนวนเงิน</Text>
+            <Text style={[styles.colDescription, styles.tableHeadText]}>
+              รายละเอียด{textEndGuard}
+            </Text>
+            <Text style={[styles.colUnit, styles.tableHeadText]}>หน่วย{textEndGuard}</Text>
+            <Text style={[styles.colQty, styles.tableHeadText]}>จำนวน{textEndGuard}</Text>
+            <Text style={[styles.colPrice, styles.tableHeadText]}>
+              ราคาต่อหน่วย{textEndGuard}
+            </Text>
+            <Text style={[styles.colAmount, styles.tableHeadText]}>
+              จำนวนเงิน{textEndGuard}
+            </Text>
           </View>
 
           {quotation.items.map((item, index) => (
             <View key={item.id ?? index} style={styles.tableRow}>
-              <Text style={styles.colDescription}>{item.description}</Text>
-              <Text style={styles.colUnit}>{item.unit || '-'}</Text>
-              <Text style={styles.colQty}>{item.quantity}</Text>
-              <Text style={styles.colPrice}>{fBaht(item.unitPrice)}</Text>
-              <Text style={styles.colAmount}>{fBaht(item.amount)}</Text>
+              <Text style={styles.colDescription}>{item.description}{textEndGuard}</Text>
+              <Text style={styles.colUnit}>{item.unit || '-'}{textEndGuard}</Text>
+              <Text style={styles.colQty}>{item.quantity}{textEndGuard}</Text>
+              <Text style={styles.colPrice}>{fBaht(item.unitPrice)}{textEndGuard}</Text>
+              <Text style={styles.colAmount}>{fBaht(item.amount)}{textEndGuard}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.totalsBox}>
           <View style={styles.totalsRow}>
-            <Text style={styles.subtitle}>ยอดรวม</Text>
-            <Text>{fBaht(quotation.subtotal)}</Text>
+            <Text style={[styles.subtitle, styles.totalsLabel]}>ยอดรวม{textEndGuard}</Text>
+            <Text style={styles.totalsValue}>{fBaht(quotation.subtotal)}</Text>
           </View>
 
           {quotation.discount > 0 && (
             <View style={styles.totalsRow}>
-              <Text style={styles.subtitle}>ส่วนลด</Text>
-              <Text>-{fBaht(quotation.discount)}</Text>
+              <Text style={[styles.subtitle, styles.totalsLabel]}>ส่วนลด{textEndGuard}</Text>
+              <Text style={styles.totalsValue}>-{fBaht(quotation.discount)}</Text>
             </View>
           )}
 
           {quotation.includeVat && (
             <View style={styles.totalsRow}>
-              <Text style={styles.subtitle}>ภาษีมูลค่าเพิ่ม ({quotation.vatRate}%)</Text>
-              <Text>{fBaht(quotation.vatAmount)}</Text>
+              <Text style={[styles.subtitle, styles.totalsLabel]}>
+                ภาษีมูลค่าเพิ่ม ({quotation.vatRate}%){textEndGuard}
+              </Text>
+              <Text style={styles.totalsValue}>{fBaht(quotation.vatAmount)}</Text>
             </View>
           )}
 
           <View style={styles.grandTotalRow}>
-            <Text style={styles.h4}>ยอดรวมสุทธิ</Text>
-            <Text style={styles.h4}>{fBaht(quotation.total)}</Text>
+            <Text style={[styles.h4, styles.totalsLabel]}>ยอดรวมสุทธิ{textEndGuard}</Text>
+            <Text style={[styles.h4, styles.totalsValue]}>{fBaht(quotation.total)}</Text>
           </View>
+        </View>
+
+        <View style={styles.amountWordsRow} wrap={false}>
+          <Text>จำนวนเงิน (Amount) {fThaiBahtText(quotation.total)}{textEndGuard}</Text>
         </View>
 
         {quotation.note && (
@@ -273,6 +327,15 @@ export function QuotationPdfDocument({
           </View>
         </View>
       </Page>
+
+      {(quotation.attachmentImageUrls ?? []).map((imageUrl, index) => (
+        <Page key={imageUrl} size="A4" style={styles.attachmentPage}>
+          <Text style={[styles.h4, { marginBottom: 12 }]}>เอกสารเพิ่มเติม {index + 1}</Text>
+          <View style={{ flexGrow: 1 }}>
+            <Image src={imageUrl} style={styles.attachmentImage} />
+          </View>
+        </Page>
+      ))}
     </Document>
   );
 }

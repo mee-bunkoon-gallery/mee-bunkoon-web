@@ -38,6 +38,7 @@ function mapQuotation(row: any) {
     customerSignatureUrl: row.customer_signature_url,
     issuerSignedAt: row.issuer_signed_at,
     customerSignedAt: row.customer_signed_at,
+    attachmentImageUrls: row.attachment_image_urls ?? [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

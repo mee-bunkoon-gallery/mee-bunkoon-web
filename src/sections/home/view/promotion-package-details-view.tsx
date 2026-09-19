@@ -2,13 +2,20 @@
 
 import type { IPublicPromotionPackage } from 'src/types/promotion-package';
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { RiArrowLeftSFill, RiShieldCheckFill, RiCheckboxCircleFill } from '@remixicon/react';
+import {
+  RiZoomInLine,
+  RiArrowLeftSFill,
+  RiShieldCheckFill,
+  RiCheckboxCircleFill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
@@ -17,6 +24,7 @@ import { fBaht } from 'src/utils/format-number';
 
 import { Image } from 'src/components/image';
 import { LoadingScreen } from 'src/components/loading-screen';
+import { Lightbox, useLightbox } from 'src/components/lightbox';
 
 async function fetchPromotionPackage(id: string): Promise<IPublicPromotionPackage> {
   const response = await fetch(`/api/public/promotion-packages/${id}/`, { cache: 'no-store' });
@@ -35,6 +43,19 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
     queryFn: () => fetchPromotionPackage(packageId),
     retry: false,
   });
+
+  const itemImageSlides = useMemo(
+    () =>
+      (promotionPackage?.items ?? [])
+        .filter((item) => Boolean(item.imageUrl))
+        .map((item) => ({
+          src: item.imageUrl as string,
+          title: item.name,
+          description: item.description || undefined,
+        })),
+    [promotionPackage?.items]
+  );
+  const itemImageLightbox = useLightbox(itemImageSlides);
 
   if (isLoading) return <LoadingScreen />;
 
@@ -166,15 +187,44 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
                     gridTemplateColumns: { xs: '1fr', sm: '112px minmax(0, 1fr)' },
                   }}
                 >
-                  <Image
-                    alt={item.name}
-                    src={item.imageUrl || '/assets/images/empty/default.png'}
+                  <ButtonBase
+                    aria-label={item.imageUrl ? `ดูภาพ ${item.name}` : undefined}
+                    disabled={!item.imageUrl}
+                    onClick={() => item.imageUrl && itemImageLightbox.onOpen(item.imageUrl)}
                     sx={{
                       width: 1,
                       height: { xs: 180, sm: 112 },
                       borderRadius: 1,
+                      overflow: 'hidden',
+                      position: 'relative',
+                      '&:hover .package-item-preview, &:focus-visible .package-item-preview': {
+                        opacity: 1,
+                      },
                     }}
-                  />
+                  >
+                    <Image
+                      alt={item.name}
+                      src={item.imageUrl || '/assets/images/empty/default.png'}
+                      sx={{ width: 1, height: 1 }}
+                    />
+                    {item.imageUrl && (
+                      <Box
+                        className="package-item-preview"
+                        sx={{
+                          inset: 0,
+                          opacity: 0,
+                          display: 'grid',
+                          color: 'common.white',
+                          position: 'absolute',
+                          placeItems: 'center',
+                          bgcolor: 'rgba(11, 37, 84, 0.5)',
+                          transition: (theme) => theme.transitions.create('opacity'),
+                        }}
+                      >
+                        <RiZoomInLine size={28} aria-hidden />
+                      </Box>
+                    )}
+                  </ButtonBase>
                   <Box sx={{ minWidth: 0 }}>
                     <Stack
                       direction={{ xs: 'column', sm: 'row' }}
@@ -307,6 +357,13 @@ export function PromotionPackageDetailsView({ packageId }: { packageId: string }
           </Card>
         </Box>
       </Box>
+
+      <Lightbox
+        open={itemImageLightbox.open}
+        close={itemImageLightbox.onClose}
+        slides={itemImageSlides}
+        index={itemImageLightbox.selected}
+      />
     </Box>
   );
 }

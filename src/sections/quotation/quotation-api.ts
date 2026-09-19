@@ -25,6 +25,36 @@ export type QuotationInput = {
   items: QuotationItemInput[];
 };
 
+export async function getNextQuotationNo(): Promise<string> {
+  const { quoteNo } = await apiFetch<{ quoteNo: string }>('/api/quotations/next-quote-no/');
+  return quoteNo;
+}
+
+export async function saveQuotationAttachments(
+  id: string,
+  images: (File | string)[]
+): Promise<string[]> {
+  const keepUrls = images.filter((image): image is string => typeof image === 'string');
+  const files = images.filter((image): image is File => image instanceof File);
+
+  const formData = new FormData();
+  formData.append('keepUrls', JSON.stringify(keepUrls));
+  files.forEach((file) => formData.append('files', file));
+
+  const response = await fetch(`/api/quotations/${id}/attachments/`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload?.message || 'อัปโหลดเอกสารเพิ่มเติมไม่สำเร็จ');
+  }
+
+  return payload.attachmentImageUrls as string[];
+}
+
 export async function getQuotations(status?: string): Promise<IQuotation[]> {
   const qs = status ? `?status=${encodeURIComponent(status)}` : '';
   const { quotations } = await apiFetch<{ quotations: IQuotation[] }>(`/api/quotations/${qs}`);
