@@ -6,6 +6,7 @@ import {
   RiHome5Fill,
   RiImageFill,
   RiListCheck2,
+  RiStore2Fill,
   RiArchiveFill,
   RiPaletteFill,
   RiFileTextFill,
@@ -82,6 +83,11 @@ const navData: NavSectionProps['data'] = [
         title: 'ลูกค้า',
         path: paths.dashboard.customer.root,
         icon: <RiGroupFill />,
+      },
+      {
+        title: 'Vendor',
+        path: paths.dashboard.vendor.root,
+        icon: <RiStore2Fill />,
       },
       {
         title: 'รายการบริการ',

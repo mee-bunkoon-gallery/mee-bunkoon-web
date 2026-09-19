@@ -6,13 +6,16 @@ import type { IJobQueue } from 'src/types/job-queue';
 import * as z from 'zod';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import {
+  RiAddLine,
+  RiTeamLine,
   RiSave3Line,
   RiUser3Line,
   RiCalendarLine,
   RiFileList3Line,
+  RiDeleteBin6Line,
   RiDeleteBin6Fill,
 } from '@remixicon/react';
 
@@ -33,13 +36,14 @@ import { useRouter } from 'src/routes/hooks';
 import { toast } from 'src/components/snackbar';
 import { Form, Field, schemaUtils } from 'src/components/hook-form';
 
+import { useVendorsQuery } from 'src/sections/vendor/vendor-queries';
 import { useContractsQuery } from 'src/sections/contract/contract-queries';
 import { useCustomersQuery } from 'src/sections/customer/customer-queries';
 import { useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
 import { useColorThemesQuery } from 'src/sections/color-theme/color-theme-queries';
 
-import { JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
 import { THAI_PROVINCES } from './thai-provinces';
+import { JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
 import {
   useCreateJobMutation,
   useUpdateJobMutation,
@@ -63,6 +67,7 @@ type JobQueueFormValues = {
   province?: string;
   status: IJobQueue['status'];
   note?: string;
+  workAssignments: IJobQueue['workAssignments'];
 };
 
 const JobQueueFormSchema = z.object({
@@ -82,6 +87,21 @@ const JobQueueFormSchema = z.object({
   province: z.string().optional(),
   status: z.enum(['queued', 'confirmed', 'in_progress', 'completed', 'cancelled']),
   note: z.string().optional(),
+  workAssignments: z.array(
+    z.object({
+      id: z.string(),
+      serviceItemId: z.string().nullable(),
+      title: z.string().min(1, { error: 'กรุณากรอกชื่องาน' }),
+      assigneeType: z.enum(['internal', 'vendor']),
+      vendorId: z.string().nullable(),
+      vendorName: z.string().nullable(),
+      scope: z.string(),
+      cost: z.coerce.number().min(0),
+      deposit: z.coerce.number().min(0),
+      paidAmount: z.coerce.number().min(0),
+      status: z.enum(['pending', 'in_progress', 'completed']),
+    })
+  ),
 });
 
 function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueueFormValues {
@@ -103,6 +123,7 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
       province: job.province ?? '',
       status: job.status,
       note: job.note ?? '',
+      workAssignments: job.workAssignments ?? [],
     };
   }
 
@@ -121,6 +142,7 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
     province: '',
     status: 'queued',
     note: '',
+    workAssignments: [],
   };
 }
 
@@ -143,6 +165,7 @@ export function JobQueueNewEditForm({
   const { data: quotations = [], isError: isQuotationsError } = useQuotationsQuery();
   const { data: contracts = [], isError: isContractsError } = useContractsQuery();
   const { data: colorThemes = [], isError: isColorThemesError } = useColorThemesQuery();
+  const { data: vendors = [] } = useVendorsQuery();
 
   const createMutation = useCreateJobMutation();
   const updateMutation = useUpdateJobMutation();
@@ -171,10 +194,14 @@ export function JobQueueNewEditForm({
   const {
     reset,
     control,
+    watch,
     setValue,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
+  const { fields: assignmentFields, append: appendAssignment, remove: removeAssignment } =
+    useFieldArray({ control, name: 'workAssignments' });
+  const workAssignments = watch('workAssignments');
 
   useEffect(() => {
     reset(toDefaultValues(currentJob, defaultDate ?? undefined));
@@ -223,6 +250,17 @@ export function JobQueueNewEditForm({
         province: data.province,
         status: data.status,
         note: data.note,
+        workAssignments: data.workAssignments.map((assignment) => {
+          const vendor = vendors.find((item) => item.id === assignment.vendorId);
+          return {
+            ...assignment,
+            vendorId: assignment.assigneeType === 'vendor' ? assignment.vendorId : null,
+            vendorName: assignment.assigneeType === 'vendor' ? vendor?.name ?? null : null,
+            cost: assignment.assigneeType === 'vendor' ? assignment.cost : 0,
+            deposit: assignment.assigneeType === 'vendor' ? assignment.deposit : 0,
+            paidAmount: assignment.assigneeType === 'vendor' ? assignment.paidAmount : 0,
+          };
+        }),
       };
       const job = currentJob
         ? await updateMutation.mutateAsync({ id: currentJob.id, input: payload })
@@ -369,6 +407,91 @@ export function JobQueueNewEditForm({
             />
                   </Grid>
                 </Grid>
+              </Stack>
+            </Card>
+
+            <Card sx={{ p: { xs: 2.5, sm: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                <SectionHeading
+                  icon={<RiTeamLine size={21} />}
+                  title="การแบ่งงาน"
+                  description="แยกงานของทีมเราและงานที่มอบหมายให้ Vendor"
+                />
+                <Button
+                  variant="outlined"
+                  startIcon={<RiAddLine />}
+                  onClick={() =>
+                    appendAssignment({
+                      id: crypto.randomUUID(),
+                      serviceItemId: null,
+                      title: '',
+                      assigneeType: 'internal',
+                      vendorId: null,
+                      vendorName: null,
+                      scope: '',
+                      cost: 0,
+                      deposit: 0,
+                      paidAmount: 0,
+                      status: 'pending',
+                    })
+                  }
+                  sx={{ flexShrink: 0 }}
+                >
+                  เพิ่มงาน
+                </Button>
+              </Box>
+              <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
+
+              {!assignmentFields.length && (
+                <Box sx={{ py: 4, textAlign: 'center', color: 'text.secondary' }}>
+                  ยังไม่มีการแบ่งงาน กด “เพิ่มงาน” เพื่อระบุผู้รับผิดชอบ
+                </Box>
+              )}
+
+              <Stack spacing={2}>
+                {assignmentFields.map((field, index) => {
+                  const isVendor = workAssignments?.[index]?.assigneeType === 'vendor';
+                  return (
+                    <Box key={field.id} sx={{ p: 2.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                      <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 7 }}>
+                          <Field.Text name={`workAssignments.${index}.title`} label="รายการงาน" required />
+                        </Grid>
+                        <Grid size={{ xs: 10, sm: 4 }}>
+                          <Field.Select name={`workAssignments.${index}.assigneeType`} label="ผู้รับผิดชอบ">
+                            <MenuItem value="internal">ทีมของเรา</MenuItem>
+                            <MenuItem value="vendor">Vendor</MenuItem>
+                          </Field.Select>
+                        </Grid>
+                        <Grid size={{ xs: 2, sm: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                          <Button color="error" onClick={() => removeAssignment(index)} sx={{ minWidth: 40, px: 0 }}><RiDeleteBin6Line /></Button>
+                        </Grid>
+                        {isVendor && (
+                          <>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Field.Select name={`workAssignments.${index}.vendorId`} label="เลือก Vendor" required>
+                                {vendors.filter((vendor) => vendor.isActive).map((vendor) => (
+                                  <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>
+                                ))}
+                              </Field.Select>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Field.Select name={`workAssignments.${index}.status`} label="สถานะงาน">
+                                <MenuItem value="pending">รอดำเนินการ</MenuItem>
+                                <MenuItem value="in_progress">กำลังดำเนินการ</MenuItem>
+                                <MenuItem value="completed">เสร็จแล้ว</MenuItem>
+                              </Field.Select>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 4 }}><Field.Text name={`workAssignments.${index}.cost`} label="ราคาตกลง" type="number" /></Grid>
+                            <Grid size={{ xs: 12, sm: 4 }}><Field.Text name={`workAssignments.${index}.deposit`} label="เงินมัดจำ" type="number" /></Grid>
+                            <Grid size={{ xs: 12, sm: 4 }}><Field.Text name={`workAssignments.${index}.paidAmount`} label="ชำระแล้ว" type="number" /></Grid>
+                          </>
+                        )}
+                        <Grid size={{ xs: 12 }}><Field.Text name={`workAssignments.${index}.scope`} label="ขอบเขตงาน / หมายเหตุ" multiline rows={2} /></Grid>
+                      </Grid>
+                    </Box>
+                  );
+                })}
               </Stack>
             </Card>
           </Stack>

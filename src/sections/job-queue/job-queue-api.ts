@@ -1,4 +1,9 @@
-import type { IJobQueue, JobQueueStatus, IJobChecklistItem } from 'src/types/job-queue';
+import type {
+  IJobQueue,
+  JobQueueStatus,
+  IJobChecklistItem,
+  IJobWorkAssignment,
+} from 'src/types/job-queue';
 
 import { apiFetch } from 'src/lib/api-fetch';
 
@@ -20,6 +25,7 @@ export type JobQueueInput = {
   province?: string;
   status: JobQueueStatus;
   note?: string;
+  workAssignments?: IJobWorkAssignment[];
 };
 
 export async function getJobs(filter?: {

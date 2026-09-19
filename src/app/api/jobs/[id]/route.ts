@@ -45,6 +45,7 @@ function mapJob(row: any) {
     status: row.status,
     note: row.note,
     checklist: Array.isArray(row.checklist) ? row.checklist : [],
+    workAssignments: Array.isArray(row.work_assignments) ? row.work_assignments : [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -155,6 +156,7 @@ export async function PUT(request: Request, { params }: Params) {
       province: body.province || null,
       status: body.status || 'queued',
       note: body.note || null,
+      work_assignments: body.workAssignments || [],
     })
     .eq('id', id)
     .select('*, customer:customers(*), color_theme:color_themes(*)')

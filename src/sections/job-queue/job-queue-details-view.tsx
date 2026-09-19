@@ -16,6 +16,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -263,6 +264,56 @@ export function JobQueueDetailsView({ jobId }: Props) {
                 )}
               </Grid>
             </Grid>
+            {!!job.workAssignments?.length && (
+              <>
+                <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Typography variant="subtitle1">การแบ่งงาน</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {job.workAssignments.length} รายการ
+                  </Typography>
+                </Box>
+                <Stack spacing={1.5}>
+                  {job.workAssignments.map((assignment) => (
+                    <Box
+                      key={assignment.id}
+                      sx={{
+                        p: 2,
+                        gap: 1.5,
+                        display: 'flex',
+                        borderRadius: 1.5,
+                        alignItems: { sm: 'center' },
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        border: '1px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle2">{assignment.title}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          {assignment.assigneeType === 'vendor'
+                            ? `Vendor: ${assignment.vendorName || '-'}`
+                            : 'ทีมของเรา'}
+                        </Typography>
+                        {!!assignment.scope && (
+                          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                            {assignment.scope}
+                          </Typography>
+                        )}
+                      </Box>
+                      {assignment.assigneeType === 'vendor' && (
+                        <Box sx={{ textAlign: { sm: 'right' } }}>
+                          <Typography variant="subtitle2">{fBaht(assignment.cost)}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            ค้างชำระ {fBaht(Math.max(assignment.cost - assignment.paidAmount, 0))}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Stack>
+              </>
+            )}
             {!!job.jobDescription && (
               <>
                 <Divider sx={{ my: 4, borderStyle: 'dashed' }} />

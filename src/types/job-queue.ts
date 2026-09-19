@@ -10,6 +10,20 @@ export type IJobChecklistItem = {
   completed: boolean;
 };
 
+export type IJobWorkAssignment = {
+  id: string;
+  serviceItemId: string | null;
+  title: string;
+  assigneeType: 'internal' | 'vendor';
+  vendorId: string | null;
+  vendorName: string | null;
+  scope: string;
+  cost: number;
+  deposit: number;
+  paidAmount: number;
+  status: 'pending' | 'in_progress' | 'completed';
+};
+
 export type IJobQueue = {
   id: string;
   jobNo: string;
@@ -32,6 +46,7 @@ export type IJobQueue = {
   status: JobQueueStatus;
   note: string | null;
   checklist: IJobChecklistItem[];
+  workAssignments: IJobWorkAssignment[];
   createdAt: string;
   updatedAt: string;
 };
