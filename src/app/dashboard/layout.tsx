@@ -116,7 +116,7 @@ const navData: NavSectionProps['data'] = [
     subheader: 'ตั้งค่า',
     items: [
       {
-        title: 'ข้อมูลผู้เสนอราคา',
+        title: 'ข้อมูลบริษัทและผู้ประกอบการ',
         path: paths.dashboard.settings.company,
         icon: <RiSettings3Fill />,
       },
