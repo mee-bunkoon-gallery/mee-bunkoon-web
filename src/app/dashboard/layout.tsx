@@ -55,7 +55,7 @@ const navData: NavSectionProps['data'] = [
         icon: <RiFileTextFill />,
       },
       {
-        title: 'สัญญาจ้างจัดงาน',
+        title: 'สัญญาจ้าง',
         path: paths.dashboard.contract.root,
         deepMatch: true,
         icon: <RiFileTextFill />,

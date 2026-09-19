@@ -7,6 +7,8 @@ import { Box, Avatar, Typography } from '@mui/material';
 
 import { varTap, varHover, AnimateBorder, transitionTap } from 'src/components/animate';
 
+import { useCompanyProfileQuery } from 'src/sections/settings/settings-queries';
+
 import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
@@ -18,16 +20,20 @@ export type AccountButtonProps = IconButtonProps & {
 
 export function AccountButton({ photoURL, displayName, sx, ...other }: AccountButtonProps) {
   const { user } = useAuthContext();
+  const { data: company } = useCompanyProfileQuery();
+
+  const accountName = company?.storeNameTh || company?.name || displayName;
+  const accountPhotoURL = company?.logoUrl || photoURL;
 
   return (
     <>
-      <Box sx={{ width: 1, textAlign: 'right' }}>
+      <Box sx={{ width: 1, textAlign: 'right', mr: 1 }}>
         <Typography
-          variant="subtitle2"
+          variant="subtitle1"
           noWrap
           sx={{ color: 'var(--layout-nav-text-primary-color)' }}
         >
-          {user?.displayName}
+          {accountName}
         </Typography>
 
         <Typography
@@ -54,8 +60,8 @@ export function AccountButton({ photoURL, displayName, sx, ...other }: AccountBu
             secondaryBorder: { sx: { color: 'warning.main' } },
           }}
         >
-          <Avatar src={photoURL} alt={displayName} sx={{ width: 1, height: 1 }}>
-            {displayName?.charAt(0).toUpperCase()}
+          <Avatar src={accountPhotoURL} alt={accountName} sx={{ width: 1, height: 1 }}>
+            {accountName?.charAt(0).toUpperCase()}
           </Avatar>
         </AnimateBorder>
       </IconButton>

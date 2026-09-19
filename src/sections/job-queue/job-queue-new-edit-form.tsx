@@ -1,19 +1,30 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { IJobQueue } from 'src/types/job-queue';
 
 import * as z from 'zod';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { RiDeleteBin6Fill } from '@remixicon/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  RiSave3Line,
+  RiUser3Line,
+  RiCalendarLine,
+  RiFileList3Line,
+  RiDeleteBin6Fill,
+} from '@remixicon/react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import { paths } from 'src/routes/paths';
@@ -28,6 +39,7 @@ import { useQuotationsQuery } from 'src/sections/quotation/quotation-queries';
 import { useColorThemesQuery } from 'src/sections/color-theme/color-theme-queries';
 
 import { JOB_QUEUE_STATUS_OPTIONS } from './job-queue-status';
+import { THAI_PROVINCES } from './thai-provinces';
 import {
   useCreateJobMutation,
   useUpdateJobMutation,
@@ -47,6 +59,8 @@ type JobQueueFormValues = {
   startTime: string | null;
   endTime: string | null;
   location?: string;
+  locationUrl?: string;
+  province?: string;
   status: IJobQueue['status'];
   note?: string;
 };
@@ -64,6 +78,8 @@ const JobQueueFormSchema = z.object({
   startTime: z.string().nullable(),
   endTime: z.string().nullable(),
   location: z.string().optional(),
+  locationUrl: z.union([z.literal(''), z.url({ error: 'ลิงก์สถานที่ไม่ถูกต้อง' })]).optional(),
+  province: z.string().optional(),
   status: z.enum(['queued', 'confirmed', 'in_progress', 'completed', 'cancelled']),
   note: z.string().optional(),
 });
@@ -83,6 +99,8 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
       startTime: job.startTime ? dayjs(`2000-01-01T${job.startTime}`).format() : null,
       endTime: job.endTime ? dayjs(`2000-01-01T${job.endTime}`).format() : null,
       location: job.location ?? '',
+      locationUrl: job.locationUrl ?? '',
+      province: job.province ?? '',
       status: job.status,
       note: job.note ?? '',
     };
@@ -99,6 +117,8 @@ function toDefaultValues(job?: IJobQueue | null, defaultDate?: string): JobQueue
     startTime: null,
     endTime: null,
     location: '',
+    locationUrl: '',
+    province: '',
     status: 'queued',
     note: '',
   };
@@ -199,6 +219,8 @@ export function JobQueueNewEditForm({
         startTime: data.startTime ? dayjs(data.startTime).format('HH:mm') : null,
         endTime: data.endTime ? dayjs(data.endTime).format('HH:mm') : null,
         location: data.location,
+        locationUrl: data.locationUrl,
+        province: data.province,
         status: data.status,
         note: data.note,
       };
@@ -231,64 +253,83 @@ export function JobQueueNewEditForm({
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
-      <Card sx={{ p: { xs: 3, md: 4 } }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-          <Field.Text name="title" label="ชื่องาน" />
-          <Field.Text
-            name="jobDescription"
-            label="รายละเอียดงาน"
-            multiline
-            rows={4}
-            placeholder="เช่น รูปแบบงาน สิ่งที่ต้องจัดเตรียม หรือรายละเอียดสำหรับทีมงาน"
-          />
-
-          <Controller
-            name="customer"
-            control={control}
-            render={({ field, fieldState: { error } }) => (
-              <Autocomplete
-                options={customers.map((customer) => ({ id: customer.id, name: customer.name }))}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={field.value}
-                onChange={(_event, value) => field.onChange(value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="ลูกค้า"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
+      <Grid container spacing={3} alignItems="flex-start">
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <Stack spacing={3}>
+            <Card sx={{ p: { xs: 2.5, sm: 3 } }}>
+              <SectionHeading
+                icon={<RiFileList3Line size={21} />}
+                title="ข้อมูลงาน"
+                description="ระบุชื่อและรายละเอียดสำหรับทีมงาน"
               />
-            )}
-          />
+              <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
+              <Stack spacing={2.5}>
+                <Field.Text name="title" label="ชื่องาน" required />
+                <Field.Text
+                  name="jobDescription"
+                  label="รายละเอียดงาน"
+                  multiline
+                  rows={5}
+                  placeholder="เช่น รูปแบบงาน สิ่งที่ต้องจัดเตรียม หรือรายละเอียดสำหรับทีมงาน"
+                />
+                <Controller
+                  name="colorThemes"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      multiple
+                      options={colorThemes.map((item) => ({ id: item.id, name: item.name }))}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={field.value}
+                      onChange={(_event, value) => field.onChange(value)}
+                      renderInput={(params) => (
+                        <TextField {...params} label="โทนสี" placeholder="เลือกได้มากกว่า 1 โทน" />
+                      )}
+                    />
+                  )}
+                />
+              </Stack>
+            </Card>
 
-          <Controller
-            name="colorThemes"
-            control={control}
-            render={({ field }) => (
-              <Autocomplete
-                multiple
-                options={colorThemes.map((item) => ({ id: item.id, name: item.name }))}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={field.value}
-                onChange={(_event, value) => field.onChange(value)}
-                renderInput={(params) => (
-                  <TextField {...params} label="โทนสี" placeholder="เลือกได้มากกว่า 1" />
-                )}
+            <Card sx={{ p: { xs: 2.5, sm: 3 } }}>
+              <SectionHeading
+                icon={<RiUser3Line size={21} />}
+                title="ลูกค้าและเอกสารอ้างอิง"
+                description="เชื่อมโยงคิวงานกับลูกค้า ใบเสนอราคา หรือสัญญา"
               />
-            )}
-          />
+              <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
+              <Stack spacing={2.5}>
+                <Controller
+                  name="customer"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <Autocomplete
+                      options={customers.map((customer) => ({ id: customer.id, name: customer.name }))}
+                      getOptionLabel={(option) => option.name}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={field.value}
+                      onChange={(_event, value) => field.onChange(value)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          required
+                          label="ลูกค้า"
+                          error={!!error}
+                          helperText={error?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
 
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2.5 }}>
+                <Grid container spacing={2.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
             <Controller
               name="quotation"
               control={control}
               render={({ field }) => (
                 <Autocomplete
-                  sx={{ flex: 1 }}
                   options={quotations.map((item) => ({ id: item.id, quoteNo: item.quoteNo }))}
                   getOptionLabel={(option) => option.quoteNo}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -305,12 +346,13 @@ export function JobQueueNewEditForm({
                 />
               )}
             />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
             <Controller
               name="contract"
               control={control}
               render={({ field }) => (
                 <Autocomplete
-                  sx={{ flex: 1 }}
                   options={contracts.map((item) => ({ id: item.id, contractNo: item.contractNo }))}
                   getOptionLabel={(option) => option.contractNo}
                   isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -325,46 +367,126 @@ export function JobQueueNewEditForm({
                 />
               )}
             />
-          </Box>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Card>
+          </Stack>
+        </Grid>
 
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2.5 }}>
-            <Field.DatePicker name="jobDate" label="วันที่" sx={{ flex: 1 }} />
-            <Field.Select name="status" label="สถานะ" sx={{ flex: 1 }}>
-              {JOB_QUEUE_STATUS_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card sx={{ p: { xs: 2.5, sm: 3 }, position: { lg: 'sticky' }, top: { lg: 24 } }}>
+            <SectionHeading
+              icon={<RiCalendarLine size={21} />}
+              title="กำหนดการ"
+              description="วัน เวลา สถานที่ และสถานะของงาน"
+            />
+            <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
+
+            <Stack spacing={2.5}>
+              <Field.DatePicker name="jobDate" label="วันที่จัดงาน" />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, lg: 12, xl: 6 }}>
+                  <Field.TimePicker name="startTime" label="เวลาเริ่ม" />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, lg: 12, xl: 6 }}>
+                  <Field.TimePicker name="endTime" label="เวลาสิ้นสุด" />
+                </Grid>
+              </Grid>
+              <Field.Select name="status" label="สถานะ">
+                {JOB_QUEUE_STATUS_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Field.Select>
+              <Field.Text name="location" label="สถานที่จัดงาน" />
+              <Field.Select name="province" label="จังหวัด">
+                <MenuItem value="">
+                  <em>ไม่ระบุ</em>
                 </MenuItem>
-              ))}
-            </Field.Select>
-          </Box>
+                {THAI_PROVINCES.map((province) => (
+                  <MenuItem key={province} value={province}>
+                    {province}
+                  </MenuItem>
+                ))}
+              </Field.Select>
+              <Field.Text
+                name="locationUrl"
+                type="url"
+                label="ลิงก์สถานที่"
+                placeholder="https://maps.google.com/..."
+                helperText="รองรับลิงก์ Google Maps หรือลิงก์แผนที่อื่น"
+              />
+              <Field.Text name="note" label="หมายเหตุ" multiline rows={3} />
+            </Stack>
 
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2.5 }}>
-            <Field.TimePicker name="startTime" label="เวลาเริ่ม" sx={{ flex: 1 }} />
-            <Field.TimePicker name="endTime" label="เวลาสิ้นสุด" sx={{ flex: 1 }} />
-          </Box>
-          <Field.Text name="location" label="สถานที่" />
-          <Field.Text name="note" label="หมายเหตุ" multiline rows={3} />
-        </Box>
+            <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
 
-        <Box sx={{ mt: 4, gap: 1.5, display: 'flex', justifyContent: 'flex-end' }}>
-          {!!currentJob && (
-            <Button
-              color="error"
-              onClick={handleDelete}
-              startIcon={<RiDeleteBin6Fill />}
-              sx={{ mr: 'auto' }}
-            >
-              ลบคิวงาน
-            </Button>
-          )}
-          <Button variant="outlined" color="inherit" onClick={() => router.push(cancelPath)}>
-            ยกเลิก
-          </Button>
-          <Button type="submit" variant="contained" loading={isSubmitting}>
-            {currentJob ? 'บันทึกการแก้ไข' : 'ลงคิวงาน'}
-          </Button>
-        </Box>
-      </Card>
+            <Stack direction={{ xs: 'column-reverse', sm: 'row', lg: 'column-reverse' }} spacing={1.5}>
+              <Button fullWidth variant="outlined" color="inherit" onClick={() => router.push(cancelPath)}>
+                ยกเลิก
+              </Button>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                loading={isSubmitting}
+                startIcon={<RiSave3Line />}
+              >
+                {currentJob ? 'บันทึกการแก้ไข' : 'ลงคิวงาน'}
+              </Button>
+            </Stack>
+
+            {!!currentJob && (
+              <Button
+                fullWidth
+                color="error"
+                onClick={handleDelete}
+                startIcon={<RiDeleteBin6Fill />}
+                sx={{ mt: 1.5 }}
+              >
+                ลบคิวงาน
+              </Button>
+            )}
+          </Card>
+        </Grid>
+      </Grid>
     </Form>
+  );
+}
+
+// ----------------------------------------------------------------------
+
+type SectionHeadingProps = {
+  icon: ReactNode;
+  title: string;
+  description: string;
+};
+
+function SectionHeading({ icon, title, description }: SectionHeadingProps) {
+  return (
+    <Stack direction="row" spacing={1.5} alignItems="center">
+      <Box
+        sx={{
+          width: 40,
+          height: 40,
+          flexShrink: 0,
+          display: 'grid',
+          borderRadius: 1.5,
+          placeItems: 'center',
+          color: 'primary.main',
+          bgcolor: 'primary.lighter',
+        }}
+      >
+        {icon}
+      </Box>
+      <Box>
+        <Typography variant="h6">{title}</Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {description}
+        </Typography>
+      </Box>
+    </Stack>
   );
 }

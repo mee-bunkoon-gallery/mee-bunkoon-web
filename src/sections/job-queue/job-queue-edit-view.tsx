@@ -41,8 +41,9 @@ export function JobQueueEditView({ jobId }: Props) {
 
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        แก้ไขคิวงาน
+      <Typography variant="h4">แก้ไขคิวงาน</Typography>
+      <Typography variant="body2" sx={{ mt: 1, mb: { xs: 3, md: 5 }, color: 'text.secondary' }}>
+        ปรับปรุงรายละเอียดและกำหนดการของงาน
       </Typography>
       <JobQueueNewEditForm currentJob={job} />
     </DashboardContent>

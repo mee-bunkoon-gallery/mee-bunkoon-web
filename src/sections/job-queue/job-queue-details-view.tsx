@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import {
   RiEditLine,
   RiTimeFill,
+  RiMapPinLine,
   RiListCheck2,
   RiFileTextFill,
   RiCheckboxCircleFill,
 } from '@remixicon/react';
 
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
@@ -238,6 +240,27 @@ export function JobQueueDetailsView({ jobId }: Props) {
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <JobInfo label="สถานที่" value={job.location} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <JobInfo label="จังหวัด" value={job.province} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="body2" sx={{ color: 'text.disabled', mb: 0.5 }}>
+                  ลิงก์สถานที่
+                </Typography>
+                {job.locationUrl ? (
+                  <Link
+                    href={job.locationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ gap: 0.75, display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    <RiMapPinLine size={18} />
+                    เปิดแผนที่
+                  </Link>
+                ) : (
+                  <Typography variant="body1">-</Typography>
+                )}
               </Grid>
             </Grid>
             {!!job.jobDescription && (

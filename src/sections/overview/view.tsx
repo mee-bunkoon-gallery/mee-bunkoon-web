@@ -45,6 +45,7 @@ import { useJobsQuery } from '../job-queue/job-queue-queries';
 import { useContractsQuery } from '../contract/contract-queries';
 import { useAllPaymentsQuery } from '../payment/payment-queries';
 import { useQuotationsQuery } from '../quotation/quotation-queries';
+import { useCompanyProfileQuery } from '../settings/settings-queries';
 
 const OUTLINED_CARD_SX = {
   height: 1,
@@ -141,6 +142,10 @@ export function OverviewView() {
   const jobsQuery = useJobsQuery();
   const paymentsQuery = useAllPaymentsQuery();
 
+  const { data: company } = useCompanyProfileQuery();
+
+  const accountName = company?.storeNameTh || company?.name;
+
   const quotations = quotationsQuery.data ?? [];
   const contracts = contractsQuery.data ?? [];
   const jobs = jobsQuery.data ?? [];
@@ -186,7 +191,8 @@ export function OverviewView() {
     plotOptions: { bar: { borderRadius: 7, columnWidth: '42%' } },
     tooltip: { y: { formatter: (value) => fBaht(value) } },
   });
-  const displayName = user?.displayName || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
+
+  const displayName = accountName || user?.displayName || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
   const pendingContracts = contracts.filter((item) => item.status === 'draft').length;
 
   return (

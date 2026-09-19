@@ -15,8 +15,9 @@ export function JobQueueCreateView() {
 
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        ลงคิวงานใหม่
+      <Typography variant="h4">ลงคิวงานใหม่</Typography>
+      <Typography variant="body2" sx={{ mt: 1, mb: { xs: 3, md: 5 }, color: 'text.secondary' }}>
+        บันทึกรายละเอียดลูกค้า กำหนดการ และข้อมูลที่ทีมงานต้องใช้
       </Typography>
       <JobQueueNewEditForm
         defaultDate={searchParams.get('date')}

@@ -39,6 +39,8 @@ function mapJob(row: any) {
     startTime: row.start_time,
     endTime: row.end_time,
     location: row.location,
+    locationUrl: row.location_url,
+    province: row.province,
     status: row.status,
     note: row.note,
     checklist: Array.isArray(row.checklist) ? row.checklist : [],
@@ -148,6 +150,8 @@ export async function PUT(request: Request, { params }: Params) {
       start_time: body.startTime || null,
       end_time: body.endTime || null,
       location: body.location || null,
+      location_url: body.locationUrl || null,
+      province: body.province || null,
       status: body.status || 'queued',
       note: body.note || null,
     })

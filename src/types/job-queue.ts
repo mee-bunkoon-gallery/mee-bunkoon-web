@@ -27,6 +27,8 @@ export type IJobQueue = {
   startTime: string | null;
   endTime: string | null;
   location: string | null;
+  locationUrl: string | null;
+  province: string | null;
   status: JobQueueStatus;
   note: string | null;
   checklist: IJobChecklistItem[];

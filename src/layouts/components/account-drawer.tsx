@@ -22,6 +22,8 @@ import { Label } from 'src/components/label';
 import { Scrollbar } from 'src/components/scrollbar';
 import { AnimateBorder } from 'src/components/animate';
 
+import { useCompanyProfileQuery } from 'src/sections/settings/settings-queries';
+
 import { useAuthContext } from 'src/auth/hooks';
 
 import { AccountButton } from './account-button';
@@ -42,6 +44,10 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   const pathname = usePathname();
 
   const { user } = useAuthContext();
+  const { data: company } = useCompanyProfileQuery();
+
+  const accountName = company?.storeNameTh || company?.name;
+  const accountPhotoURL = company?.logoUrl;
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
@@ -52,7 +58,11 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         primaryBorder: { size: 120, sx: { color: 'primary.main' } },
       }}
     >
-      <Avatar src={user?.photoURL} alt={user?.displayName} sx={{ width: 1, height: 1 }}>
+      <Avatar
+        src={accountPhotoURL || user?.photoURL}
+        alt={user?.displayName}
+        sx={{ width: 1, height: 1 }}
+      >
         {user?.displayName?.charAt(0).toUpperCase()}
       </Avatar>
     </AnimateBorder>
@@ -155,7 +165,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             {renderAvatar()}
 
             <Typography variant="subtitle1" noWrap sx={{ mt: 2 }}>
-              {user?.displayName}
+              {accountName}
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }} noWrap>

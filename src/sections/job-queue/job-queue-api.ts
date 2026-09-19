@@ -16,6 +16,8 @@ export type JobQueueInput = {
   startTime?: string | null;
   endTime?: string | null;
   location?: string;
+  locationUrl?: string;
+  province?: string;
   status: JobQueueStatus;
   note?: string;
 };
